@@ -1,0 +1,7 @@
+org\lamisplus\modules\lims\installers\LimsSchemaInstaller.class
+org\lamisplus\modules\lims\LimsModule.class
+org\lamisplus\modules\lims\domain\LimsDomain.class
+org\lamisplus\modules\lims\config\DomainConfiguration.class
+org\lamisplus\modules\lims\installers\LimsInsertSchemaInstaller.class
+org\lamisplus\modules\lims\util\JsonNodeTransformer.class
+org\lamisplus\modules\lims\extensions\EntityScanConfiguration.class
