@@ -2,6 +2,10 @@ import React, {useEffect, useCallback, useState} from 'react';
 import MaterialTable from 'material-table';
 import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
+import { Row, Col, Card } from "react-bootstrap";
+
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -55,7 +59,7 @@ const SampleSearch = (props) => {
 
      const loadLabTestData = useCallback(async () => {
             try {
-                const response = await axios.get(`${url}laboratory/orders/pending-sample-collection`, { headers: {"Authorization" : `Bearer ${token}`} });
+                //const response = await axios.get(`${url}laboratory/orders/pending-sample-collection`, { headers: {"Authorization" : `Bearer ${token}`} });
                 //console.log("lab test", response);
                 setCollectedSamples([{
                     "facilityName": "FMC Abuja",
@@ -114,7 +118,40 @@ const SampleSearch = (props) => {
 
   return (
       <div>
-
+      <Card>
+         <Card.Body>
+            <form className="row gy-2 gx-3 align-items-center">
+              <div className="col-auto">
+                <div className="form-outline">
+                  <label className="form-label" for="form11Example1">Patient Id</label>
+                  <input type="text" id="form11Example1" class="form-control" />
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="form-outline">
+                  <label className="form-label" for="form11Example3">Sample Id</label>
+                  <input type="text" id="form11Example3" class="form-control" />
+                </div>
+              </div>
+               <div className="col-auto">
+                  <div className="form-outline">
+                    <label className="form-label" for="form11Example3">Start Date</label>
+                    <input type="text" id="form11Example3" class="form-control" />
+                  </div>
+                </div>
+                <div className="col-auto">
+                 <div className="form-outline">
+                   <label className="form-label" for="form11Example3">End Date</label>
+                   <input type="text" id="form11Example3" class="form-control" />
+                 </div>
+               </div>
+              <div class="col-auto">
+                <Button variant="outlined" color="success">
+                     Search...
+                  </Button>
+              </div>
+            </form>
+          <br />
           <MaterialTable
            icons={tableIcons}
               title="Sample Collection List"
@@ -173,16 +210,42 @@ const SampleSearch = (props) => {
                         margingLeft: '250px',
                     },
                     selection: true,
-                    filtering: false,
+                    filtering: true,
                     exportButton: false,
                     searchFieldAlignment: 'left',
                     pageSizeOptions:[10,20,100],
-                    pageSize:10,
+                    pageSize:5,
                     debounceInterval: 400
                 }}
 
           />
-
+          <br />
+            <div>
+                 <Stack direction="row" spacing={2}
+                 m={1}
+                 display="flex"
+                 justifyContent="flex-end"
+                 alignItems="flex-end">
+                      <Link color="inherit"
+                          to={{pathname: "/"}}
+                           >
+                          <Button variant="outlined" color="primary">
+                             PrevPage
+                          </Button>
+                      </Link>
+                      {" "}
+                      <Link color="inherit"
+                        to={{pathname: "/create-manifest"}}
+                         >
+                        <Button variant="outlined" color="success">
+                           NextPage
+                        </Button>
+                    </Link>
+                  </Stack>
+                 <br />
+             </div>
+         </Card.Body>
+       </Card>
     </div>
   );
 }

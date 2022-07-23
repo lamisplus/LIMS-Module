@@ -17,7 +17,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import SaveIcon from '@material-ui/icons/Save'
 import CancelIcon from '@material-ui/icons/Cancel'
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import SendIcon from '@mui/icons-material/Send';
+import PrintIcon from '@mui/icons-material/Print';
 
 import { forwardRef } from 'react';
 import axios from "axios";
@@ -64,82 +65,195 @@ const CreateManifest = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
+    const [saved, setSaved] = useState(false);
+    const [manifestData, setManifestData] =  useState({
+        dateTimeCreated: "",
+        destination: "",
+        pcr_lab_number: "",
+        courier_name: "",
+        courier_contact: "",
+        result_status: "",
+        manifest_id: "",
+        total_sample: "",
+        test_type: "",
+        comment: "",
+        samples: []
+    })
+
+    const handleChange = (event) => {
+          const { name, value } = event.target
+          setManifestData({ ...manifestData, [name]: value })
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        console.log(`manifest created...${manifestData}`)
+        setSaved(true);
+    }
 
   return (
     <Container>
-         <p>Create Manifest Form</p>
          <Card>
           <CardBody>
+              <h2>Create Manifest Form</h2>
+              <br />
+              <br />
               <form>
+               <h3>
+                  PCR Details
+               </h3>
+               <hr />
                 <div className="row">
-                        <div className="form-group mb-3 col-md-6">
+                        <div className="form-group mb-3 col-md-3">
                             <FormGroup>
-                                <Label for="maritalStatus">Date & Time</Label>
+                                <Label for="dateTimeCreated">Date & Time</Label>
 
                                 <Input
                                     type="datetime-local"
-                                    name="dateTimeDispensed"
-
-                                    id="dateTimeDispensed"
-                                    placeholder="Date Dispensed"
-
+                                    name="dateTimeCreated"
+                                    value={manifestData.dateTimeCreated}
+                                    id="dateTimeCreated"
+                                    placeholder="Date & Time Created"
+                                    onChange={handleChange}
                                 />
                             </FormGroup>
                         </div>
-                        </div>
-                        <div className="row">
-                        <div className="form-group mb-3 col-md-5">
+                         <div className="form-group mb-3 col-md-6">
                             <FormGroup>
-                                <Label for="exampleNumber">Created By</Label>
+                                <Label for="destination">Destination</Label>
                                 <Input
                                     type="text"
-                                    name="brand"
+                                    name="destination"
+                                    value={manifestData.destination}
+                                    id="destination"
+                                    onChange={handleChange}
 
-                                    id="brand"
-                                    //placeholder="brand name"
+                                />
+
+                            </FormGroup>
+                        </div>
+                         <div className="form-group mb-3 col-md-3">
+                            <FormGroup>
+                                <Label for="pcr_lab_number">PCR Lab number</Label>
+                                <Input
+                                    type="text"
+                                    name="pcr_lab_number"
+                                    value={manifestData.pcr_lab_number}
+                                    id="pcr_lab_number"
+                                    onChange={handleChange}
 
                                 />
 
                             </FormGroup>
                         </div>
-                        <div className="form-group mb-3 col-md-3">
-                            <FormGroup>
-                                <Label>Contact Phone</Label>
-                                <Input
-                                    type="number"
-                                    name="quantity"
+                        </div>
+                        <br />
+                          <h3>
+                            Courier Details
+                          </h3>
+                          <br />
 
-                                    id="quantity"
+                        <div className="row">
+                            <div className="form-group mb-3 col-md-6">
+                                <FormGroup>
+                                    <Label for="courier_name">Courier Name</Label>
+                                    <Input
+                                        type="text"
+                                        name="courier_name"
+                                        id="courier_name"
+                                        value={manifestData.courier_name}
+                                        onChange={handleChange}
+
+                                    />
+
+                                </FormGroup>
+                            </div>
+                            <div className="form-group mb-3 col-md-6">
+                                <FormGroup>
+                                    <Label for="courier_contact">Courier Contact</Label>
+                                    <Input
+                                        type="text"
+                                        name="courier_contact"
+                                        value={manifestData.courier_contact}
+                                        id="courier_contact"
+                                        onChange={handleChange}
+                                    />
+                                </FormGroup>
+                            </div>
+                        <h3>
+                          Manifest Details
+                        </h3>
+                        <hr />
+                         <div className="form-group mb-3 col-md-6">
+                            <FormGroup>
+                                <Label for="result_status">Result status</Label>
+                                <Input
+                                    type="text"
+                                    name="result_status"
+                                    id="result_status"
+                                    value={manifestData.result_status}
+                                    onChange={handleChange}
 
                                 />
+
                             </FormGroup>
                         </div>
-                        <div className="form-group mb-3 col-md-3">
+                        <div className="form-group mb-3 col-md-6">
                             <FormGroup>
-                                <Label>Lab Number</Label>
+                                <Label for="manifest_id">Manifest Id</Label>
                                 <Input
-                                    type="number"
-                                    name="quantity"
-
-                                    id="quantity"
+                                    type="text"
+                                    name="manifest_id"
+                                    id="manifest_id"
+                                    value={manifestData.manifest_id}
+                                    onChange={handleChange}
 
                                 />
+
                             </FormGroup>
                         </div>
-                        <div className="form-group mb-3 col-md-12">
+                         <div className="form-group mb-3 col-md-6">
                             <FormGroup>
-                                <Label for="comment">Comments</Label>
+                                <Label for="total_sample">Total Sample</Label>
                                 <Input
-                                    type="textarea"
-                                    name="comment"
-                                    id="comment"
+                                    type="text"
+                                    name="total_sample"
+                                    id="total_sample"
+                                    value={manifestData.total_sample}
+                                    onChange={handleChange}
 
-                                    row="40"
-                                    style={{ minHeight: 100, fontSize: 14 }}
+                                />
 
-                                ></Input>
                             </FormGroup>
                         </div>
+                        <div className="form-group mb-3 col-md-6">
+                            <FormGroup>
+                                <Label for="test_type">Test type</Label>
+                                <Input
+                                    type="text"
+                                    name="test_type"
+                                    id="test_type"
+                                    value={manifestData.test_type}
+                                    onChange={handleChange}
+
+                                />
+
+                            </FormGroup>
+                        </div>
+                             <div className="form-group mb-3 col-md-12">
+                                <FormGroup>
+                                    <Label for="comment">Comments</Label>
+                                    <Input
+                                        type="textarea"
+                                        name="comment"
+                                        id="comment"
+                                        row="40"
+                                        style={{ minHeight: 100, fontSize: 14 }}
+                                        value={manifestData.comment}
+                                        onChange={handleChange}
+                                    ></Input>
+                                </FormGroup>
+                            </div>
                         <div>
                              <Table striped bordered hover size="sm">
                                 <thead>
@@ -160,7 +274,7 @@ const CreateManifest = (props) => {
                                     <td>2022-07-20@16:15:21</td>
                                   </tr>
                                     <tr>
-                                      <th scope="row">GH Wuse</th>
+                                      <th scope="row">FMC Abuja</th>
                                       <td>001</td>
                                       <td>Sp-001</td>
                                       <td>Blood</td>
@@ -175,13 +289,12 @@ const CreateManifest = (props) => {
                         </div>
                     </div>
                     <MatButton
-                        type="submit"
                         variant="contained"
                         color="primary"
                         className={classes.button}
                         startIcon={<SaveIcon />}
-
-                        // disabled={loading}
+                        onClick={handleSubmit}
+                        disabled={!saved ? false : true}
                     >
                         Save
                     </MatButton>
@@ -191,13 +304,26 @@ const CreateManifest = (props) => {
                         variant="contained"
                         color="secondary"
                         className={classes.button}
-                        startIcon={<ArrowForwardIcon />}
+                        startIcon={<SendIcon />}
 
-                        // disabled={loading}
+                        disabled={saved ? false : true}
                     >
                         Send
                     </MatButton>
+                    <MatButton
+                        type="submit"
+                        variant="contained"
+                        color="success"
+                        className={classes.button}
+                        startIcon={<PrintIcon />}
 
+                        disabled={saved ? false: true}
+                    >
+                        Print
+                    </MatButton>
+                    <Link color="inherit"
+                    to={{pathname: "/"}}
+                     >
                     <MatButton
                         variant="contained"
                         color="default"
@@ -206,6 +332,7 @@ const CreateManifest = (props) => {
                         startIcon={<CancelIcon />}>
                         Cancel
                     </MatButton>
+                   </Link>
                 </form>
           </CardBody>
          </Card>
