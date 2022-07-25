@@ -105,28 +105,9 @@ const DownloadManifest = (props) => {
 
        const loadManifestData = useCallback(async () => {
                 try {
-                    //const response = await axios.get(`${url}laboratory/orders/pending-sample-collection`, { headers: {"Authorization" : `Bearer ${token}`} });
-                    //console.log("lab test", response);
-                    setCollectedSamples([{
-                        "manifestId": "FADF-12323",
-                        "manifestDate": "2022-07-20",
-                        "manifestTime": "16:15:21",
-                        "createdBy": "Admin",
-                        "status": "Approved"
-                    },
-                    {
-                        "manifestId": "pADF-12323",
-                        "manifestDate": "2022-07-20",
-                        "manifestTime": "16:15:21",
-                        "createdBy": "Mike M",
-                        "status": "Available"
-                    },{
-                      "manifestId": "hADF-00001",
-                      "manifestDate": "2022-07-20",
-                      "manifestTime": "17:15:21",
-                      "createdBy": "Hanna .N",
-                      "status": "Available"
-                  }]);
+                    const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
+                    console.log("manifest", response);
+                    setCollectedSamples(response.data);
                 } catch (e) {
                     toast.error("An error occurred while fetching lab", {
                         position: toast.POSITION.TOP_RIGHT
@@ -158,7 +139,7 @@ const DownloadManifest = (props) => {
                 <Link color="inherit"
                     to={{pathname: "/samples"}}
                      >
-                    <Button variant="outlined" color="success">
+                    <Button variant="outlined" color="primary">
                        Create Manifest
                     </Button>
                 </Link>
@@ -172,8 +153,9 @@ const DownloadManifest = (props) => {
                   title="Existing Manifest List"
                   columns={[
                       { title: "Manifest Id", field: "manifestId" },
-                      { title: "Created By", field: "createdby" },
-                      { title: "Created Date", field: "manifest_date" },
+                      { title: "Pickup Date", field: "pickupDate" },
+                      { title: "Receiving Lab", field: "lab" },
+                       { title: "Packaged By", field: "packaged_by" },
                       {
                         title: "Status",
                         field: "status",
@@ -187,9 +169,10 @@ const DownloadManifest = (props) => {
                   //isLoading={loading}
                   data={ collectedSamples.map((row) => (
                         {
-                          manifestId: row.manifestId,
-                          createdby: row.createdBy,
-                          manifest_date: row.manifestDate + '@' + row.manifestTime,
+                          manifestId: row.manifestID,
+                          pickupDate: row.dateScheduledForPickup,
+                          lab: row.receivingLabName,
+                          packaged_by: row.samplePackagedBy,
                           status: row.status,
 
     //                      actions:  <Link to ={{
@@ -209,11 +192,13 @@ const DownloadManifest = (props) => {
 
                       options={{
                         headerStyle: {
-                            backgroundColor: "#9F9FA5",
-                            color: "#000",
+                            backgroundColor: "#014d88",
+                            color: "#fff",
+                            fontSize:'16px',
+                            padding:'10px'
                         },
                         searchFieldStyle: {
-                            width : '300%',
+                            width : '200%',
                             margingLeft: '250px',
                         },
                         selection: false,

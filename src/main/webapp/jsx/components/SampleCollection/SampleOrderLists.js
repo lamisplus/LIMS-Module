@@ -1,11 +1,8 @@
 import React, {useEffect, useCallback, useState} from 'react';
-import MaterialTable from 'material-table';
+import Container from '@mui/material/Container';
 import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
 import { Row, Col, Card } from "react-bootstrap";
-
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -17,6 +14,9 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import {token, url } from "../../../api";
 
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import MaterialTable from 'material-table';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -32,6 +32,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import { makeStyles } from '@material-ui/core/styles'
 
 const tableIcons = {
 Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -53,14 +54,51 @@ ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
 ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
+const useStyles = makeStyles(theme => ({
+    card: {
+        margin: theme.spacing(20),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    form: {
+        width: '100%', // Fix IE 11 issue.
+        marginTop: theme.spacing(3)
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2)
+    },
+    cardBottom: {
+        marginBottom: 20
+    },
+    Select: {
+        height: 45,
+        width: 350
+    },
+    button: {
+        margin: theme.spacing(1)
+    },
+
+    root: {
+        '& > *': {
+            margin: theme.spacing(1)
+        }
+    },
+    input: {
+        display: 'none'
+    }
+}))
+
 const SampleSearch = (props) => {
+    const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
+    const samples = []
 
      const loadLabTestData = useCallback(async () => {
             try {
-                //const response = await axios.get(`${url}laboratory/orders/pending-sample-collection`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("lab test", response);
+                const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
+                console.log("samples", response);
                 setCollectedSamples([{
                     "facilityName": "FMC Abuja",
                     "facilityId": "FMC-1113",
@@ -74,7 +112,7 @@ const SampleSearch = (props) => {
                     "sampleTypeName": "Blood",
                 },
                 {
-                                    "facilityName": "Kuje Hosiptal",
+                                    "facilityName": "FMC Abuja",
                                     "facilityId": "FMC-0113",
                                     "patientHospitalNumber": "021",
                                     "sampleId": "sp-301",
@@ -85,7 +123,7 @@ const SampleSearch = (props) => {
                                     "sampleTypeId": 188,
                                     "sampleTypeName": "Urine",
                                 },{
-                                                      "facilityName": "GH Wuse",
+                                                      "facilityName": "FMC Abuja",
                                                       "facilityId": "FMC-14413",
                                                       "patientHospitalNumber": "0089",
                                                       "sampleId": "sp-4001",
@@ -115,6 +153,18 @@ const SampleSearch = (props) => {
          loadLabTestData();
 
      }, [loadLabTestData]);
+
+     const handleSampleChanges = (sample) => {
+        sample.filter((item) => {
+            var i = samples.findIndex(x => (x.patientId == item.patientId && x.sampleId == item.sampleId && x.sampleType == item.sampleType));
+            if(i <= -1){
+                    samples.push(item);
+              }
+             return null;
+        })
+
+        //sample.map((data) => { samples.push(data) })
+     }
 
   return (
       <div>
@@ -146,7 +196,7 @@ const SampleSearch = (props) => {
                  </div>
                </div>
               <div class="col-auto">
-                <Button variant="outlined" color="success">
+                <Button variant="outlined" color="primary">
                      Search...
                   </Button>
               </div>
@@ -157,11 +207,11 @@ const SampleSearch = (props) => {
               title="Sample Collection List"
               columns={[
                   { title: "Facility Name", field: "FacilityName" },
-                  { title: "Patient ID", field: "Id" },
+                  { title: "Patient ID", field: "patientId" },
                   { title: "Sample ID", field: "sampleId" },
                   {
                     title: "Sample Type",
-                    field: "name",
+                    field: "sampleType",
                   },
                   { title: "Date Order", field: "date", type: "date" , filtering: false},
 
@@ -180,9 +230,9 @@ const SampleSearch = (props) => {
               data={ collectedSamples.map((row) => (
                     {
                       FacilityName: row.facilityName,
-                      Id: row.patientHospitalNumber,
+                      patientId: row.patientHospitalNumber,
                       sampleId: row.sampleId,
-                      name: row.sampleTypeName,
+                      sampleType: row.sampleTypeName,
                       date: row.orderDate + '@' + row.orderTime,
                       datecollected: row.dateSampleCollected + '@' + row.timeSampleCollected,
 //                      actions:  <Link to ={{
@@ -202,21 +252,24 @@ const SampleSearch = (props) => {
 
                   options={{
                     headerStyle: {
-                        backgroundColor: "#9F9FA5",
-                        color: "#000",
+                        backgroundColor: "#014d88",
+                        color: "#fff",
+                        fontSize:'16px',
+                        padding:'10px'
                     },
                     searchFieldStyle: {
                         width : '300%',
                         margingLeft: '250px',
                     },
                     selection: true,
-                    filtering: true,
+                    filtering: false,
                     exportButton: false,
                     searchFieldAlignment: 'left',
                     pageSizeOptions:[10,20,100],
                     pageSize:5,
                     debounceInterval: 400
                 }}
+                 onSelectionChange={(rows) => handleSampleChanges(rows)}
 
           />
           <br />
@@ -234,13 +287,19 @@ const SampleSearch = (props) => {
                           </Button>
                       </Link>
                       {" "}
-                      <Link color="inherit"
-                        to={{pathname: "/create-manifest"}}
-                         >
-                        <Button variant="outlined" color="success">
-                           NextPage
-                        </Button>
-                    </Link>
+                      { <Link color="inherit"
+                             to={{
+                             pathname: "/create-manifest",
+                             state:{ sampleObj: samples }
+                             }}
+
+                              >
+                             <Button variant="outlined" color="success">
+                                NextPage
+                             </Button>
+                         </Link>
+                         }
+
                   </Stack>
                  <br />
              </div>
