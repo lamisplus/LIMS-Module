@@ -85,7 +85,29 @@ const useStyles = makeStyles(theme => ({
         }
     },
     input: {
-        display: 'none'
+        border:'2px solid #014d88',
+        borderRadius:'0px',
+        fontSize:'16px',
+        color:'#000'
+    },
+    error: {
+        color: "#f85032",
+        fontSize: "11px",
+    },
+    success: {
+        color: "#4BB543 ",
+        fontSize: "11px",
+    },
+    inputGroupText:{
+        backgroundColor:'#014d88',
+        fontWeight:"bolder",
+        color:'#fff',
+        borderRadius:'0px'
+    },
+    label:{
+        fontSize:'16px',
+        color:'rgb(153, 46, 98)',
+        fontWeight:'600'
     }
 }))
 
@@ -97,8 +119,8 @@ const SampleSearch = (props) => {
 
      const loadLabTestData = useCallback(async () => {
             try {
-                const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("samples", response);
+                //const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
+                //console.log("samples", response);
                 setCollectedSamples([{
                     "facilityName": "FMC Abuja",
                     "facilityId": "FMC-1113",
@@ -173,26 +195,26 @@ const SampleSearch = (props) => {
             <form className="row gy-2 gx-3 align-items-center">
               <div className="col-auto">
                 <div className="form-outline">
-                  <label className="form-label" for="form11Example1">Patient Id</label>
-                  <input type="text" id="form11Example1" class="form-control" />
+                  <label className={classes.label} for="form11Example1">Patient Id :</label>
+                  <input type="text" id="form11Example1" className={classes.input} />
                 </div>
               </div>
               <div className="col-auto">
                 <div className="form-outline">
-                  <label className="form-label" for="form11Example3">Sample Id</label>
-                  <input type="text" id="form11Example3" class="form-control" />
+                  <label className={classes.label} for="form11Example3">Sample Id :</label>
+                  <input type="text" id="form11Example3" className={classes.input} />
                 </div>
               </div>
                <div className="col-auto">
                   <div className="form-outline">
-                    <label className="form-label" for="form11Example3">Start Date</label>
-                    <input type="text" id="form11Example3" class="form-control" />
+                    <label className={classes.label} for="form11Example3">Start Date :</label>
+                    <input type="text" id="form11Example3" className={classes.input} />
                   </div>
                 </div>
                 <div className="col-auto">
                  <div className="form-outline">
-                   <label className="form-label" for="form11Example3">End Date</label>
-                   <input type="text" id="form11Example3" class="form-control" />
+                   <label className={classes.label} for="form11Example3">End Date :</label>
+                   <input type="text" id="form11Example3" className={classes.input} />
                  </div>
                </div>
               <div class="col-auto">
@@ -208,6 +230,10 @@ const SampleSearch = (props) => {
               columns={[
                   { title: "Facility Name", field: "FacilityName" },
                   { title: "Patient ID", field: "patientId" },
+                  {
+                    title: "Test Type",
+                    field: "testType",
+                  },
                   { title: "Sample ID", field: "sampleId" },
                   {
                     title: "Sample Type",
@@ -231,6 +257,7 @@ const SampleSearch = (props) => {
                     {
                       FacilityName: row.facilityName,
                       patientId: row.patientHospitalNumber,
+                      testType: "VL",
                       sampleId: row.sampleId,
                       sampleType: row.sampleTypeName,
                       date: row.orderDate + '@' + row.orderTime,
