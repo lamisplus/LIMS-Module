@@ -1,6 +1,5 @@
 basePackage: org.lamisplus.modules.lims
 name: LimsModule
-dependencies: {PatientModule: 1.0.0}
 menus:
   - icon:
     disabled: false

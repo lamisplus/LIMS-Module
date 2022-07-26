@@ -208,11 +208,11 @@
 			<artifactId>across-hibernate-module</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.lamisplus.modules</groupId>
-			<artifactId>patient</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.lamisplus.modules</groupId>-->
+<!--			<artifactId>patient</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>

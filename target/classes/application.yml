@@ -17,7 +17,7 @@ acrossHibernate:
 applicationInfo:
   applicationId: lamisplus
   applicationName: LAMISPLUS
-  buildDate: "2022-07-21T14:54:43Z"
+  buildDate: "2022-07-24T04:10:46Z"
   buildId: "1.0.0-1.0.0"
 
 jpa:
