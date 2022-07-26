@@ -8,11 +8,11 @@ menus:
     url: /across/resources/static/lims/index.html
 umdLocation: /across/resources/static/lims/index.html
 webModules:
-  - breadcrumb: PHARMACY
+  - breadcrumb: LIMS
     name: LimsModule
     path: lims
     position: 99
 permissions:
   - name: lims_dispense_drug
-    description: Dispense a drug
+    description: LIMS Module
     moduleName: LimsModule

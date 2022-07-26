@@ -8,6 +8,7 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.web.AcrossWebModule;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.base.BaseModule;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -34,6 +35,10 @@ public class LimsModule extends AcrossModule {
 
 	public String getName() {
 		return NAME;
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run (LimsModule.class, args);
 	}
 
 	public LimsModule() {

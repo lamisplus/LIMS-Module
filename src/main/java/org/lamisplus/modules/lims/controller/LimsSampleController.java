@@ -15,28 +15,33 @@ import java.util.List;
 public class LimsSampleController {
     private final SampleService sampleService;
 
-    @PostMapping("/samples")
+    @PostMapping("/manifest-samples")
     public SampleDTO SaveManifest(@RequestBody SampleDTO manifestDTO){
         return sampleService.Save(manifestDTO);
     }
 
-    @PutMapping("/samples")
+    @PutMapping("/manifest-samples")
     public SampleDTO UpdateManifest(@RequestBody SampleDTO manifestDTO){
         return sampleService.Update(manifestDTO);
     }
 
-    @DeleteMapping("/samples/{id}")
+    @DeleteMapping("/manifest-samples/{id}")
     public String DeleteManifest(@PathVariable int id){
         return sampleService.Delete(id);
     }
 
-    @GetMapping("/samples/{id}")
+    @GetMapping("/manifest-samples/{id}")
     public SampleDTO GetAllLabOrders(@PathVariable int id){
         return sampleService.findById(id);
     }
 
-    @GetMapping("/samples/manifests/{id}")
+    @GetMapping("/manifest-samples/manifests/{id}")
     public List<SampleDTO> GetSamplesByManifestId(@PathVariable String id){
         return sampleService.findbyManifestId(id);
+    }
+
+    @GetMapping("/collected-samples/")
+    public List<SampleDTO> GetAllCollectedSamples(){
+        return sampleService.getAllPendingSamples();
     }
 }

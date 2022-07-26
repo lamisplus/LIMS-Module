@@ -19,29 +19,30 @@ public class Manifest {
     private int id;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
-    @Column(name = "manifestID")
-    private String manifestID;
-    @Column(name = "sendingFacilityID")
+    @Column(name = "manifest_number")
+    private String manifestNumber;
+    @Column(name = "sending_facility_id")
     private String sendingFacilityID;
-    @Column(name = "sendingFacilityName")
+    @Column(name = "sending_facility_name")
     private String sendingFacilityName;
-    @Column(name = "receivingLabID")
+    @Column(name = "receiving_lab_id")
     private String receivingLabID;
-    @Column(name = "receivingLabName")
+    @Column(name = "receiving_lab_name")
     private String receivingLabName;
-    @Column(name = "dateScheduledForPickup")
+    @Column(name = "date_scheduled_for_pickup")
     private String dateScheduledForPickup;
-    @Column(name = "temperatureAtPickup")
+    @Column(name = "temperature_at_pickup")
     private String temperatureAtPickup;
-    @Column(name = "samplePackagedBy")
+    @Column(name = "sample_packaged_by")
     private String samplePackagedBy;
-    @Column(name = "courierRiderName")
+    @Column(name = "courier_rider_name")
     private String courierRiderName;
-    @Column(name = "courierContact")
+    @Column(name = "courier_contact")
     private String courierContact;
-    @Column(name = "manifestStatus")
+    @Column(name = "manifest_status")
     private String manifestStatus;
-    @JoinColumn(name = "manifestID")
+
+    @JoinColumn(name = "manifest_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sample> sampleList;
 }

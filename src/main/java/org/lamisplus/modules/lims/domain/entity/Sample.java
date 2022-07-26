@@ -19,41 +19,19 @@ public class Sample {
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
 
-    @Column(name = "firstName")
-    private String firstName;
-    @Column(name = "surName")
-    private String surName;
-    @Column(name = "sex")
-    private String sex;
-    @Column(name = "pregnantBreastFeedingStatus")
-    private String pregnantBreastFeedingStatus;
-    @Column(name = "age")
-    private String age;
-    @Column(name = "dateOfBirth")
-    private String dateOfBirth;
-
-    @Column(name = "sampleID")
+    @Column(name = "sample_id")
     private String sampleID;
-    @Column(name = "sampleType")
+    @Column(name = "pid")
+    private int pid;
+    @Column(name = "patient_id")
+    private String patientID;
+    @Column(name = "sample_type")
     private String sampleType;
-    @Column(name = "indicationVLTest")
-    private String indicationVLTest;
-    @Column(name = "artCommencementDate")
-    private String artCommencementDate;
-    @Column(name = "drugRegimen")
-    private String drugRegimen;
-    @Column(name = "sampleOrderedBy")
-    private String sampleOrderedBy;
-    @Column(name = "sampleOrderDate")
-    private String sampleOrderDate;
-    @Column(name = "sampleCollectedBy")
-    private String sampleCollectedBy;
-    @Column(name = "sampleCollectionDate")
-    private String sampleCollectionDate;
-    @Column(name = "sampleCollectionTime")
-    private String sampleCollectionTime;
-    @Column(name = "dateSampleSent")
+    @Column(name = "collection_date")
+    private String collectionDate;
+    @Column(name = "date_sample_sent")
     private String dateSampleSent;
-    @Column(name = "manifestID")
+
+    @Column(name = "manifest_id")
     private String manifestID;
 }

@@ -31,7 +31,7 @@ public class LimsManifestController {
     }
 
     @GetMapping("/manifests/{id}")
-    public ManifestDTO GetAllLabOrders(@PathVariable int id){
+    public ManifestDTO GetManifestById(@PathVariable int id){
         return manifestService.findById(id);
     }
 

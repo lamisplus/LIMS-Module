@@ -55,7 +55,7 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
   http2:
     enabled: true
-  port: 8282
+  port: 8082
   tomcat:
     uri-encoding: UTF-8
     connection-timeout: 20s
@@ -63,8 +63,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: emeka
-    url: jdbc:postgresql://localhost:5432/core
+    password: 1
+    url: jdbc:postgresql://localhost:5432/lamisplus
     hibernate:
       ddl-auto: none
       event.merge.enty_copy_observer: allow
@@ -135,8 +135,8 @@ lamisplus:
     module:
       driver-class-name: org.postgresql.Driver
       username: postgres
-      password: emeka
-      url: jdbc:postgresql://localhost:5432/core
+      password: 1
+      url: jdbc:postgresql://localhost:5432/lamisplus
       hikari:
         auto-commit: true
         data-source-properties:
@@ -150,7 +150,7 @@ lamisplus:
     version-one: "/api/v1/"
   secugen:
     biometrics:
-      server-url: http://localhost:8282
-      server-port: 8282
+      server-url: http://localhost:8082
+      server-port: 8082
       timeout: 3000
       quality: 80
