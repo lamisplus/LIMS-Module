@@ -369,9 +369,10 @@ const CreateManifest = (props) => {
                     >
                         Save
                     </MatButton>
-
+                    <Link color="inherit"
+                    to={{pathname: "/"}}
+                     >
                     <MatButton
-                        type="submit"
                         variant="contained"
                         color="secondary"
                         className={classes.button}
@@ -381,6 +382,7 @@ const CreateManifest = (props) => {
                     >
                         Send
                     </MatButton>
+                    </Link>
 
                     <Link color="inherit"
                     to={{pathname: "/"}}

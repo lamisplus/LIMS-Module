@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState} from 'react';
 import { Link, useHistory } from 'react-router-dom'
-import nglogo from './nglogo.png'
+import nglogo from '../../../images/nglogo.png'
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -42,17 +42,17 @@ class ManifestPrint extends React.Component {
                             </Table>
                       </div>
                 <br/>
-              <hr />
+              <br />
             <div>
                    <Table bordered size="sm">
                       <tbody>
                            <tr>
                               <th scope="row">Date/Time:</th>
-                              <td>{this.props.sampleObj.dateTimeCreated}</td>
+                              <td>{this.props.sampleObj.dateScheduledForPickup}</td>
                               <th scope="row">Destination:</th>
-                              <td>{this.props.sampleObj.destination}</td>
+                              <td>{this.props.sampleObj.receivingLabName}</td>
                               <th scope="row">PCR Lab Number:</th>
-                              <td>{this.props.sampleObj.pcr_lab_number}</td>
+                              <td>{this.props.sampleObj.receivingLabID}</td>
                             </tr>
                             <tr>
                               <th scope="row">Status:</th>
@@ -64,9 +64,9 @@ class ManifestPrint extends React.Component {
                             </tr>
                              <tr>
                               <th scope="row">Courier Name:</th>
-                              <td>{this.props.sampleObj.courier_name}</td>
+                              <td>{this.props.sampleObj.courierRiderName}</td>
                               <th scope="row">Courier Contact:</th>
-                              <td>{this.props.sampleObj.courier_contact}</td>
+                              <td>{this.props.sampleObj.courierContact}</td>
                               <th scope="row">Test Type:</th>
                               <td>{this.props.sampleObj.test_type}</td>
                             </tr>
@@ -88,7 +88,7 @@ class ManifestPrint extends React.Component {
                         <tbody>
                         { this.props.sampleObj && this.props.sampleObj.samples.map((data, i) => (
                              <tr key={i}>
-                                <th scope="row">{data.FacilityName}</th>
+                                <td scope="row">{data.FacilityName}</td>
                                 <td>{data.patientId}</td>
                                 <td>{data.sampleId}</td>
                                 <td>{data.sampleType}</td>
