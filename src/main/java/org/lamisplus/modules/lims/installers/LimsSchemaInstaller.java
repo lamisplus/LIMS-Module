@@ -10,6 +10,6 @@ import org.springframework.core.annotation.Order;
         version = 1)
 public class LimsSchemaInstaller extends AcrossLiquibaseInstaller {
     public LimsSchemaInstaller() {
-        super("classpath:schema/lims-schema.xml");
+        super("classpath:installers/lims/schema/schema.xml");
     }
 }
