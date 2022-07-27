@@ -21,6 +21,7 @@ import SaveIcon from '@material-ui/icons/Save'
 import CancelIcon from '@material-ui/icons/Cancel'
 import SendIcon from '@mui/icons-material/Send';
 import PrintIcon from '@mui/icons-material/Print';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 
 import { forwardRef } from 'react';
 import axios from "axios";
@@ -141,6 +142,20 @@ const CreateManifest = (props) => {
          <Card>
           <CardBody>
               <h2 className="text-center">Create Manifest Form</h2>
+              <p style={{textAlign: 'right'}}>
+                <Link color="inherit"
+                  to={{pathname: "/"}}
+                   >
+                  <MatButton
+                      variant="contained"
+                      color="primary"
+                      //onClick={toggle}
+                      className={classes.button}
+                      startIcon={<FirstPageIcon />}>
+                      Back
+                  </MatButton>
+                 </Link>
+              </p>
               <br />
               <hr />
               <form>
