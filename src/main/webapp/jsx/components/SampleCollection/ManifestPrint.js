@@ -12,7 +12,9 @@ let today = new Date().toLocaleDateString()
 
 
 class ManifestPrint extends React.Component {
+
   render() {
+    console.log(this.props.sampleObj)
     return (
              <Card>
               <CardBody>
@@ -56,11 +58,11 @@ class ManifestPrint extends React.Component {
                             </tr>
                             <tr>
                               <th scope="row">Status:</th>
-                              <td>{this.props.sampleObj.result_status}</td>
+                              <td>Pending</td>
                               <th scope="row">Manifest Id:</th>
-                              <td>{this.props.sampleObj.manifest_id}</td>
-                              <th scope="row">Total Samples:</th>
-                              <td>{this.props.sampleObj.total_sample}</td>
+                              <td>{this.props.sampleObj.manifestID}</td>
+                              <th scope="row">Sample Temperature:</th>
+                              <td>{this.props.sampleObj.temperatureAtPickup}</td>
                             </tr>
                              <tr>
                               <th scope="row">Courier Name:</th>
@@ -68,7 +70,7 @@ class ManifestPrint extends React.Component {
                               <th scope="row">Courier Contact:</th>
                               <td>{this.props.sampleObj.courierContact}</td>
                               <th scope="row">Test Type:</th>
-                              <td>{this.props.sampleObj.test_type}</td>
+                              <td>VL</td>
                             </tr>
                       </tbody>
                     </Table>
@@ -86,7 +88,7 @@ class ManifestPrint extends React.Component {
                           </tr>
                         </thead>
                         <tbody>
-                        { this.props.sampleObj && this.props.sampleObj.samples.map((data, i) => (
+                        { this.props.sampleObj > 0 && this.props.sampleObj.samples.map((data, i) => (
                              <tr key={i}>
                                 <td scope="row">{data.FacilityName}</td>
                                 <td>{data.patientId}</td>

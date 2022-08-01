@@ -119,43 +119,9 @@ const SampleSearch = (props) => {
 
      const loadLabTestData = useCallback(async () => {
             try {
-                //const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("samples", response);
-                setCollectedSamples([{
-                    "facilityName": "FMC Abuja",
-                    "facilityId": "FMC-1113",
-                    "patientHospitalNumber": "001",
-                    "sampleId": "sp-001",
-                    "orderDate": "2022-07-20",
-                    "orderTime": "16:15:21",
-                    "dateSampleCollected": "2022-07-20",
-                    "timeSampleCollected": "16:15:57",
-                    "sampleTypeId": 186,
-                    "sampleTypeName": "Blood",
-                },
-                {
-                                    "facilityName": "FMC Abuja",
-                                    "facilityId": "FMC-0113",
-                                    "patientHospitalNumber": "021",
-                                    "sampleId": "sp-301",
-                                    "orderDate": "2022-07-21",
-                                    "orderTime": "16:15:21",
-                                    "dateSampleCollected": "2022-07-20",
-                                    "timeSampleCollected": "16:15:57",
-                                    "sampleTypeId": 188,
-                                    "sampleTypeName": "Urine",
-                                },{
-                                                      "facilityName": "FMC Abuja",
-                                                      "facilityId": "FMC-14413",
-                                                      "patientHospitalNumber": "0089",
-                                                      "sampleId": "sp-4001",
-                                                      "orderDate": "2022-07-20",
-                                                      "orderTime": "17:15:21",
-                                                      "dateSampleCollected": "2022-07-21",
-                                                      "timeSampleCollected": "17:15:57",
-                                                      "sampleTypeId": 180,
-                                                      "sampleTypeName": "Blood",
-                                                  }]);
+                const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
+                console.log("samples", response);
+                setCollectedSamples(response.data);
             } catch (e) {
                 toast.error("An error occurred while fetching lab", {
                     position: toast.POSITION.TOP_RIGHT
@@ -193,7 +159,7 @@ const SampleSearch = (props) => {
       <Card>
          <Card.Body>
             <form className="row gy-2 gx-3 align-items-center">
-              <div className="col-auto">
+              { /*<div className="col-auto">
                 <div className="form-outline">
                   <label className={classes.label} for="form11Example1">Patient Id :</label>
                   <input type="text" id="form11Example1" className={classes.input} />
@@ -204,7 +170,7 @@ const SampleSearch = (props) => {
                   <label className={classes.label} for="form11Example3">Sample Id :</label>
                   <input type="text" id="form11Example3" className={classes.input} />
                 </div>
-              </div>
+              </div>*/}
                <div className="col-auto">
                   <div className="form-outline">
                     <label className={classes.label} for="form11Example3">Start Date :</label>
@@ -239,11 +205,11 @@ const SampleSearch = (props) => {
                     title: "Sample Type",
                     field: "sampleType",
                   },
-                  { title: "Date Order", field: "date", type: "date" , filtering: false},
+                  { title: "Date Collected", field: "datecollected", type: "date" , filtering: false},
 
                   {
-                    title: "Date Collected ",
-                    field: "datecollected",
+                    title: "Date Sent",
+                    field: "datesent",
                     filtering: false
                   },
 //                  {
@@ -256,12 +222,12 @@ const SampleSearch = (props) => {
               data={ collectedSamples.map((row) => (
                     {
                       FacilityName: row.facilityName,
-                      patientId: row.patientHospitalNumber,
+                      patientId: row.patientID,
                       testType: "VL",
-                      sampleId: row.sampleId,
-                      sampleType: row.sampleTypeName,
-                      date: row.orderDate + '@' + row.orderTime,
-                      datecollected: row.dateSampleCollected + '@' + row.timeSampleCollected,
+                      sampleId: row.sampleID,
+                      sampleType: row.sampleType,
+                      datecollected: row.collectionDate,
+                      datesent: row.dateSampleSent === null ? row.dateSampleSent : "-----",
 //                      actions:  <Link to ={{
 //                                      pathname: "/samples-collection",
 //                                      state: row

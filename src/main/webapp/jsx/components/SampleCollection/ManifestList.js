@@ -105,30 +105,9 @@ const DownloadManifest = (props) => {
 
        const loadManifestData = useCallback(async () => {
                 try {
-                    //const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                    //console.log("manifest", response);
-                    setCollectedSamples([{
-                        manifestID: "asd-1234-0000",
-                        dateScheduledForPickup: "2022-07-20@16:15:57",
-                        receivingLabName: "National Reference Laboratory Gaduwa (NRL) Abuja",
-                        samplePackagedBy: "Abdul",
-                        status: "Pending"
-                    },
-                    {
-                            manifestID: "cvd-1234-0000",
-                            dateScheduledForPickup: "2022-17-20@14:15:57",
-                            receivingLabName: "National Reference Laboratory Gaduwa (NRL) Abuja",
-                            samplePackagedBy: "Mike",
-                            status: "Approved"
-                        },
-                    {
-                        manifestID: "ert-1234-1010",
-                        dateScheduledForPickup: "2022-17-10@12:11:00",
-                        receivingLabName: "National Reference Laboratory Gaduwa (NRL) Abuja",
-                        samplePackagedBy: "Mike",
-                        status: "Approved"
-                    }
-                ]);
+                    const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
+                    console.log("manifest", response);
+                    setCollectedSamples(response.data);
                 } catch (e) {
                     toast.error("An error occurred while fetching lab", {
                         position: toast.POSITION.TOP_RIGHT
@@ -191,10 +170,10 @@ const DownloadManifest = (props) => {
                   data={ collectedSamples.map((row) => (
                         {
                           manifestId: row.manifestID,
-                          pickupDate: row.dateScheduledForPickup,
+                          pickupDate: row.dateScheduledForPickup.replace('T', '@'),
                           lab: row.receivingLabName,
                           packaged_by: row.samplePackagedBy,
-                          status: row.status,
+                          status: "Pending",
 
     //                      actions:  <Link to ={{
     //                                      pathname: "/samples-collection",
