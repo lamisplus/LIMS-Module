@@ -93,6 +93,7 @@ const CreateAManifest = (props) => {
     const samples = []
     const [saved, setSaved] = useState(false);
     const [localStore, SetLocalStore] = useState([]);
+    const [manifestsId, setManifestsId] = useState(0);
 
     useEffect(() => {
       const collectedSamples = JSON.parse(localStorage.getItem('samples'));
@@ -100,8 +101,6 @@ const CreateAManifest = (props) => {
         SetLocalStore(collectedSamples);
       }
     }, []);
-
-    console.log('local', localStore);
 
     const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
@@ -120,7 +119,7 @@ const CreateAManifest = (props) => {
          sampleInformation: localStore
      })
 
-      const handleChange = (event) => {
+    const handleChange = (event) => {
            checkPCRLab(event.target.value)
            const { name, value } = event.target
            setManifestData({ ...manifestData, [name]: value, receivingLabID: pcrLabCode.labNo,
@@ -140,21 +139,33 @@ const CreateAManifest = (props) => {
         console.log(`manifest created...${JSON.stringify(manifestData)}`)
            await axios.post(`${url}lims/manifests`, manifestData,
             { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                setLoading(!true);
-                 toast.success("Sample manifest saved successfully!!", {
+
+                setManifestsId(resp.data.id)
+                 console.log("response", resp)
+//                axios.get(`${url}lims/ready-manifests/${resp.data.id}`, { headers: {"Authorization" : `Bearer ${token}`} })
+//                .then((resp) => {
+//                    console.log("sent",resp)
+//                })
+                //setLoading(!true);
+                toast.success("Sample manifest saved successfully!!", {
                     position: toast.POSITION.TOP_RIGHT
                 });
+
                 localStorage.setItem('manifest', JSON.stringify(manifestData));
                 localStorage.removeItem("samples");
             });
 
         setSaved(true);
     }
-
-    const sendManifest = async () => {
-         toast.success("Sample manifest sent successfully to PCR Lab.", {
-            position: toast.POSITION.TOP_RIGHT
-        });
+    console.log("Id",manifestsId)
+    const sendManifest = async (e) => {
+        e.preventDefault()
+         await axios.get(`${url}lims/ready-manifests/${manifestsId}`, { headers: {"Authorization" : `Bearer ${token}`} })
+            .then((resp) => {
+                 toast.success("Sample manifest sent successfully to PCR Lab.", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+            })
     }
 
   return (
@@ -322,7 +333,7 @@ const CreateAManifest = (props) => {
                     </Button>
                     {" "}
                     <Button variant="contained" color="secondary" startIcon={<SendIcon />}
-                    type="submit" disabled={saved ? false : true} onClick={sendManifest}>
+                    type="submit" onClick={sendManifest} disabled={saved ? false : true}>
                       Send
                     </Button>
                 </form>
