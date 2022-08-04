@@ -40,6 +40,6 @@ public interface SampleRepository extends JpaRepository<Sample, Integer> {
             "inner join base_application_codeset e on c.sample_type_id = e.id\n" +
             "left join base_application_codeset f on b.viral_load_indication = e.id\n" +
             "where d.lab_test_name='Viral Load'\n" +
-            "and b.lab_test_order_status=1 ", nativeQuery = true)
+            "and b.lab_test_order_status in (1,2) ", nativeQuery = true)
     List<Sample> findPendingVLSamples();
 }

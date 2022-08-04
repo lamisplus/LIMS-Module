@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -26,6 +27,7 @@ public class SampleService {
 
     public SampleDTO Save(SampleDTO sampleDTO){
         Sample sample = limsMapper.toSample(sampleDTO);
+        sample.setUuid(UUID.randomUUID().toString());
         return limsMapper.tosSampleDto( sampleRepository.save(sample));
     }
 

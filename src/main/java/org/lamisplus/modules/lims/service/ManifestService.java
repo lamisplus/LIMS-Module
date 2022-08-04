@@ -9,7 +9,9 @@ import org.lamisplus.modules.lims.domain.entity.Manifest;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
 import org.lamisplus.modules.lims.repository.ManifestRepository;
+import org.lamisplus.modules.lims.util.JsonNodeTransformer;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
+import org.lamisplus.modules.patient.service.PersonService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,6 +32,8 @@ public class ManifestService {
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private final SampleService sampleService;
+    private final PersonService personService;
+    private final JsonNodeTransformer jsonNodeTransformer;
 
     public ManifestDTO Save(ManifestDTO manifestDTO){
         Manifest manifest = limsMapper.tomManifest(manifestDTO);
@@ -52,7 +56,7 @@ public class ManifestService {
             sample.setUuid(UUID.randomUUID().toString());
         }
 
-        return limsMapper.toManifestDto( manifestRepository.save(manifest));
+        return AppendPatientInformation(limsMapper.toManifestDto( manifestRepository.save(manifest)));
     }
 
     public ManifestDTO Update(ManifestDTO manifestDTO){
@@ -66,14 +70,14 @@ public class ManifestService {
     }
 
     public ManifestDTO findById(Integer id) {
-        return limsMapper.toManifestDto(manifestRepository.findById(id).orElse(null));
+        return AppendPatientInformation(limsMapper.toManifestDto(manifestRepository.findById(id).orElse(null)));
     }
 
     public List<ManifestDTO> findAllManifests(){
         List<ManifestDTO> dtos = limsMapper.toManifestDtoList(manifestRepository.findAll());
-//        for(ManifestDTO dto: dtos){
-//            AppendPatientInformation(dto);
-//        }
+        for(ManifestDTO dto: dtos){
+            AppendPatientInformation(dto);
+        }
         return dtos;
     }
 
@@ -118,8 +122,21 @@ public class ManifestService {
         return responseDTO;
     }
 
-//    private ManifestDTO AppendPatientInformation(ManifestDTO dto){
-//        dto.setSampleInformation(sampleService.AppendPatientDetails(dto.getSampleInformation()));
-//        return dto;
-//    }
+    private ManifestDTO AppendPatientInformation(ManifestDTO dto){
+        try {
+            for (SampleDTO sampleDTO : dto.getSampleInformation()) {
+                PersonResponseDto personResponseDTO = personService.getPersonById((long) sampleDTO.getPid());
+                List<PatientIdDTO> patientIdDTOS = new ArrayList<>();
+                PatientIdDTO patientIdDTO = new PatientIdDTO();
+                patientIdDTO.setIdTypeCode("HOSPITALNO");
+                patientIdDTO.setIdNumber(jsonNodeTransformer.getNodeValue(personResponseDTO.getIdentifier(), "identifier", "value", true));
+                patientIdDTOS.add(patientIdDTO);
+                sampleDTO.setPatientID(patientIdDTOS);
+            }
+            return dto;
+        }
+        catch (Exception exception){
+            return dto;
+        }
+    }
 }
