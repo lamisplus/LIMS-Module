@@ -36,7 +36,7 @@ public class LimsSampleController {
     }
 
     @GetMapping("/manifest-samples/manifests/{id}")
-    public List<SampleDTO> GetSamplesByManifestId(@PathVariable String id){
+    public List<SampleDTO> GetSamplesByManifestId(@PathVariable int id){
         return sampleService.findbyManifestId(id);
     }
 

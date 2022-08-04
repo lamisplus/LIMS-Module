@@ -2,6 +2,7 @@ package org.lamisplus.modules.lims.domain.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,5 +19,7 @@ public class ManifestDTO {
     private String samplePackagedBy;
     private String courierRiderName;
     private String courierContact;
-    private List<SampleDTO> sampleDTOS;
+    private String manifestStatus;
+    private LocalDateTime createDate;
+    private List<SampleDTO> sampleInformation;
 }

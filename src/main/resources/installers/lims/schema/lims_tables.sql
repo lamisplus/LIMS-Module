@@ -3,7 +3,7 @@ CREATE TABLE public.lims_manifest
 (
     id bigint NOT NULL DEFAULT nextval('lims_manifest_id_seq'),
     uuid character varying(100),
-    manifest_number character varying(100),
+    manifest_id character varying(100),
     sending_facility_id character varying(100),
     sending_facility_name character varying(100),
     receiving_lab_id character varying(100),
@@ -14,6 +14,8 @@ CREATE TABLE public.lims_manifest
     courier_rider_name character varying(100),
     courier_contact character varying(100),
     manifest_status character varying(100),
+	create_date timestamp,
+	current_status character varying(100),
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_manifest_id_seq OWNED BY lims_manifest.id;
@@ -25,12 +27,28 @@ CREATE TABLE public.lims_sample
     id bigint NOT NULL DEFAULT nextval('lims_sample_id_seq'),
     uuid character varying(100),
     sample_id character varying(100),
-    pid INTEGER,
-    patient_id character varying(100),
+    pid character varying(100),
     sample_type character varying(100),
-    collection_Date character varying(100),
+    sample_ordered_by character varying(100),
+    sample_order_date character varying(100),
+    sample_collected_by character varying(100),
+    sample_collection_date character varying(100),
+    sample_Collection_time character varying(100),
     date_sample_sent character varying(100),
-    manifest_id INTEGER,
+    indication_vl_test character varying(100),
+    first_name character varying(100),
+    surname character varying(100),
+    Sex character varying(100),
+    Age character varying(100),
+    date_of_birth character varying(100),
+    pregnant_breast_feeding_status character varying(100),
+    art_commencement_date character varying(100),
+    drug_regimen character varying(100),
+    sending_facility_id character varying(100),
+    sending_facility_name character varying(100),
+	priority character varying(100),
+	priority_reason character varying(100),
+    manifest_id bigint,
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_sample_id_seq OWNED BY lims_sample.id;

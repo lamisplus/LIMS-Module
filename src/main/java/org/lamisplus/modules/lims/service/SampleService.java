@@ -2,6 +2,7 @@ package org.lamisplus.modules.lims.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lamisplus.modules.lims.domain.dto.PatientIdDTO;
 import org.lamisplus.modules.lims.domain.dto.SampleDTO;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
@@ -42,18 +43,34 @@ public class SampleService {
         return limsMapper.tosSampleDto(sampleRepository.findById(id).orElse(null));
     }
 
-    public List<SampleDTO> findbyManifestId(String id){
-        return limsMapper.toSampleDtoList(sampleRepository.findAllByManifestID(id));
+    public List<SampleDTO> findbyManifestId(int id){
+        return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findAllByManifestID(id)));
     }
 
     public List<SampleDTO> getAllPendingSamples(){
         return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findPendingVLSamples()));
     }
 
-    private List<SampleDTO> AppendPatientDetails(List<SampleDTO> sampleDTOS){
+    public List<SampleDTO> AppendPatientDetails(List<SampleDTO> sampleDTOS){
         for (SampleDTO sampleDTO: sampleDTOS) {
             PersonResponseDto personResponseDTO = personService.getPersonById((long) sampleDTO.getPid());
-            sampleDTO.setPatientID(jsonNodeTransformer.getNodeValue(personResponseDTO.getIdentifier(), "identifier", "value", true));
+            List<PatientIdDTO> patientIdDTOS = new ArrayList<>();
+            PatientIdDTO patientIdDTO = new PatientIdDTO();
+            patientIdDTO.setIdNumber(jsonNodeTransformer.getNodeValue(personResponseDTO.getIdentifier(), "identifier", "value", true));
+            patientIdDTO.setIdTypeCode("HOSPITALNO");
+            patientIdDTOS.add(patientIdDTO);
+
+            sampleDTO.setPatientID(patientIdDTOS);
+            sampleDTO.setAge("10");
+            sampleDTO.setDateSampleSent("");
+            sampleDTO.setArtCommencementDate("");
+            sampleDTO.setDateOfBirth(String.valueOf(personResponseDTO.getDateOfBirth()));
+            sampleDTO.setDrugRegimen("");
+            sampleDTO.setFirstName(personResponseDTO.getFirstName());
+            sampleDTO.setSurName(personResponseDTO.getSurname());
+            sampleDTO.setIndicationVLTest("1");
+            sampleDTO.setPregnantBreastFeedingStatus("");
+            sampleDTO.setSex("M");
         }
 
         return sampleDTOS;

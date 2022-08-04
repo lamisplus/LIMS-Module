@@ -2,6 +2,7 @@ package org.lamisplus.modules.lims.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lamisplus.modules.lims.domain.dto.LIMSManifestResponseDTO;
 import org.lamisplus.modules.lims.domain.dto.ManifestDTO;
 import org.lamisplus.modules.lims.service.ManifestService;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +39,10 @@ public class LimsManifestController {
     @GetMapping("/manifests")
     public List<ManifestDTO> GetAllManifests(){
         return manifestService.findAllManifests();
+    }
+
+    @GetMapping("/ready-manifests/{id}")
+    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id){
+        return manifestService.PostManifestToServer(id);
     }
 }
