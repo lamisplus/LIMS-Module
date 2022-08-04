@@ -42,6 +42,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import SplitActionButton from '../../layouts/SplitActionButton'
 
 const tableIcons = {
 Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -102,39 +103,33 @@ const DownloadManifest = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
+    const [permissions, setPermissions] = useState([]);
+
+        const userPermission =()=>{
+            axios
+                .get(`${url}account`,
+                    { headers: {"Authorization" : `Bearer ${token}`} }
+                )
+                .then((response) => {
+                    setPermissions(response.data.permissions);
+
+                })
+                .catch((error) => {
+                });
+
+        }
 
        const loadManifestData = useCallback(async () => {
-                try {
-                    //const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                    //console.log("manifest", response);
-                    setCollectedSamples([{
-                        manifestID: "asd-1234-0000",
-                        dateScheduledForPickup: "2022-07-20@16:15:57",
-                        receivingLabName: "National Reference Laboratory Gaduwa (NRL) Abuja",
-                        samplePackagedBy: "Abdul",
-                        status: "Pending"
-                    },
-                    {
-                            manifestID: "cvd-1234-0000",
-                            dateScheduledForPickup: "2022-17-20@14:15:57",
-                            receivingLabName: "National Reference Laboratory Gaduwa (NRL) Abuja",
-                            samplePackagedBy: "Mike",
-                            status: "Approved"
-                        },
-                    {
-                        manifestID: "ert-1234-1010",
-                        dateScheduledForPickup: "2022-17-10@12:11:00",
-                        receivingLabName: "National Reference Laboratory Gaduwa (NRL) Abuja",
-                        samplePackagedBy: "Mike",
-                        status: "Approved"
-                    }
-                ]);
-                } catch (e) {
-                    toast.error("An error occurred while fetching lab", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
-                }
-            }, []);
+            try {
+                const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
+                console.log("manifest", response);
+                setCollectedSamples(response.data);
+            } catch (e) {
+                toast.error("An error occurred while fetching lab", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+            }
+        }, []);
 
          useEffect(() => {
          setLoading('true');
@@ -149,16 +144,34 @@ const DownloadManifest = (props) => {
 
          }, [loadManifestData]);
 
+       function actionItems(row){
+            return  [            {
+                type:'single',
+                actions:[
+                    {
+                        name:'Print Manifest',
+                        type:'link',
+
+                        to:{
+                            pathname: "/print-manifest",
+                            state:{ sampleObj: [] }
+                        }
+                    },
+                ]
+            }
+            ]
+        }
+
   return (
     <>
        <div>
-           <Stack direction="row" spacing={2}
+           {/*<Stack direction="row" spacing={2}
            m={1}
            display="flex"
            justifyContent="flex-end"
            alignItems="flex-end">
                 <Link color="inherit"
-                    to={{pathname: "/samples"}}
+                    to={{pathname: "/create-manifest"}}
                      >
                     <Button variant="outlined" color="primary">
                        Create Manifest
@@ -166,7 +179,7 @@ const DownloadManifest = (props) => {
                 </Link>
 
             </Stack>
-           <br />
+           <br />*/}
        </div>
        <div>
               <MaterialTable
@@ -175,41 +188,39 @@ const DownloadManifest = (props) => {
                   columns={[
                       { title: "Manifest Id", field: "manifestId" },
                       { title: "Pickup Date", field: "pickupDate" },
+                      { title: "Created Date", field: "createDate" },
                       { title: "Receiving Lab", field: "lab" },
                        { title: "Packaged By", field: "packaged_by" },
                       {
                         title: "Status",
                         field: "status",
                       },
-    //                  {
-    //                    title: "Action",
-    //                    field: "actions",
-    //                    filtering: false,
-    //                  },
+                      {
+                        title: "Action",
+                        field: "actions",
+                        filtering: false,
+                      },
                   ]}
                   //isLoading={loading}
                   data={ collectedSamples.map((row) => (
                         {
-                          manifestId: row.manifestID,
-                          pickupDate: row.dateScheduledForPickup,
+                          manifestId: "DATA.FI-a0c3fwz0fus",
+                          pickupDate: row.dateScheduledForPickup.replace('T', ' '),
+                          createDate: new Date().toISOString().slice(0, 10),
                           lab: row.receivingLabName,
                           packaged_by: row.samplePackagedBy,
-                          status: row.status,
+                          status: "Pending",
 
-    //                      actions:  <Link to ={{
-    //                                      pathname: "/samples-collection",
-    //                                      state: row
-    //                                  }}
-    //                                      style={{ cursor: "pointer", color: "blue", fontStyle: "bold"}}
-    //                                >
-    //                                    <Tooltip title="Collect Sample">
-    //                                        <IconButton aria-label="Collect Sample" >
-    //                                            <VisibilityIcon color="primary"/>
-    //                                        </IconButton>
-    //                                    </Tooltip>
-    //                                </Link>
-                        })
-                  )}
+                          actions:  <div>
+                            {
+                            //permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                                  <SplitActionButton actions={actionItems(row)} />
+                              //):""
+
+                            }
+                          </div>
+
+                        }))}
 
                       options={{
                         headerStyle: {

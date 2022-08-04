@@ -1,8 +1,7 @@
 import React, {useState, Fragment, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Row, Col, Card,  Tab, Tabs, } from "react-bootstrap";
-import SampleSearch from './SampleCollection/SampleOrderLists';
-//import CreateManifest from './SampleCollection/CreateManifest';
+import SampleCollection from './SampleCollection/SamplesCollection';
 import ManifestList from './SampleCollection/ManifestList';
 import {labObj} from './sampleObj'
 
@@ -43,9 +42,9 @@ const Home = (props) => {
                        <Tab eventKey="manifest-list" title="Existing Manifest">
                          <ManifestList />
                         </Tab>
-                        {/*<Tab eventKey="collection" title="Create Manifest">
-                         <SampleSearch />
-                        </Tab>*/}
+                        <Tab eventKey="collection" title="Create Manifest">
+                         <SampleCollection />
+                        </Tab>
                         {/*<Tab eventKey="manifest" title="Create Manifest">
                           <CreateManifest />
                         </Tab>*/}

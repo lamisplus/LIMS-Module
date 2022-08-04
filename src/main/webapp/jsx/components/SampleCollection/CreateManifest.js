@@ -10,7 +10,7 @@ import ManifestPrint from './ManifestPrint';
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
     FormGroup,
-    Label,Card, CardBody, Table
+    Label,Card, CardBody, Table, Badge
 } from 'reactstrap';
 
 import "./sample.css";
@@ -21,11 +21,13 @@ import SaveIcon from '@material-ui/icons/Save'
 import CancelIcon from '@material-ui/icons/Cancel'
 import SendIcon from '@mui/icons-material/Send';
 import PrintIcon from '@mui/icons-material/Print';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import { pcr_lab } from './pcr';
 
 import { forwardRef } from 'react';
 import axios from "axios";
 import { toast } from 'react-toastify';
-import {token, url } from "../../../api";
+import {token, url, pcrUrl } from "../../../api";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -92,31 +94,33 @@ const CreateManifest = (props) => {
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
     const [saved, setSaved] = useState(false);
-    const [manifestData, setManifestData] =  useState({
-        dateScheduledForPickup: "",
-        receivingLabName: "",
-        receivingLabID: "",
-        courierRiderName: "",
-        courierContact: "",
-        result_status: "Pending",
-        manifest_id: `DATA.FI-${Math.random().toString(36).slice(2)}`,
-        total_sample: sampleObj.length,
-        test_type: "VL",
-        comment: "",
-        samples: sampleObj,
-        samplePackagedBy: "",
-        sendingFacilityID: "",
-        sendingFacilityName: "",
-        temperatureAtPickup: "",
-    });
+    const [status, setStatus] = useState(0);
+    const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
+
+    const [manifestData, setManifestData] = useState({
+         token: "",
+         manifestID: `DATA.FI-${Math.random().toString(36).slice(2)}`,
+         sendingFacilityID: "",
+         sendingFacilityName: "",
+         receivingLabID: pcrLabCode.labNo,
+         receivingLabName: pcrLabCode.name,
+         dateScheduledForPickup: "",
+         temperatureAtPickup: 0,
+         samplePackagedBy: "",
+         courierRiderName: "",
+         courierContact: "",
+         sampleInformation: sampleObj
+     })
+
     const [errors, setErrors] = useState({});
 
     const handleChange = (event) => {
+          checkPCRLab(event.target.value)
           const { name, value } = event.target
-          setManifestData({ ...manifestData, [name]: value })
+          setManifestData({ ...manifestData, [name]: value, receivingLabID: pcrLabCode.labNo, receivingLabName: pcrLabCode.name })
     }
 
-     const validate = () => {
+    const validate = () => {
             let temp = { ...errors }
             setErrors({
                 ...temp
@@ -124,10 +128,51 @@ const CreateManifest = (props) => {
             return Object.values(temp).every(x => x == "")
         }
 
-    const handleSubmit = (e) => {
+    const checkPCRLab = (name) => {
+        pcr_lab.map(( val ) => {
+            if (val.name === name) {
+                setPcrLabCode({name: val.name, labNo: val.labNo})
+            }
+        })
+    }
+
+    const sampleStatus = e =>{
+        if(e===1){
+            return <p><Badge  color="primary">Saved</Badge></p>
+        }else if(e===2){
+            return <p><Badge  color="success">Sent</Badge></p>
+        }else{
+            return <p><Badge  color="warning">Pending</Badge></p>
+        }
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(`manifest created...${JSON.stringify(manifestData)}`)
+        //console.log(`manifest created...${JSON.stringify(manifestData)}`)
+
+           await axios.post(`${url}lims/manifests`, manifestData,
+            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                setLoading(!true);
+                 toast.success("Sample manifest saved successfully!!", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+                setStatus(1);
+            });
+
         setSaved(true);
+    }
+
+    const sendManifest = async () => {
+        setStatus(2)
+        console.log("sent manifest", manifestData)
+       const loginData = { "email": "nmrs@lims.ng", "password": "nmrs@2020!"}
+
+      await axios.post(`${pcrUrl}/apidemo/login.php`, loginData)
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
+      .catch(err => console.log("PCR Lab error caught", err))
     }
 
     const componentRef = useRef();
@@ -140,8 +185,24 @@ const CreateManifest = (props) => {
     <Container>
          <Card>
           <CardBody>
-              <h2 className="text-center">Create Manifest Form</h2>
-              <br />
+              <h2>Create Sample Manifest Form</h2>
+              <p style={{textAlign: 'right'}}>
+              <Link color="inherit"
+                to={{pathname: "/"}}
+                 >
+                <MatButton
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}
+                    startIcon={<FirstPageIcon />}>
+                    Back
+                </MatButton>
+               </Link>
+              </p>
+              <p>
+              <b>Manifest Status:</b>
+              <span>{sampleStatus(status)}</span>
+              </p>
               <hr />
               <form>
                <h3>
@@ -170,29 +231,34 @@ const CreateManifest = (props) => {
                         </div>
                          <div className="form-group mb-3 col-md-6">
                             <FormGroup>
-                                <Label for="receivingLabName" className={classes.label}>Destination *</Label>
+                                <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
                                 <Input
-                                    type="text"
-                                    name="receivingLabName"
-                                    value={manifestData.receivingLabName}
+                                    type="select"
+                                    name="select"
+                                    value={pcrLabCode.name}
                                     id="receivingLabName"
                                     onChange={handleChange}
                                     className={classes.input}
-                                />
-
+                                >
+                                  <option>
+                                    Selcet PCR Lab
+                                  </option>
+                                  {pcr_lab.map((value, i) =>
+                                  <option key={i} value={value.name} >{value.name}</option>)}
+                                </Input>
                             </FormGroup>
                         </div>
                          <div className="form-group mb-3 col-md-3">
                             <FormGroup>
-                                <Label for="receivingLabID" className={classes.label}>PCR Lab number *</Label>
+                                <Label for="receivingLabID" className={classes.label}>Receiving Lab number *</Label>
                                 <Input
                                     type="text"
                                     name="receivingLabID"
-                                    value={manifestData.receivingLabID}
+                                    value={pcrLabCode.labNo}
                                     id="receivingLabID"
                                     onChange={handleChange}
                                     className={classes.input}
-
+                                    disabled={true}
                                 />
 
                             </FormGroup>
@@ -234,7 +300,7 @@ const CreateManifest = (props) => {
                             </div>
                             <div className="form-group mb-3 col-md-4">
                                 <FormGroup>
-                                    <Label for="samplePackagedBy" className={classes.label}>Packaged By</Label>
+                                    <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By</Label>
                                     <Input
                                         type="text"
                                         name="samplePackagedBy"
@@ -250,29 +316,14 @@ const CreateManifest = (props) => {
                         </h3>
                         <br />
                         <br />
-                         <div className="form-group mb-3 col-md-6">
-                            <FormGroup>
-                                <Label for="result_status" className={classes.label}>Result status</Label>
-                                <Input
-                                    type="text"
-                                    name="result_status"
-                                    id="result_status"
-                                    value={manifestData.result_status}
-                                    onChange={handleChange}
-                                    disabled={true}
-                                    className={classes.input}
-                                />
-
-                            </FormGroup>
-                        </div>
                         <div className="form-group mb-3 col-md-6">
                             <FormGroup>
                                 <Label for="manifest_id" className={classes.label}>Manifest Id</Label>
                                 <Input
                                     type="text"
-                                    name="manifest_id"
-                                    id="manifest_id"
-                                    value={manifestData.manifest_id}
+                                    name="manifestID"
+                                    id="manifestID"
+                                    value={manifestData.manifestID}
                                     onChange={handleChange}
                                     disabled={true}
                                     className={classes.input}
@@ -280,6 +331,22 @@ const CreateManifest = (props) => {
 
                             </FormGroup>
                         </div>
+                         <div className="form-group mb-3 col-md-6">
+                            <FormGroup>
+                                <Label for="temperatureAtPickup" className={classes.label}>Tempaerature at pickup</Label>
+                                <Input
+                                    type="text"
+                                    name="temperatureAtPickup"
+                                    id="temperatureAtPickup"
+                                    value={manifestData.temperatureAtPickup}
+                                    onChange={handleChange}
+                                    disabled={false}
+                                    className={classes.input}
+                                />
+
+                            </FormGroup>
+                        </div>
+
                          <div className="form-group mb-3 col-md-6">
                             <FormGroup>
                                 <Label for="total_sample" className={classes.label}>Total Sample</Label>
@@ -287,7 +354,7 @@ const CreateManifest = (props) => {
                                     type="text"
                                     name="total_sample"
                                     id="total_sample"
-                                    value={manifestData.total_sample}
+                                    value={sampleObj.length}
                                     onChange={handleChange}
                                     disabled={true}
                                     className={classes.input}
@@ -302,7 +369,7 @@ const CreateManifest = (props) => {
                                     type="text"
                                     name="test_type"
                                     id="test_type"
-                                    value={manifestData.test_type}
+                                    value="VL"
                                     onChange={handleChange}
                                     disabled={true}
                                     className={classes.input}
@@ -310,24 +377,15 @@ const CreateManifest = (props) => {
 
                             </FormGroup>
                         </div>
-                             <div className="form-group mb-3 col-md-12">
-                                <FormGroup>
-                                    <Label for="comment" className={classes.label}>Comments</Label>
-                                    <Input
-                                        type="textarea"
-                                        name="comment"
-                                        id="comment"
-                                        row="40"
-                                        style={{ minHeight: 100, fontSize: 14 }}
-                                        value={manifestData.comment}
-                                        onChange={handleChange}
-                                        className={classes.input}
-                                    ></Input>
-                                </FormGroup>
-                            </div>
-                            <br />
+
                             { saved !== true ?
                             <div>
+                               <h3>
+                                  Samples collected for PCR Lab
+                                </h3>
+                                <br />
+
+                                <br />
                                  <Table striped bordered hover size="sm">
                                     <thead>
                                       <tr>
@@ -339,13 +397,13 @@ const CreateManifest = (props) => {
                                       </tr>
                                     </thead>
                                     <tbody>
-                                    { sampleObj && sampleObj.map((data) => (
-                                         <tr>
+                                    { sampleObj && sampleObj.map((data, i) => (
+                                         <tr key={i}>
                                             <th scope="row">{data.FacilityName}</th>
-                                            <td>{data.patientId}</td>
-                                            <td>{data.sampleId}</td>
+                                            <td>{data.patientID[0].idNumber}</td>
+                                            <td>{data.sampleID}</td>
                                             <td>{data.sampleType}</td>
-                                            <td>{data.datecollected}</td>
+                                            <td>{data.sampleCollectionDate}</td>
                                           </tr>
                                     ))}
 
@@ -360,6 +418,7 @@ const CreateManifest = (props) => {
                         </div>
                     </div>
                     <MatButton
+                        type="submit"
                         variant="contained"
                         color="primary"
                         className={classes.button}
@@ -369,20 +428,17 @@ const CreateManifest = (props) => {
                     >
                         Save
                     </MatButton>
-                    <Link color="inherit"
-                    to={{pathname: "/"}}
-                     >
+
                     <MatButton
                         variant="contained"
                         color="secondary"
                         className={classes.button}
                         startIcon={<SendIcon />}
-
+                        onClick={sendManifest}
                         disabled={saved ? false : true}
                     >
                         Send
                     </MatButton>
-                    </Link>
 
                     <Link color="inherit"
                     to={{pathname: "/"}}

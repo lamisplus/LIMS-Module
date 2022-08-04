@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState} from 'react';
 import { Link, useHistory } from 'react-router-dom'
-//import nglogo from './assets/images/nglogo.png'
+import nglogo from '../../../../../assets/images/nglogo.png'
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -12,7 +12,9 @@ let today = new Date().toLocaleDateString()
 
 
 class ManifestPrint extends React.Component {
+
   render() {
+    console.log(this.props.sampleObj)
     return (
              <Card>
               <CardBody>
@@ -26,7 +28,7 @@ class ManifestPrint extends React.Component {
                                       <th scope="row"></th>
 
                                       <th scope="row" className="text-center">
-                                        <img src={`${process.env.PUBLIC_URL}/assets/images/nglogo.png`} style={{width: "80px", height: "80px"}}/>
+                                        <img src={nglogo} style={{width: "80px", height: "80px"}}/>
                                       </th>
 
                                     </tr>
@@ -56,11 +58,11 @@ class ManifestPrint extends React.Component {
                             </tr>
                             <tr>
                               <th scope="row">Status:</th>
-                              <td>{this.props.sampleObj.result_status}</td>
+                              <td>Pending</td>
                               <th scope="row">Manifest Id:</th>
-                              <td>{this.props.sampleObj.manifest_id}</td>
-                              <th scope="row">Total Samples:</th>
-                              <td>{this.props.sampleObj.total_sample}</td>
+                              <td>{this.props.sampleObj.manifestID}</td>
+                              <th scope="row">Sample Temperature:</th>
+                              <td>{this.props.sampleObj.temperatureAtPickup}</td>
                             </tr>
                              <tr>
                               <th scope="row">Courier Name:</th>
@@ -68,7 +70,7 @@ class ManifestPrint extends React.Component {
                               <th scope="row">Courier Contact:</th>
                               <td>{this.props.sampleObj.courierContact}</td>
                               <th scope="row">Test Type:</th>
-                              <td>{this.props.sampleObj.test_type}</td>
+                              <td>VL</td>
                             </tr>
                       </tbody>
                     </Table>
@@ -86,13 +88,13 @@ class ManifestPrint extends React.Component {
                           </tr>
                         </thead>
                         <tbody>
-                        { this.props.sampleObj && this.props.sampleObj.samples.map((data, i) => (
+                        { this.props.sampleObj.sampleInformation && this.props.sampleObj.sampleInformation.map((data, i) => (
                              <tr key={i}>
-                                <td scope="row">{data.FacilityName}</td>
-                                <td>{data.patientId}</td>
-                                <td>{data.sampleId}</td>
+                                <td scope="row">Lagos state General Hospital</td>
+                                <td>{data.patientID[0].idNumber}</td>
+                                <td>{data.sampleID}</td>
                                 <td>{data.sampleType}</td>
-                                <td>{data.datecollected}</td>
+                                <td>{data.sampleCollectionDate}</td>
                               </tr>
                         ))}
 
