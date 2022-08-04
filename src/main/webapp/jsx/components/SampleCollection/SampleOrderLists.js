@@ -3,7 +3,8 @@ import Container from '@mui/material/Container';
 import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
 import { Row, Col, Card } from "react-bootstrap";
-
+import {Label, Input, FormGroup} from "reactstrap"
+import Grid from "@material-ui/core/Grid";
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -122,6 +123,7 @@ const SampleSearch = (props) => {
                 const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
                 console.log("samples", response);
                 setCollectedSamples(response.data);
+
             } catch (e) {
                 toast.error("An error occurred while fetching lab", {
                     position: toast.POSITION.TOP_RIGHT
@@ -146,49 +148,79 @@ const SampleSearch = (props) => {
         sample.filter((item) => {
             var i = samples.findIndex(x => (x.patientId == item.patientId && x.sampleId == item.sampleId && x.sampleType == item.sampleType));
             if(i <= -1){
-                    samples.push(item);
+                    console.log("items", item)
+
+                    samples.push({
+                      patientID: [{
+                          idNumber: item.patientId,
+                          idTypeCode: ""
+                      }],
+                      firstName: "",
+                      surName: "",
+                      sex: "",
+                      pregnantBreastFeedingStatus: "",
+                      age: 0,
+                      dateOfBirth: "",
+                      sampleID: item.sampleId,
+                      sampleType: item.sampleType,
+                      indicationVLTest: "VL",
+                      artCommencementDate: "",
+                      drugRegimen: "",
+                      sampleOrderedBy: "",
+                      sampleOrderDate: "",
+                      sampleCollectedBy: "",
+                      sampleCollectionDate: item.datecollected,
+                      sampleCollectionTime: item.timecollected,
+                      dateSampleSent: ""
+                  });
+
+                  localStorage.setItem('samples', JSON.stringify(samples));
+
               }
              return null;
         })
 
-        //sample.map((data) => { samples.push(data) })
      }
 
   return (
       <div>
       <Card>
          <Card.Body>
-            <form className="row gy-2 gx-3 align-items-center">
-              { /*<div className="col-auto">
-                <div className="form-outline">
-                  <label className={classes.label} for="form11Example1">Patient Id :</label>
-                  <input type="text" id="form11Example1" className={classes.input} />
-                </div>
-              </div>
-              <div className="col-auto">
-                <div className="form-outline">
-                  <label className={classes.label} for="form11Example3">Sample Id :</label>
-                  <input type="text" id="form11Example3" className={classes.input} />
-                </div>
-              </div>*/}
-               <div className="col-auto">
-                  <div className="form-outline">
-                    <label className={classes.label} for="form11Example3">Start Date :</label>
-                    <input type="text" id="form11Example3" className={classes.input} />
-                  </div>
-                </div>
-                <div className="col-auto">
-                 <div className="form-outline">
-                   <label className={classes.label} for="form11Example3">End Date :</label>
-                   <input type="text" id="form11Example3" className={classes.input} />
-                 </div>
-               </div>
-              <div class="col-auto">
-                <Button variant="outlined" color="primary">
-                     Search...
-                  </Button>
-              </div>
-            </form>
+            <Grid container spacing={2}>
+              <Grid item xs={2}>
+                   <FormGroup>
+                       <Label for="dateScheduledForPickup" className={classes.label}>Start date</Label>
+
+                       <Input
+                           type="date"
+                           name="dateScheduledForPickup"
+
+                           id="dateScheduledForPickup"
+                           placeholder="Date & Time Created"
+
+                           className={classes.input}
+                       />
+                   </FormGroup>
+              </Grid>
+              <Grid item xs={2}>
+                    <FormGroup>
+                      <Label for="dateScheduledForPickup" className={classes.label}>End date</Label>
+
+                      <Input
+                          type="date"
+                          name="dateScheduledForPickup"
+
+                          id="dateScheduledForPickup"
+                          placeholder="Date & Time Created"
+
+                          className={classes.input}
+                      />
+                  </FormGroup>
+              </Grid>
+              <Grid item xs={2}>
+
+              </Grid>
+            </Grid>
           <br />
           <MaterialTable
            icons={tableIcons}
@@ -206,12 +238,7 @@ const SampleSearch = (props) => {
                     field: "sampleType",
                   },
                   { title: "Date Collected", field: "datecollected", type: "date" , filtering: false},
-
-                  {
-                    title: "Date Sent",
-                    field: "datesent",
-                    filtering: false
-                  },
+                  { title: "Time Collected", field: "timecollected", type: "time" , filtering: false},
 //                  {
 //                    title: "Action",
 //                    field: "actions",
@@ -221,13 +248,14 @@ const SampleSearch = (props) => {
               //isLoading={loading}
               data={ collectedSamples.map((row) => (
                     {
-                      FacilityName: row.facilityName,
-                      patientId: row.patientID,
+                      FacilityName: "Lagos State General Hospital",
+                      patientId: row.patientID[0].idNumber,
                       testType: "VL",
                       sampleId: row.sampleID,
                       sampleType: row.sampleType,
-                      datecollected: row.collectionDate,
-                      datesent: row.dateSampleSent === null ? row.dateSampleSent : "-----",
+                      datecollected: row.sampleCollectionDate,
+                      timecollected: row.sampleCollectionTime,
+
 //                      actions:  <Link to ={{
 //                                      pathname: "/samples-collection",
 //                                      state: row
@@ -265,8 +293,7 @@ const SampleSearch = (props) => {
                  onSelectionChange={(rows) => handleSampleChanges(rows)}
 
           />
-          <br />
-            <div>
+           {/*  <div>
                  <Stack direction="row" spacing={2}
                  m={1}
                  display="flex"
@@ -295,7 +322,7 @@ const SampleSearch = (props) => {
 
                   </Stack>
                  <br />
-             </div>
+             </div>*/}
          </Card.Body>
        </Card>
     </div>

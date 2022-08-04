@@ -22,6 +22,7 @@ import CancelIcon from '@material-ui/icons/Cancel'
 import SendIcon from '@mui/icons-material/Send';
 import PrintIcon from '@mui/icons-material/Print';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
+import { pcr_lab } from './pcr';
 
 import { forwardRef } from 'react';
 import axios from "axios";
@@ -94,49 +95,29 @@ const CreateManifest = (props) => {
     const [collectedSamples, setCollectedSamples] = useState([])
     const [saved, setSaved] = useState(false);
     const [status, setStatus] = useState(0);
+    const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
     const [manifestData, setManifestData] = useState({
          token: "",
          manifestID: `DATA.FI-${Math.random().toString(36).slice(2)}`,
          sendingFacilityID: "",
          sendingFacilityName: "",
-         receivingLabID: "",
-         receivingLabName: "",
+         receivingLabID: pcrLabCode.labNo,
+         receivingLabName: pcrLabCode.name,
          dateScheduledForPickup: "",
          temperatureAtPickup: 0,
          samplePackagedBy: "",
          courierRiderName: "",
          courierContact: "",
-         sampleInformation: [{
-             patientID: [{
-                 idNumber: "",
-                 idTypeCode: ""
-             }],
-             firstName: "",
-             surName: "",
-             sex: "",
-             pregnantBreastFeedingStatus: "",
-             age: 0,
-             dateOfBirth: "",
-             sampleID: "",
-             sampleType: "",
-             indicationVLTest: "VL",
-             artCommencementDate: "",
-             drugRegimen: "",
-             sampleOrderedBy: "",
-             sampleOrderDate: "",
-             sampleCollectedBy: "",
-             sampleCollectionDate: "",
-             sampleCollectionTime: "",
-             dateSampleSent: ""
-         }]
+         sampleInformation: sampleObj
      })
 
     const [errors, setErrors] = useState({});
 
     const handleChange = (event) => {
+          checkPCRLab(event.target.value)
           const { name, value } = event.target
-          setManifestData({ ...manifestData, [name]: value })
+          setManifestData({ ...manifestData, [name]: value, receivingLabID: pcrLabCode.labNo, receivingLabName: pcrLabCode.name })
     }
 
     const validate = () => {
@@ -146,6 +127,14 @@ const CreateManifest = (props) => {
             })
             return Object.values(temp).every(x => x == "")
         }
+
+    const checkPCRLab = (name) => {
+        pcr_lab.map(( val ) => {
+            if (val.name === name) {
+                setPcrLabCode({name: val.name, labNo: val.labNo})
+            }
+        })
+    }
 
     const sampleStatus = e =>{
         if(e===1){
@@ -159,7 +148,7 @@ const CreateManifest = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(`manifest created...${JSON.stringify(manifestData)}`)
+        //console.log(`manifest created...${JSON.stringify(manifestData)}`)
 
            await axios.post(`${url}lims/manifests`, manifestData,
             { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
@@ -175,6 +164,7 @@ const CreateManifest = (props) => {
 
     const sendManifest = async () => {
         setStatus(2)
+        console.log("sent manifest", manifestData)
        const loginData = { "email": "nmrs@lims.ng", "password": "nmrs@2020!"}
 
       await axios.post(`${pcrUrl}/apidemo/login.php`, loginData)
@@ -243,14 +233,19 @@ const CreateManifest = (props) => {
                             <FormGroup>
                                 <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
                                 <Input
-                                    type="text"
-                                    name="receivingLabName"
-                                    value={manifestData.receivingLabName}
+                                    type="select"
+                                    name="select"
+                                    value={pcrLabCode.name}
                                     id="receivingLabName"
                                     onChange={handleChange}
                                     className={classes.input}
-                                />
-
+                                >
+                                  <option>
+                                    Selcet PCR Lab
+                                  </option>
+                                  {pcr_lab.map((value, i) =>
+                                  <option key={i} value={value.name} >{value.name}</option>)}
+                                </Input>
                             </FormGroup>
                         </div>
                          <div className="form-group mb-3 col-md-3">
@@ -259,11 +254,11 @@ const CreateManifest = (props) => {
                                 <Input
                                     type="text"
                                     name="receivingLabID"
-                                    value={manifestData.receivingLabID}
+                                    value={pcrLabCode.labNo}
                                     id="receivingLabID"
                                     onChange={handleChange}
                                     className={classes.input}
-
+                                    disabled={true}
                                 />
 
                             </FormGroup>
@@ -402,13 +397,13 @@ const CreateManifest = (props) => {
                                       </tr>
                                     </thead>
                                     <tbody>
-                                    { sampleObj && sampleObj.map((data) => (
-                                         <tr>
+                                    { sampleObj && sampleObj.map((data, i) => (
+                                         <tr key={i}>
                                             <th scope="row">{data.FacilityName}</th>
-                                            <td>{data.patientId}</td>
-                                            <td>{data.sampleId}</td>
+                                            <td>{data.patientID[0].idNumber}</td>
+                                            <td>{data.sampleID}</td>
                                             <td>{data.sampleType}</td>
-                                            <td>{data.datecollected}</td>
+                                            <td>{data.sampleCollectionDate}</td>
                                           </tr>
                                     ))}
 

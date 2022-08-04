@@ -88,13 +88,13 @@ class ManifestPrint extends React.Component {
                           </tr>
                         </thead>
                         <tbody>
-                        { this.props.sampleObj > 0 && this.props.sampleObj.samples.map((data, i) => (
+                        { this.props.sampleObj.sampleInformation && this.props.sampleObj.sampleInformation.map((data, i) => (
                              <tr key={i}>
-                                <td scope="row">{data.FacilityName}</td>
-                                <td>{data.patientId}</td>
-                                <td>{data.sampleId}</td>
+                                <td scope="row">Lagos state General Hospital</td>
+                                <td>{data.patientID[0].idNumber}</td>
+                                <td>{data.sampleID}</td>
                                 <td>{data.sampleType}</td>
-                                <td>{data.datecollected}</td>
+                                <td>{data.sampleCollectionDate}</td>
                               </tr>
                         ))}
 

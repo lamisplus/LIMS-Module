@@ -11,8 +11,8 @@ import "./main/webapp/vendor/bootstrap-select/dist/css/bootstrap-select.min.css"
 import "./../src/main/webapp/css/style.css";
 
 import Home from './main/webapp/jsx/components/Home'
-import CreateManifest from './main/webapp/jsx/components/SampleCollection/CreateManifest';
-import ManifestList from './main/webapp/jsx/components/SampleCollection/ManifestList';
+import SampleCollection from './main/webapp/jsx/components/SampleCollection/SamplesCollection';
+import PrintManifest from './main/webapp/jsx/components/SampleCollection/PrintManifest';
 import SampleSearch from './main/webapp/jsx/components/SampleCollection/SampleOrderLists';
 
 export default function App() {
@@ -20,15 +20,15 @@ export default function App() {
       <div>
       <ToastContainer />
         <Switch>
-         <Route path="/existing-manifest">
-             <ManifestList />
+         <Route path="/print-manifest">
+             <PrintManifest />
            </Route>
          <Route path="/create-manifest">
-            <CreateManifest />
+            <SampleCollection />
           </Route>
-          <Route path="/samples">
+          {/*<Route path="/samples">
               <SampleSearch />
-            </Route>
+            </Route>*/}
           <Route path="/">
             <Home />
           </Route>
