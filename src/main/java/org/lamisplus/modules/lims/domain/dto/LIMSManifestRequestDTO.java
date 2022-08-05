@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class LIMSManifestRequestDTO {
     String token;
-    ManifestDTO viralLoadManifest;
+    LIMSManifestDTO viralLoadManifest;
 }

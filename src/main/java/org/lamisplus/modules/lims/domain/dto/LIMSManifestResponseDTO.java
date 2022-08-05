@@ -14,5 +14,6 @@ public class LIMSManifestResponseDTO {
     String receivingPCRLabId;
     String totalSamplesProcessed;
     String totalSamplesNotProcessed;
-    List<Objects> errors;
+    @JsonProperty("errors")
+    private JsonNode errors;
 }
