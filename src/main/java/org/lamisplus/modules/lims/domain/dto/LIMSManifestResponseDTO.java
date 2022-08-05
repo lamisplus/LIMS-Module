@@ -1,5 +1,7 @@
 package org.lamisplus.modules.lims.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.util.List;
