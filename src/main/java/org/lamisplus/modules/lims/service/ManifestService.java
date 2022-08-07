@@ -45,14 +45,22 @@ public class ManifestService {
     private  final UserService userService;
     private final JsonNodeTransformer jsonNodeTransformer;
 
+
+    //TODO: move this to config file
+    String FacilityDATIMCode = "FH7LMnbnVlT";
+    String FacilityMFLCode = "543";
+    String LIMSUsername = "nmrs@lims.ng";
+    String LIMSPassword = "nmrs@2020!";
+    String loginUrl = "https://lims.ng/apidemo/login.php";
+    String manifestUrl = "https://lims.ng/apidemo/samples/create.php";
+
+
     public ManifestDTO Save(ManifestDTO manifestDTO){
         Manifest manifest = limsMapper.tomManifest(manifestDTO);
 
         //TODO: pick the active facility
         Long FacilityId = getCurrentUserOrganization();
         OrganisationUnit organisationUnit = organisationUnitService.getOrganizationUnit(FacilityId);
-        String FacilityDATIMCode = "FH7LMnbnVlT";
-        String FacilityMFLCode = "543";
         String FacilityName = organisationUnit.getName();
 
         manifest.setManifestID(GenerateManifestID(FacilityMFLCode));
@@ -108,15 +116,15 @@ public class ManifestService {
 
         //Get token
         LIMSLoginRequestDTO loginRequestDTO = new LIMSLoginRequestDTO();
-        loginRequestDTO.setEmail("nmrs@lims.ng");
-        loginRequestDTO.setPassword("nmrs@2020!");
+        loginRequestDTO.setEmail(LIMSUsername);
+        loginRequestDTO.setPassword(LIMSPassword);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("user-agent", "Application");
         HttpEntity<LIMSLoginRequestDTO> loginEntity = new HttpEntity<>(loginRequestDTO, headers);
-        String loginUrl = "https://lims.ng/apidemo/login.php";
+
         ResponseEntity<LIMSLoginResponseDTO> loginResponse = restTemplate.exchange(loginUrl, HttpMethod.POST, loginEntity, LIMSLoginResponseDTO.class);
         LIMSLoginResponseDTO loginResponseDTO = loginResponse.getBody();
 
@@ -127,22 +135,15 @@ public class ManifestService {
         requestDTO.setToken(loginResponseDTO.getJwt());
         requestDTO.setViralLoadManifest(manifest);
 
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String manifestObject = ow.writeValueAsString(requestDTO);
-
-        LOG.info("MANIFEST-REQUEST: "+manifestObject);
-
         HttpEntity<LIMSManifestRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
-        String manifestUrl = "https://lims.ng/apidemo/samples/create.php";
-        ResponseEntity<JsonNode> manifestResponse = restTemplate.exchange(manifestUrl, HttpMethod.POST, manifestEntity, JsonNode.class);
-        LOG.info("MANIFEST-RESPONSE: "+manifestResponse.getBody());
+        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
 
         //Update manifest status
-        //manifest.setManifestStatus("Submitted");
-        //manifest.setCreateDate(LocalDateTime.now());
-        //Save(limsMapper.toManifestDto(manifest));
+        manifest.setManifestStatus("Submitted");
+        manifest.setCreateDate(LocalDateTime.now());
+        Save(limsMapper.toManifestDto(manifest));
 
-        return null;//manifestResponse.getBody();
+        return manifestResponse.getBody();
     }
 
     private ManifestDTO AppendPatientInformation(ManifestDTO dto){
@@ -162,8 +163,6 @@ public class ManifestService {
             return dto;
         }
     }
-
-
 
     public Long getCurrentUserOrganization() {
         Optional<User> userWithRoles = userService.getUserWithRoles ();
