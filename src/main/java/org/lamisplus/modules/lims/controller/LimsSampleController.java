@@ -1,6 +1,5 @@
 package org.lamisplus.modules.lims.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.SampleDTO;
@@ -37,12 +36,12 @@ public class LimsSampleController {
     }
 
     @GetMapping("/manifest-samples/manifests/{id}")
-    public List<SampleDTO> GetSamplesByManifestId(@PathVariable int id) throws JsonProcessingException {
+    public List<SampleDTO> GetSamplesByManifestId(@PathVariable int id) {
         return sampleService.findbyManifestRecordId(id);
     }
 
     @GetMapping("/collected-samples/")
-    public List<SampleDTO> GetAllCollectedSamples() throws JsonProcessingException {
+    public List<SampleDTO> GetAllCollectedSamples() {
         return sampleService.getAllPendingSamples();
     }
 }
