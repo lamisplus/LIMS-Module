@@ -1,5 +1,9 @@
 package org.lamisplus.modules.lims.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.PatientIdDTO;
@@ -45,24 +49,28 @@ public class SampleService {
         return limsMapper.tosSampleDto(sampleRepository.findById(id).orElse(null));
     }
 
-    public List<SampleDTO> findbyManifestId(int id){
-        return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findAllByManifestID(id)));
+    public List<SampleDTO> findbyManifestRecordId(int id) {
+        return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findAllByManifestRecordID(id)));
     }
 
-    public List<SampleDTO> getAllPendingSamples(){
+    public List<SampleDTO> getAllPendingSamples() {
         return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findPendingVLSamples()));
     }
 
-    public List<SampleDTO> AppendPatientDetails(List<SampleDTO> sampleDTOS){
+    public List<SampleDTO> AppendPatientDetails(List<SampleDTO> sampleDTOS) {
         for (SampleDTO sampleDTO: sampleDTOS) {
             PersonResponseDto personResponseDTO = personService.getPersonById((long) sampleDTO.getPid());
+
             List<PatientIdDTO> patientIdDTOS = new ArrayList<>();
             PatientIdDTO patientIdDTO = new PatientIdDTO();
             patientIdDTO.setIdNumber(jsonNodeTransformer.getNodeValue(personResponseDTO.getIdentifier(), "identifier", "value", true));
             patientIdDTO.setIdTypeCode("HOSPITALNO");
             patientIdDTOS.add(patientIdDTO);
 
-            sampleDTO.setPatientID(patientIdDTOS);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode patientIDNode = mapper.convertValue(patientIdDTO, JsonNode.class);
+
+            sampleDTO.setPatientID(patientIDNode);
             sampleDTO.setAge("10");
             sampleDTO.setDateSampleSent("");
             sampleDTO.setArtCommencementDate("");

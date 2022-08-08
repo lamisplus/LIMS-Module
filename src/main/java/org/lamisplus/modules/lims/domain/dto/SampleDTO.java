@@ -1,5 +1,6 @@
 package org.lamisplus.modules.lims.domain.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class SampleDTO {
     private int id;
     private String uuid;
     private int pid;
-    private List<PatientIdDTO> patientID;
+    private JsonNode patientID;
     private String firstName;
     private String surName;
     private String Sex;
@@ -29,6 +30,5 @@ public class SampleDTO {
     private String dateSampleSent;
     private String priority;
     private String priorityReason;
-
-    private int manifestID;
+    private int manifestRecordId;
 }

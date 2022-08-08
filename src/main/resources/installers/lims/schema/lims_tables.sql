@@ -28,6 +28,7 @@ CREATE TABLE public.lims_sample
     uuid character varying(100),
     sample_id character varying(100),
     pid character varying(100),
+    patient_id JSONB,
     sample_type character varying(100),
     sample_ordered_by character varying(100),
     sample_order_date character varying(100),
@@ -48,7 +49,7 @@ CREATE TABLE public.lims_sample
     sending_facility_name character varying(100),
 	priority character varying(100),
 	priority_reason character varying(100),
-    manifest_id bigint,
+    manifest_record_id bigint,
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_sample_id_seq OWNED BY lims_sample.id;

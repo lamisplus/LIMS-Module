@@ -1,12 +1,13 @@
 package org.lamisplus.modules.lims.domain.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class LIMSSampleDTO {
-    private List<PatientIdDTO> patientID;
+    private JsonNode patientID;
     private String firstName;
     private String surName;
     private String Sex;
