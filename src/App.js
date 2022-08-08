@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  MemoryRouter as Router,
+  //MemoryRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
@@ -26,9 +26,6 @@ export default function App() {
          <Route path="/create-manifest">
             <SampleCollection />
           </Route>
-          {/*<Route path="/samples">
-              <SampleSearch />
-            </Route>*/}
           <Route path="/">
             <Home />
           </Route>

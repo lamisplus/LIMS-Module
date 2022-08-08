@@ -54,15 +54,21 @@ return(
             {renderContent(activeStep)}
             <br />
             <br />
-            <Stack direction="row" spacing={2}
-             m={1}
-             display="flex"
-             justifyContent="flex-end"
-             alignItems="flex-end">
-             <Button variant="outlined" color="primary" onClick={() => previousStep()}>Previous Step</Button>
-             {" "}
-             <Button variant="outlined" color="primary" onClick={() => nextStep()}>Next Step</Button>
-            </Stack>
+
+                    <Stack direction="row" spacing={2}
+                           m={1}
+                           display="flex"
+                           justifyContent="flex-end"
+                           alignItems="flex-end">
+                           <Button variant="outlined" color="primary" onClick={() => previousStep()}
+                           >Previous Step</Button>
+                           {" "}
+                           <Button variant="outlined" color="primary" onClick={() => nextStep()}
+                           disabled={activeStep == 2 ? true : false}>Next Step</Button>
+                    </Stack>
+
+
+
         </>
     </div>
 );

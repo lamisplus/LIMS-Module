@@ -12,6 +12,8 @@ import Grid from "@material-ui/core/Grid";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
+import {format} from "date-fns";
+
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
     FormGroup,
@@ -92,7 +94,10 @@ const CreateAManifest = (props) => {
     const [collectedSamples, setCollectedSamples] = useState([])
     const samples = []
     const [saved, setSaved] = useState(false);
+    const [send, setSend] = useState(false);
     const [localStore, SetLocalStore] = useState([]);
+    const [manifestsId, setManifestsId] = useState(0);
+    const [status, setStatus] = useState("Pending")
 
     useEffect(() => {
       const collectedSamples = JSON.parse(localStorage.getItem('samples'));
@@ -101,15 +106,14 @@ const CreateAManifest = (props) => {
       }
     }, []);
 
-    console.log('local', localStore);
-
     const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
     const [manifestData, setManifestData] = useState({
          token: "",
-         manifestID: `DATA.FI-${Math.random().toString(36).slice(2)}`,
-         sendingFacilityID: "",
-         sendingFacilityName: "",
+         manifestID: "",
+         manifestStatus: "Pending",
+         sendingFacilityID: "FH7LMnbnVlT",
+         sendingFacilityName: "CHC ZUNGERU",
          receivingLabID: pcrLabCode.labNo,
          receivingLabName: pcrLabCode.name,
          dateScheduledForPickup: "",
@@ -117,10 +121,13 @@ const CreateAManifest = (props) => {
          samplePackagedBy: "",
          courierRiderName: "",
          courierContact: "",
-         sampleInformation: localStore
+         createDate: "",
+         sampleInformation: localStore,
+         id: 0,
+         uuid: ""
      })
 
-      const handleChange = (event) => {
+    const handleChange = (event) => {
            checkPCRLab(event.target.value)
            const { name, value } = event.target
            setManifestData({ ...manifestData, [name]: value, receivingLabID: pcrLabCode.labNo,
@@ -137,24 +144,35 @@ const CreateAManifest = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(`manifest created...${JSON.stringify(manifestData)}`)
+        //console.log(`manifest created...${JSON.stringify(manifestData)}`)
            await axios.post(`${url}lims/manifests`, manifestData,
             { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                setLoading(!true);
-                 toast.success("Sample manifest saved successfully!!", {
+                setManifestsId(resp.data.id)
+                 console.log("response", resp)
+                  setSaved(true);
+                toast.success("Sample manifest saved successfully!!", {
                     position: toast.POSITION.TOP_RIGHT
                 });
+                manifestData.manifestID = resp.data.manifestID
+                manifestData.sendingFacilityID = resp.data.sendingFacilityID
+                manifestData.sendingFacilityName = resp.data.sendingFacilityName
+
                 localStorage.setItem('manifest', JSON.stringify(manifestData));
                 localStorage.removeItem("samples");
             });
-
-        setSaved(true);
     }
 
-    const sendManifest = async () => {
-         toast.success("Sample manifest sent successfully to PCR Lab.", {
-            position: toast.POSITION.TOP_RIGHT
-        });
+    const sendManifest = async (e) => {
+        e.preventDefault()
+         await axios.get(`${url}lims/ready-manifests/${manifestsId}`, { headers: {"Authorization" : `Bearer ${token}`} })
+            .then((resp) => {
+                console.log("sending manifest", resp)
+                 toast.success("Sample manifest sent successfully to PCR Lab.", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+                setSend(true)
+                setStatus("Manifest Sent");
+            })
     }
 
   return (
@@ -243,7 +261,7 @@ const CreateAManifest = (props) => {
                          </Grid>
                          <Grid item xs={6} md={4}>
                               <FormGroup>
-                                 <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By</Label>
+                                 <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
                                  <Input
                                      type="text"
                                      name="samplePackagedBy"
@@ -256,12 +274,12 @@ const CreateAManifest = (props) => {
                           </Grid>
                           <Grid item xs={6} md={6}>
                             <FormGroup>
-                                <Label for="manifest_id" className={classes.label}>Manifest Id</Label>
+                                <Label for="manifest_status" className={classes.label}>Status</Label>
                                 <Input
                                     type="text"
-                                    name="manifestID"
-                                    id="manifestID"
-                                    value={manifestData.manifestID}
+                                    name="manifestStatus"
+                                    id="manifestStatus"
+                                    value={status}
                                     onChange={handleChange}
                                     disabled={true}
                                     className={classes.input}
@@ -316,15 +334,20 @@ const CreateAManifest = (props) => {
                         </Grid>
                       </Grid>
                     </Box>
-                    <Button variant="contained" color="primary" type="submit"
-                    startIcon={<SaveIcon />} onClick={handleSubmit} disabled={!saved ? false : true}>
-                      Save
-                    </Button>
-                    {" "}
-                    <Button variant="contained" color="secondary" startIcon={<SendIcon />}
-                    type="submit" disabled={saved ? false : true} onClick={sendManifest}>
-                      Send
-                    </Button>
+                    {
+                        send ? " " :
+                        <>
+                            <Button variant="contained" color="primary" type="submit"
+                            startIcon={<SaveIcon />} onClick={handleSubmit} disabled={!saved ? false : true}>
+                              Save
+                            </Button>
+                            {" "}
+                            <Button variant="contained" color="secondary" startIcon={<SendIcon />}
+                            type="submit" onClick={sendManifest} disabled={saved ? false : true}>
+                              Send
+                            </Button>
+                        </>
+                    }
                 </form>
              </CardBody>
         </Card>

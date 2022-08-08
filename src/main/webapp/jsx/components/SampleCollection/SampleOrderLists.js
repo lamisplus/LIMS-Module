@@ -9,6 +9,7 @@ import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
+import {format} from "date-fns";
 
 import { forwardRef } from 'react';
 import axios from "axios";
@@ -123,11 +124,14 @@ const SampleSearch = (props) => {
                 const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
                 console.log("samples", response);
                 setCollectedSamples(response.data);
+                setLoading(false)
+                localStorage.clear();
 
             } catch (e) {
                 toast.error("An error occurred while fetching lab", {
                     position: toast.POSITION.TOP_RIGHT
                 });
+                setLoading(false)
             }
         }, []);
 
@@ -144,34 +148,47 @@ const SampleSearch = (props) => {
 
      }, [loadLabTestData]);
 
+     const calculate_age = dob => {
+             var today = new Date();
+             var birthDate = new Date(dob);
+             var age_now = today.getFullYear() - birthDate.getFullYear();
+             return age_now
+
+           };
+
      const handleSampleChanges = (sample) => {
         sample.filter((item) => {
-            var i = samples.findIndex(x => (x.patientId == item.patientId && x.sampleId == item.sampleId && x.sampleType == item.sampleType));
+            var i = samples.findIndex(x => (x.patientId === item.patientId && x.sampleId === item.sampleId && x.sampleType === item.sampleType));
             if(i <= -1){
                     console.log("items", item)
 
                     samples.push({
                       patientID: [{
                           idNumber: item.patientId,
-                          idTypeCode: ""
+                          idTypeCode: item.typecode
                       }],
-                      firstName: "",
-                      surName: "",
-                      sex: "",
+                      firstName: item.firstname,
+                      surName: item.surname,
+                      sex: item.sex,
                       pregnantBreastFeedingStatus: "",
                       age: 0,
-                      dateOfBirth: "",
+                      dateOfBirth: item.dob,
+                      age: item.age,
                       sampleID: item.sampleId,
                       sampleType: item.sampleType,
-                      indicationVLTest: "VL",
+                      indicationVLTest: 1,
                       artCommencementDate: "",
                       drugRegimen: "",
-                      sampleOrderedBy: "",
-                      sampleOrderDate: "",
-                      sampleCollectedBy: "",
+                      sampleOrderedBy: item.orderby,
+                      sampleOrderDate: item.orderbydate,
+                      sampleCollectedBy: item.collectedby,
                       sampleCollectionDate: item.datecollected,
                       sampleCollectionTime: item.timecollected,
-                      dateSampleSent: ""
+                      dateSampleSent: format(new Date(), 'yyyy-MM-dd'),
+                      id: 0,
+                      manifestID: 0,
+                      pid: 0,
+                      priority: 0,
                   });
 
                   localStorage.setItem('samples', JSON.stringify(samples));
@@ -226,8 +243,13 @@ const SampleSearch = (props) => {
            icons={tableIcons}
               title="Sample Collection List"
               columns={[
-                  { title: "Facility Name", field: "FacilityName" },
+                  { title: "Type code", field: "typecode" },
                   { title: "Patient ID", field: "patientId" },
+                  { title: "First Name", field: "firstname" },
+                  { title: "Surname", field: "surname" },
+                  { title: "Sex", field: "sex" },
+                  { title: "DOB", field: "dob" },
+                  { title: "Age", field: "age" },
                   {
                     title: "Test Type",
                     field: "testType",
@@ -237,6 +259,9 @@ const SampleSearch = (props) => {
                     title: "Sample Type",
                     field: "sampleType",
                   },
+                  { title: "Sample Orderby", field: "orderby" },
+                  { title: "Orderby Date", field: "orderbydate" },
+                  { title: "Collected By", field: "collectedby" },
                   { title: "Date Collected", field: "datecollected", type: "date" , filtering: false},
                   { title: "Time Collected", field: "timecollected", type: "time" , filtering: false},
 //                  {
@@ -245,14 +270,22 @@ const SampleSearch = (props) => {
 //                    filtering: false,
 //                  },
               ]}
-              //isLoading={loading}
+              isLoading={loading}
               data={ collectedSamples.map((row) => (
                     {
-                      FacilityName: "Lagos State General Hospital",
-                      patientId: row.patientID[0].idNumber,
+                      typecode: row.patientID.idTypeCode,
+                      patientId: row.patientID.idNumber,
+                      firstname: row.firstName,
+                      surname: row.surName,
+                      sex: row.sex,
+                      dob: row.dateOfBirth,
+                      age: calculate_age(row.dateOfBirth),
                       testType: "VL",
                       sampleId: row.sampleID,
                       sampleType: row.sampleType,
+                      orderby: row.sampleOrderedBy,
+                      orderbydate: row.sampleOrderDate,
+                      collectedby: row.sampleCollectedBy,
                       datecollected: row.sampleCollectionDate,
                       timecollected: row.sampleCollectionTime,
 

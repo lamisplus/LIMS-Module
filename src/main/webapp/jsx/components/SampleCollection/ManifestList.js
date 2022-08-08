@@ -4,6 +4,10 @@ import MaterialTable from 'material-table';
 import { Link } from 'react-router-dom'
 import MatButton from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/core/styles'
+import { MdDashboard, MdDeleteForever, MdModeEdit, MdPerson } from "react-icons/md";
+import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
+import { alpha } from '@material-ui/core/styles'
+import SplitActionButton from './SplitActionButton';
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -26,6 +30,8 @@ import {token, url } from "../../../api";
 
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import "@reach/menu-button/styles.css";
+import {FaEye, FaUserPlus} from "react-icons/fa";
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
@@ -42,7 +48,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
-import SplitActionButton from '../../layouts/SplitActionButton'
+
 
 const tableIcons = {
 Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -96,14 +102,26 @@ const useStyles = makeStyles(theme => ({
     },
     input: {
         display: 'none'
-    }
-}))
+    },
+    error: {
+        color: "#f85032",
+        fontSize: "11px",
+    },
+    success: {
+        color: "#4BB543 ",
+        fontSize: "11px",
+    },
+}));
 
 const DownloadManifest = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
     const [permissions, setPermissions] = useState([]);
+
+     useEffect(() => {
+            userPermission();
+          }, []);
 
         const userPermission =()=>{
             axios
@@ -116,7 +134,6 @@ const DownloadManifest = (props) => {
                 })
                 .catch((error) => {
                 });
-
         }
 
        const loadManifestData = useCallback(async () => {
@@ -124,27 +141,24 @@ const DownloadManifest = (props) => {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
                 console.log("manifest", response);
                 setCollectedSamples(response.data);
+                setLoading(false)
+
             } catch (e) {
                 toast.error("An error occurred while fetching lab", {
                     position: toast.POSITION.TOP_RIGHT
                 });
+                setLoading(false)
             }
         }, []);
 
          useEffect(() => {
          setLoading('true');
-             const onSuccess = () => {
-                 setLoading(false)
-             }
-             const onError = () => {
-                 setLoading(false)
-             }
 
              loadManifestData();
 
          }, [loadManifestData]);
 
-       function actionItems(row){
+       function actionItemss(row){
             return  [            {
                 type:'single',
                 actions:[
@@ -160,7 +174,54 @@ const DownloadManifest = (props) => {
                 ]
             }
             ]
-        }
+       }
+
+     const actionItems = row => {
+          return  [
+              {
+                  name:'View',
+                  type:'link',
+                  icon:<FaEye  size="22"/>,
+                  to:{
+                      pathname: "/register-patient",
+                      state: { patientId : row.id, permissions:permissions  }
+                  }
+              },
+              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
+                      {
+                          name:'Print Manifest',
+                          type:'link',
+                          icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+                          to:{
+                              pathname: "/print-manifest",
+                              state: { sampleObj: [], permissions:permissions  }
+                          }
+                      }
+              )},
+              {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+                      {
+                          name:'Add Results',
+                          type:'link',
+                          icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+                          to:{
+                              pathname: "/register-patient",
+                              state: { sampleObj: [], permissions:permissions  }
+                          }
+                      }
+                  )},
+//              {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+//                      {
+//                          name:'Delete Patient',
+//                          type:'link',
+//                          icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+//                          to:{
+//                              pathname: "/#",
+//                              state: { patientObj: row, permissions:permissions  }
+//                          }
+//                      }
+//                  )}
+           ]
+       }
 
   return (
     <>
@@ -201,24 +262,20 @@ const DownloadManifest = (props) => {
                         filtering: false,
                       },
                   ]}
-                  //isLoading={loading}
+                  isLoading={loading}
                   data={ collectedSamples.map((row) => (
                         {
-                          manifestId: "DATA.FI-a0c3fwz0fus",
+                          manifestId: row.manifestID,
                           pickupDate: row.dateScheduledForPickup.replace('T', ' '),
-                          createDate: new Date().toISOString().slice(0, 10),
+                          createDate: row.createDate.replace('T', ' '),
                           lab: row.receivingLabName,
                           packaged_by: row.samplePackagedBy,
-                          status: "Pending",
+                          status: row.manifestStatus,
 
-                          actions:  <div>
-                            {
-                            //permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                                  <SplitActionButton actions={actionItems(row)} />
-                              //):""
-
-                            }
-                          </div>
+                          actions:
+                            <div>
+                               <SplitActionButton actions={actionItems(row)} />
+                            </div>
 
                         }))}
 
