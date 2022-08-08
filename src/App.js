@@ -26,9 +26,6 @@ export default function App() {
          <Route path="/create-manifest">
             <SampleCollection />
           </Route>
-          {/*<Route path="/samples">
-              <SampleSearch />
-            </Route>*/}
           <Route path="/">
             <Home />
           </Route>

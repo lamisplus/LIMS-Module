@@ -45,9 +45,6 @@ const Home = (props) => {
                         <Tab eventKey="collection" title="Create Manifest">
                          <SampleCollection />
                         </Tab>
-                        {/*<Tab eventKey="manifest" title="Create Manifest">
-                          <CreateManifest />
-                        </Tab>*/}
 
                     </Tabs>
               </div>

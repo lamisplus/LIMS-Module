@@ -77,8 +77,8 @@ class ManifestPrint extends React.Component {
               </div>
               <br/>
               <div>
-                     <Table striped bordered hover size="sm">
-                        <thead>
+                     <Table striped bordered size="sm">
+                        <thead style={{  backgroundColor:'#014d88', color:'#fff' }}>
                           <tr>
                             <th>Facility</th>
                             <th>Patient ID</th>
@@ -90,7 +90,7 @@ class ManifestPrint extends React.Component {
                         <tbody>
                         { this.props.sampleObj.sampleInformation && this.props.sampleObj.sampleInformation.map((data, i) => (
                              <tr key={i}>
-                                <td scope="row">Lagos state General Hospital</td>
+                                <td scope="row">{this.props.sampleObj.sendingFacilityName}</td>
                                 <td>{data.patientID[0].idNumber}</td>
                                 <td>{data.sampleID}</td>
                                 <td>{data.sampleType}</td>

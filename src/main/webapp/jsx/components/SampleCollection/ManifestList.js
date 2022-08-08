@@ -116,7 +116,6 @@ const DownloadManifest = (props) => {
                 })
                 .catch((error) => {
                 });
-
         }
 
        const loadManifestData = useCallback(async () => {
@@ -124,10 +123,17 @@ const DownloadManifest = (props) => {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
                 console.log("manifest", response);
                 setCollectedSamples(response.data);
+                setLoading(false)
+//                  const manifests = JSON.parse(localStorage.getItem('manifest'));
+//                     const samples = JSON.parse(localStorage.getItem('samples'));
+//                     if (manifests || samples) {
+//                         localStorage.clear();
+//                     }
             } catch (e) {
                 toast.error("An error occurred while fetching lab", {
                     position: toast.POSITION.TOP_RIGHT
                 });
+                setLoading(false)
             }
         }, []);
 
@@ -201,10 +207,10 @@ const DownloadManifest = (props) => {
                         filtering: false,
                       },
                   ]}
-                  //isLoading={loading}
+                  isLoading={loading}
                   data={ collectedSamples.map((row) => (
                         {
-                          manifestId: "DATA.FI-a0c3fwz0fus",
+                          manifestId: row.manifestID,
                           pickupDate: row.dateScheduledForPickup.replace('T', ' '),
                           createDate: new Date().toISOString().slice(0, 10),
                           lab: row.receivingLabName,
