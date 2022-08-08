@@ -273,8 +273,8 @@ const SampleSearch = (props) => {
               isLoading={loading}
               data={ collectedSamples.map((row) => (
                     {
-                      typecode: row.patientID[0].idTypeCode,
-                      patientId: row.patientID[0].idNumber,
+                      typecode: row.patientID.idTypeCode,
+                      patientId: row.patientID.idNumber,
                       firstname: row.firstName,
                       surname: row.surName,
                       sex: row.sex,
