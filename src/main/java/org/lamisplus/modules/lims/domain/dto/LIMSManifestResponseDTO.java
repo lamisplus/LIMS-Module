@@ -1,5 +1,7 @@
 package org.lamisplus.modules.lims.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.util.List;
@@ -14,5 +16,6 @@ public class LIMSManifestResponseDTO {
     String receivingPCRLabId;
     String totalSamplesProcessed;
     String totalSamplesNotProcessed;
-    List<Objects> errors;
+    @JsonProperty("errors")
+    private JsonNode errors;
 }

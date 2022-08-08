@@ -1,8 +1,18 @@
 package org.lamisplus.modules.lims.domain.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.array.IntArrayType;
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
+import com.vladmihalcea.hibernate.type.json.JsonNodeStringType;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 
@@ -11,6 +21,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Table(name = "lims_sample")
+@TypeDefs({
+        @TypeDef(name = "string-array", typeClass = StringArrayType.class),
+        @TypeDef(name = "int-array", typeClass = IntArrayType.class),
+        @TypeDef(name = "json", typeClass = JsonStringType.class),
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
+        @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
+        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class),
+})
 public class Sample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +36,14 @@ public class Sample {
     private int id;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
-
+    @Column(name = "pid")
+    private String pid;
     @Column(name = "sample_id")
     private String sampleID;
-    @Column(name = "pid")
-    private int pid;
+
+    @Type(type = "jsonb-node")
+    @Column(columnDefinition = "jsonb", name = "patient_id")
+    private JsonNode patientID;
 
     @Column(name = "sample_type")
     private String sampleType;
@@ -68,6 +89,6 @@ public class Sample {
     @Column(name = "priority_reason")
     private String priorityReason;
 
-    @Column(name = "manifest_id")
-    private int manifestID;
+    @Column(name = "manifest_record_id")
+    private int manifestRecordID;
 }

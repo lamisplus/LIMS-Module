@@ -6,10 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SampleDTO {
-    private int id;
-    private String uuid;
-    private int pid;
+public class LIMSSampleDTO {
     private JsonNode patientID;
     private String firstName;
     private String surName;
@@ -30,5 +27,4 @@ public class SampleDTO {
     private String dateSampleSent;
     private String priority;
     private String priorityReason;
-    private int manifestRecordId;
 }

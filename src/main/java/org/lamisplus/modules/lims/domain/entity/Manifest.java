@@ -45,7 +45,7 @@ public class Manifest {
     @Column(name = "create_date")
     private LocalDateTime createDate;
 
-    @JoinColumn(name = "manifest_id")
+    @JoinColumn(name = "manifest_record_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sample> sampleInformation;
 }

@@ -1,10 +1,12 @@
 package org.lamisplus.modules.lims.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.LIMSManifestResponseDTO;
 import org.lamisplus.modules.lims.domain.dto.ManifestDTO;
 import org.lamisplus.modules.lims.service.ManifestService;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +44,7 @@ public class LimsManifestController {
     }
 
     @GetMapping("/ready-manifests/{id}")
-    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id){
+    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id) throws JSONException, JsonProcessingException {
         return manifestService.PostManifestToServer(id);
     }
 }

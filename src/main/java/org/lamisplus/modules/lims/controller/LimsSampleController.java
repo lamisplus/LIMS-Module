@@ -36,12 +36,12 @@ public class LimsSampleController {
     }
 
     @GetMapping("/manifest-samples/manifests/{id}")
-    public List<SampleDTO> GetSamplesByManifestId(@PathVariable int id){
-        return sampleService.findbyManifestId(id);
+    public List<SampleDTO> GetSamplesByManifestId(@PathVariable int id) {
+        return sampleService.findbyManifestRecordId(id);
     }
 
     @GetMapping("/collected-samples/")
-    public List<SampleDTO> GetAllCollectedSamples(){
+    public List<SampleDTO> GetAllCollectedSamples() {
         return sampleService.getAllPendingSamples();
     }
 }

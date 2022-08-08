@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface SampleRepository extends JpaRepository<Sample, Integer> {
-    List<Sample> findAllByManifestID(Integer id);
-
-    @Query(value = "select c.id, '0' as manifest_id\n" +
+    List<Sample> findAllByManifestRecordID(Integer id);
+    @Query(value = "select c.id, '0' as manifest_record_id\n" +
             ", c.id as sample_id\n" +
             ", c.uuid\n" +
             ", a.patient_id as pid\n" +
+            ", null as patient_id\n" +
             ", e.display as sample_type\n" +
             ", a.userid as sample_ordered_by\n" +
             ", CAST(a.order_date as TEXT)||' 00:00:00'sample_order_date\n" +
@@ -40,6 +40,6 @@ public interface SampleRepository extends JpaRepository<Sample, Integer> {
             "inner join base_application_codeset e on c.sample_type_id = e.id\n" +
             "left join base_application_codeset f on b.viral_load_indication = e.id\n" +
             "where d.lab_test_name='Viral Load'\n" +
-            "and b.lab_test_order_status=1 ", nativeQuery = true)
+            "and b.lab_test_order_status in (1,2) ", nativeQuery = true)
     List<Sample> findPendingVLSamples();
 }
