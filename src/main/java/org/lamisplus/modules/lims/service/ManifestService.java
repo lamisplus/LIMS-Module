@@ -44,20 +44,22 @@ public class ManifestService {
     public ManifestDTO Save(ManifestDTO manifestDTO){
         Manifest manifest = limsMapper.tomManifest(manifestDTO);
 
-        //TODO: pick the active facility
-        Long FacilityId = getCurrentUserOrganization();
-        OrganisationUnit organisationUnit = organisationUnitService.getOrganizationUnit(FacilityId);
-        String FacilityName = organisationUnit.getName();
+        if(manifest.getId()==0) {
+            //TODO: pick the active facility
+            Long FacilityId = getCurrentUserOrganization();
+            OrganisationUnit organisationUnit = organisationUnitService.getOrganizationUnit(FacilityId);
+            String FacilityName = organisationUnit.getName();
 
-        manifest.setManifestID(GenerateManifestID(FacilityMFLCode));
-        manifest.setSendingFacilityID(FacilityDATIMCode);
-        manifest.setSendingFacilityName(FacilityName);
-        manifest.setManifestStatus("Ready");
-        manifest.setCreateDate(LocalDateTime.now());
-        manifest.setUuid(UUID.randomUUID().toString());
+            manifest.setManifestID(GenerateManifestID(FacilityMFLCode));
+            manifest.setSendingFacilityID(FacilityDATIMCode);
+            manifest.setSendingFacilityName(FacilityName);
+            manifest.setManifestStatus("Ready");
+            manifest.setCreateDate(LocalDateTime.now());
+            manifest.setUuid(UUID.randomUUID().toString());
 
-        for(Sample sample: manifest.getSampleInformation()){
-            sample.setUuid(UUID.randomUUID().toString());
+            for(Sample sample: manifest.getSampleInformation()){
+                sample.setUuid(UUID.randomUUID().toString());
+            }
         }
 
         return limsMapper.toManifestDto( manifestRepository.save(manifest));
@@ -87,7 +89,7 @@ public class ManifestService {
         return "LP-"+FacilityCode +"-"+ String.format("%05d", manifestDTOList.size()+1);
     }
 
-    public LIMSManifestResponseDTO PostManifestToServer(int id) throws JsonProcessingException, JSONException {
+    public LIMSManifestResponseDTO PostManifestToServer(int id) {
         RestTemplate restTemplate = new RestTemplate();
 
         //set message converters
@@ -122,9 +124,9 @@ public class ManifestService {
         ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
 
         //Update manifest status
-        manifest.setManifestStatus("Submitted");
-        manifest.setCreateDate(LocalDateTime.now());
-        Save(limsMapper.toManifestDto(manifest));
+        ManifestDTO dto = findById(id);
+        dto.setManifestStatus("Submitted");
+        Save(dto);
 
         return manifestResponse.getBody();
     }
