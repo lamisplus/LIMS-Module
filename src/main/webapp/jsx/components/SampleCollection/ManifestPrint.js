@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState} from 'react';
 import { Link, useHistory } from 'react-router-dom'
-import nglogo from '../../../../../assets/images/nglogo.png'
+//import nglogo from '../../../../../assets/images/nglogo.png'
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -28,7 +28,7 @@ class ManifestPrint extends React.Component {
                                       <th scope="row"></th>
 
                                       <th scope="row" className="text-center">
-                                        <img src={nglogo} style={{width: "80px", height: "80px"}}/>
+                                        <img src="/nglogo.png" style={{width: "80px", height: "80px"}}/>
                                       </th>
 
                                     </tr>
