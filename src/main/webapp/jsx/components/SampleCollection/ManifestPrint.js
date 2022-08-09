@@ -49,8 +49,8 @@ class ManifestPrint extends React.Component {
                    <Table bordered size="sm">
                       <tbody>
                            <tr>
-                              <th scope="row">Date/Time:</th>
-                              <td>{this.props.sampleObj.dateScheduledForPickup}</td>
+                              <th scope="row">Pick Up Date:</th>
+                              <td>{this.props.sampleObj.dateScheduledForPickup === null ? " " : this.props.sampleObj.dateScheduledForPickup?.replace("T", " ")}</td>
                               <th scope="row">Destination:</th>
                               <td>{this.props.sampleObj.receivingLabName}</td>
                               <th scope="row">PCR Lab Number:</th>

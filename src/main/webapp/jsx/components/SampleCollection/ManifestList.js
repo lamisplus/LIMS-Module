@@ -183,21 +183,23 @@ const DownloadManifest = (props) => {
                   type:'link',
                   icon:<FaEye  size="22"/>,
                   to:{
-                      pathname: "/register-patient",
-                      state: { patientId : row.id, permissions:permissions  }
+                      pathname: "/print-manifest",
+                      state: { sampleObj: row, permissions:permissions  }
                   }
               },
-              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
-                      {
-                          name:'Print Manifest',
-                          type:'link',
-                          icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
-                          to:{
-                              pathname: "/print-manifest",
-                              state: { sampleObj: [], permissions:permissions  }
-                          }
-                      }
-              )},
+
+//              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
+//                      {
+//                          name:'Print Manifest',
+//                          type:'link',
+//                          icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+//                          to:{
+//                              pathname: "/print-manifest",
+//                              state: { sampleObj: row, permissions:permissions  }
+//                          }
+//                      }
+//              )},
+
               {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
                       {
                           name:'Add Results',

@@ -117,7 +117,16 @@ const SampleSearch = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
-    const samples = []
+    const samples = [];
+    const [ dateFilter, setDateFilter] = useState({
+        startDate: null,
+        endDate: null
+    })
+
+    const handleChange = e => {
+        const {name, value} = e.target;
+        setDateFilter({...dateFilter, [name]: value})
+    }
 
      const loadLabTestData = useCallback(async () => {
             try {
@@ -206,30 +215,30 @@ const SampleSearch = (props) => {
             <Grid container spacing={2}>
               <Grid item xs={2}>
                    <FormGroup>
-                       <Label for="dateScheduledForPickup" className={classes.label}>Start date</Label>
+                       <Label for="startDate" className={classes.label}>Start date</Label>
 
                        <Input
                            type="date"
-                           name="dateScheduledForPickup"
+                           name="startDate"
 
-                           id="dateScheduledForPickup"
-                           placeholder="Date & Time Created"
-
+                           id="startDate"
+                           placeholder="Start Date"
+                           onChange={handleChange}
                            className={classes.input}
                        />
                    </FormGroup>
               </Grid>
               <Grid item xs={2}>
                     <FormGroup>
-                      <Label for="dateScheduledForPickup" className={classes.label}>End date</Label>
+                      <Label for="endDate" className={classes.label}>End date</Label>
 
                       <Input
                           type="date"
-                          name="dateScheduledForPickup"
+                          name="endDate"
 
-                          id="dateScheduledForPickup"
-                          placeholder="Date & Time Created"
-
+                          id="endDate"
+                          placeholder="End Date"
+                          onChange={handleChange}
                           className={classes.input}
                       />
                   </FormGroup>
@@ -260,7 +269,7 @@ const SampleSearch = (props) => {
                     field: "sampleType",
                   },
                   { title: "Sample Orderby", field: "orderby" },
-                  { title: "Orderby Date", field: "orderbydate" },
+                  { title: "Orderby Date", field: "orderbydate", type: "date" , filtering: false },
                   { title: "Collected By", field: "collectedby" },
                   { title: "Date Collected", field: "datecollected", type: "date" , filtering: false},
                   { title: "Time Collected", field: "timecollected", type: "time" , filtering: false},
@@ -271,7 +280,17 @@ const SampleSearch = (props) => {
 //                  },
               ]}
               isLoading={loading}
-              data={ collectedSamples.map((row) => (
+              data={ collectedSamples.filter( row => {
+                   let filterPass = true
+                   const date = new Date(row.sampleCollectionDate)
+                   if (dateFilter.startDate) {
+                     filterPass = filterPass && (new Date(dateFilter.startDate) <= date)
+                   }
+                   if (dateFilter.endDate) {
+                     filterPass = filterPass && (new Date(dateFilter.endDate) >= date)
+                   }
+                   return filterPass
+              }).map((row) => (
                     {
                       typecode: row.patientID.idTypeCode,
                       patientId: row.patientID.idNumber,

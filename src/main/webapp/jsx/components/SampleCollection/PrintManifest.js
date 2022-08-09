@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState, useRef} from 'react';
 import Container from '@mui/material/Container';
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { connect } from "react-redux";
 import { Row, Col, Card } from "react-bootstrap";
 
@@ -82,6 +82,9 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const PrintManifest = (props) => {
+    let history = useHistory();
+    const sampleObj = history.location && history.location.state ? history.location.state.sampleObj : {}
+    console.log("props",sampleObj)
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
@@ -99,6 +102,8 @@ const PrintManifest = (props) => {
       if (manifests) {
         SetLocalStore(manifests);
         localStorage.clear();
+      }else {
+        SetLocalStore(sampleObj)
       }
     }, []);
 
