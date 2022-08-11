@@ -15,9 +15,10 @@ import FormLabel from "@material-ui/core/FormLabel";
 import {format} from "date-fns";
 
 import {  Modal, ModalHeader, ModalBody,
-    Col,Input,
-    FormGroup,
-    Label,Card, CardBody, Table, Badge
+    Col, Card, CardBody, Table,
+    Form, FormFeedback, FormGroup, FormText,
+    Input,
+    Label, Badge
 } from 'reactstrap';
 
 import { forwardRef } from 'react';
@@ -98,6 +99,15 @@ const CreateAManifest = (props) => {
     const [localStore, SetLocalStore] = useState([]);
     const [manifestsId, setManifestsId] = useState(0);
     const [status, setStatus] = useState("Pending")
+    const [validate, setValidate] = useState({
+        dateScheduledForPickupSucess: false,
+        dateScheduledForPickupFail: false,
+        temperatureAtPickup: false,
+        receivingLabID: "",
+        receivingLabName: "",
+        courierRiderName: "",
+        courierContact: ""
+    })
 
     useEffect(() => {
       const collectedSamples = JSON.parse(localStorage.getItem('samples'));
@@ -117,7 +127,7 @@ const CreateAManifest = (props) => {
          receivingLabID: pcrLabCode.labNo,
          receivingLabName: pcrLabCode.name,
          dateScheduledForPickup: "",
-         temperatureAtPickup: 0,
+         temperatureAtPickup: "",
          samplePackagedBy: "",
          courierRiderName: "",
          courierContact: "",
@@ -126,6 +136,7 @@ const CreateAManifest = (props) => {
          id: 0,
          uuid: ""
      })
+
 
     const handleChange = (event) => {
            checkPCRLab(event.target.value)
@@ -142,24 +153,48 @@ const CreateAManifest = (props) => {
         })
     }
 
+   const validateInputs = (manifestData) => {
+        //console.log("mani",manifestData)
+        if (manifestData.dateScheduledForPickup.length === 0) {
+            validate.dateScheduledForPickupFail = true;
+        }
+
+        setValidate({validate})
+       //console.log("after",validate)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
-        //console.log(`manifest created...${JSON.stringify(manifestData)}`)
-           await axios.post(`${url}lims/manifests`, manifestData,
-            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                setManifestsId(resp.data.id)
-                 console.log("response", resp)
-                  setSaved(true);
-                toast.success("Sample manifest saved successfully!!", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-                manifestData.manifestID = resp.data.manifestID
-                manifestData.sendingFacilityID = resp.data.sendingFacilityID
-                manifestData.sendingFacilityName = resp.data.sendingFacilityName
+        validateInputs(manifestData)
 
-                localStorage.setItem('manifest', JSON.stringify(manifestData));
-                localStorage.removeItem("samples");
-            });
+        if (manifestData.dateScheduledForPickup.length === 0) {
+             toast.error("Sample Pick up date can not be empty", {
+                position: toast.POSITION.TOP_RIGHT
+             });
+        }
+
+        if ( manifestData.receivingLabName.length === 0) {
+             toast.error("Receiving lab can not be empty", {
+                position: toast.POSITION.TOP_RIGHT
+             });
+        }
+        else{
+               await axios.post(`${url}lims/manifests`, manifestData,
+                { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                    setManifestsId(resp.data.id)
+                     console.log("response", resp)
+                      setSaved(true);
+                    toast.success("Sample manifest saved successfully!!", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                    manifestData.manifestID = resp.data.manifestID
+                    manifestData.sendingFacilityID = resp.data.sendingFacilityID
+                    manifestData.sendingFacilityName = resp.data.sendingFacilityName
+
+                    localStorage.setItem('manifest', JSON.stringify(manifestData));
+                    localStorage.removeItem("samples");
+                });
+        }
     }
 
     const sendManifest = async (e) => {
@@ -180,7 +215,7 @@ const CreateAManifest = (props) => {
         <Card>
             <CardBody>
              <br/>
-                <form>
+                <Form>
                     <Box sx={{ flexGrow: 1 }}>
                       <Grid container spacing={2}>
                         <Grid item xs={6} md={4}>
@@ -190,12 +225,16 @@ const CreateAManifest = (props) => {
                                 <Input
                                     type="datetime-local"
                                     name="dateScheduledForPickup"
-                                    value={manifestData.dateScheduledForPickup}
                                     id="dateScheduledForPickup"
                                     placeholder="Date & Time Created"
-                                    onChange={handleChange}
                                     className={classes.input}
+                                    invalid={manifestData.dateScheduledForPickup.length === 0? true: false}
+                                    value={manifestData.dateScheduledForPickup}
+                                    onChange={handleChange}
                                 />
+                                <FormFeedback>
+                                  Pick up date is a required
+                                </FormFeedback>
                             </FormGroup>
                         </Grid>
                         <Grid item xs={6} md={4}>
@@ -208,6 +247,7 @@ const CreateAManifest = (props) => {
                                     id="receivingLabName"
                                     onChange={handleChange}
                                     className={classes.input}
+                                    invalid={pcrLabCode.name.length === 0? true: false}
                                 >
                                   <option>
                                     Selcet PCR Lab
@@ -215,6 +255,7 @@ const CreateAManifest = (props) => {
                                   {pcr_lab.map((value, i) =>
                                   <option key={i} value={value.name} >{value.name}</option>)}
                                 </Input>
+                                <FormFeedback>Receiving lab is a required field</FormFeedback>
                             </FormGroup>
                         </Grid>
                         <Grid item xs={6} md={4}>
@@ -227,9 +268,10 @@ const CreateAManifest = (props) => {
                                      id="receivingLabID"
                                      onChange={handleChange}
                                      className={classes.input}
-                                     disabled={true}
+                                     disabled
+                                     invalid={pcrLabCode.labNo.length === 0? true: false}
                                  />
-
+                             <FormFeedback>Receiving lab Id is a required field</FormFeedback>
                              </FormGroup>
                         </Grid>
                         <Grid item xs={6} md={4}>
@@ -242,8 +284,9 @@ const CreateAManifest = (props) => {
                                     value={manifestData.courierRiderName}
                                     onChange={handleChange}
                                     className={classes.input}
+                                    invalid={manifestData.courierRiderName.length === 0? true: false}
                                 />
-
+                            <FormFeedback>Courier name is a required field</FormFeedback>
                             </FormGroup>
                         </Grid>
                         <Grid item xs={6} md={4}>
@@ -256,7 +299,9 @@ const CreateAManifest = (props) => {
                                     id="courierContact"
                                     onChange={handleChange}
                                     className={classes.input}
+                                    invalid={manifestData.courierContact.length === 0? true: false}
                                 />
+                                <FormFeedback>Courier contact is a required field</FormFeedback>
                             </FormGroup>
                          </Grid>
                          <Grid item xs={6} md={4}>
@@ -269,7 +314,9 @@ const CreateAManifest = (props) => {
                                      id="samplePackagedBy"
                                      onChange={handleChange}
                                      className={classes.input}
+                                     invalid={manifestData.samplePackagedBy.length === 0? true: false}
                                  />
+                                 <FormFeedback>Sample package by is a required field</FormFeedback>
                              </FormGroup>
                           </Grid>
                           <Grid item xs={6} md={6}>
@@ -281,7 +328,7 @@ const CreateAManifest = (props) => {
                                     id="manifestStatus"
                                     value={status}
                                     onChange={handleChange}
-                                    disabled={true}
+                                    disabled
                                     className={classes.input}
                                 />
 
@@ -296,10 +343,12 @@ const CreateAManifest = (props) => {
                                       id="temperatureAtPickup"
                                       value={manifestData.temperatureAtPickup}
                                       onChange={handleChange}
-                                      disabled={false}
+                                      invalid={manifestData.temperatureAtPickup.length === 0? true: false}
                                       className={classes.input}
                                   />
-
+                              <FormFeedback>
+                                Temperature at pickup is a required
+                              </FormFeedback>
                               </FormGroup>
                           </Grid>
                           <Grid item xs={6} md={6}>
@@ -311,7 +360,7 @@ const CreateAManifest = (props) => {
                                        id="total_sample"
                                        value={localStore.length}
                                        onChange={handleChange}
-                                       disabled={true}
+                                       disabled
                                        className={classes.input}
                                    />
 
@@ -326,7 +375,7 @@ const CreateAManifest = (props) => {
                                    id="test_type"
                                    value="VL"
                                    onChange={handleChange}
-                                   disabled={true}
+                                   disabled
                                    className={classes.input}
                                />
 
@@ -348,7 +397,7 @@ const CreateAManifest = (props) => {
                             </Button>
                         </>
                     }
-                </form>
+                </Form>
              </CardBody>
         </Card>
       </>

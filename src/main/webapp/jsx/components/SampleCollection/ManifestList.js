@@ -136,7 +136,7 @@ const DownloadManifest = (props) => {
                 });
         }
 
-       const loadManifestData = useCallback(async () => {
+         const loadManifestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
                 console.log("manifest", response);
@@ -157,24 +157,6 @@ const DownloadManifest = (props) => {
              loadManifestData();
 
          }, [loadManifestData]);
-
-       function actionItemss(row){
-            return  [            {
-                type:'single',
-                actions:[
-                    {
-                        name:'Print Manifest',
-                        type:'link',
-
-                        to:{
-                            pathname: "/print-manifest",
-                            state:{ sampleObj: [] }
-                        }
-                    },
-                ]
-            }
-            ]
-       }
 
      const actionItems = row => {
           return  [
