@@ -58,7 +58,7 @@ class ManifestPrint extends React.Component {
                             </tr>
                             <tr>
                               <th scope="row">Status:</th>
-                              <td>Pending</td>
+                              <td>{this.props.sampleObj.manifestStatus}</td>
                               <th scope="row">Manifest Id:</th>
                               <td>{this.props.sampleObj.manifestID}</td>
                               <th scope="row">Sample Temperature:</th>

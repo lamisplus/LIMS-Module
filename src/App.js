@@ -14,12 +14,16 @@ import Home from './main/webapp/jsx/components/Home'
 import SampleCollection from './main/webapp/jsx/components/SampleCollection/SamplesCollection';
 import PrintManifest from './main/webapp/jsx/components/SampleCollection/PrintManifest';
 import SampleSearch from './main/webapp/jsx/components/SampleCollection/SampleOrderLists';
+import Result from './main/webapp/jsx/components/SampleCollection/Result'
 
 export default function App() {
   return (
       <div>
       <ToastContainer />
         <Switch>
+         <Route path="/result">
+          <Result />
+         </Route>
          <Route path="/print-manifest">
              <PrintManifest />
            </Route>

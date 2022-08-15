@@ -184,12 +184,12 @@ const DownloadManifest = (props) => {
 
               {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
                       {
-                          name:'Add Results',
+                          name:'Get Results',
                           type:'link',
                           icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
                           to:{
-                              pathname: "/register-patient",
-                              state: { sampleObj: [], permissions:permissions  }
+                              pathname: "/result",
+                              state: { manifestObj: row }
                           }
                       }
                   )},

@@ -23,6 +23,7 @@ import MatButton from '@material-ui/core/Button'
 import PrintIcon from '@mui/icons-material/Print';
 import { useReactToPrint } from 'react-to-print';
 import HomeIcon from '@mui/icons-material/Home';
+import SendIcon from '@mui/icons-material/Send';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -84,13 +85,14 @@ const useStyles = makeStyles(theme => ({
 const PrintManifest = (props) => {
     let history = useHistory();
     const sampleObj = history.location && history.location.state ? history.location.state.sampleObj : {}
-    console.log("props",sampleObj)
+    //console.log("props",sampleObj)
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
     const manifestData = []
     const [saved, setSaved] = useState(false);
     const [localStore, SetLocalStore] = useState([]);
+    const [send, setSend] = useState(false);
 
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
@@ -107,12 +109,46 @@ const PrintManifest = (props) => {
       }
     }, []);
 
+     const sendManifest = async (e) => {
+            e.preventDefault()
+             await axios.get(`${url}lims/ready-manifests/${localStore.id}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                .then((resp) => {
+                    console.log("sending manifest", resp)
+                    if (resp.data.errors.length > 0) {
+                        toast.error(resp.data.errors[0].reasons, {
+                            position: toast.POSITION.TOP_RIGHT
+                         });
+                         setSend(true)
+                    }
+                    else {
+                         toast.success("Sample manifest sent successfully to PCR Lab.", {
+                            position: toast.POSITION.TOP_RIGHT
+                        });
+                        setSend(true)
+                    }
+
+                })
+        }
+
   return (
       <div>
       <Card>
          <Card.Body>
 
             <p style={{textAlign: 'right'}}>
+            { localStore.manifestStatus === "Ready" ?
+                <MatButton
+                     variant="contained"
+                     color="success"
+                     className={classes.button}
+                     startIcon={<SendIcon />}
+                     disabled={!send ? false : true}
+                     onClick={sendManifest}
+                 >
+                     Send Manifest
+                 </MatButton> : " "
+            }
+
             <MatButton
                  variant="contained"
                  color="success"
@@ -134,6 +170,17 @@ const PrintManifest = (props) => {
                      back Home
                  </MatButton>
                 </Link>
+                  <Link color="inherit"
+                     to={{pathname: "/result", state: { manifestObj: localStore }}}
+                      >
+                     <MatButton
+                         variant="contained"
+                         color="secondary"
+                         className={classes.button}
+                         startIcon={<HomeIcon />}>
+                         Results
+                     </MatButton>
+                    </Link>
                </p>
             <ManifestPrint sampleObj={localStore} ref={componentRef}/>
          </Card.Body>
