@@ -242,7 +242,7 @@ const CreateAManifest = (props) => {
                                     onChange={handleChange}
                                 />
                                 <FormFeedback>
-                                  Pick up date is a required
+                                  Pick up date is a required field
                                 </FormFeedback>
                             </FormGroup>
                         </Grid>
