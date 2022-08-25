@@ -1,10 +1,11 @@
 import React, {useEffect, useCallback, useState, useRef, forwardRef} from 'react';
 import Container from '@mui/material/Container';
 import { Link, useHistory } from 'react-router-dom'
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card, Table } from "react-bootstrap";
 import MaterialTable from 'material-table';
 import MatButton from '@material-ui/core/Button';
 import HomeIcon from '@mui/icons-material/Home';
+import { Badge, Spinner } from 'reactstrap';
 
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -116,34 +117,20 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    console.log("manifestObj",manifestObj)
+    //console.log("maniObj",manifestObj)
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
     const [results, setResults] = useState([])
-    const [requestData, setRequestData] = useState({
-        token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvbGltcy5uZyIsImF1ZCI6Imh0dHBzOmxpbXMubmciLCJpYXQiOjEzNTY5OTk1MjQsIm5iZiI6MTM1NzAwMDAwMCwiZGF0YSI6eyJpZCI6IjEiLCJmaXJzdG5hbWUiOiJNUlMiLCJsYXN0bmFtZSI6Ik5pZ2VyaWEiLCJlbWFpbCI6Im5tcnNAbGltcy5uZyIsImFjY2Vzc19sZXZlbCI6IiJ9fQ.9QSnCgsVC-IktzNfM3oBsY2ZhG5Xil1kXvBN9497I5U",
-        manifestID: manifestObj.manifestID,
-        sendingFacilityID: manifestObj.sendingFacilityID,
-        sendingFacilityName: manifestObj.sendingFacilityName,
-        testType: "VL",
-        receivingLabID: manifestObj.receivingLabID,
-        receivingLabName: manifestObj.receivingLabName
-    })
 
      const loadResults = useCallback(async () => {
         try {
-            console.log("requests", requestData)
-            await axios.post(`${url}lims/manifests`, requestData,
-            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                 console.log("results", resp)
-                toast.success("Sample Results Available!!", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-            });
+            const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            //console.log("results", response);
+            setResults(response.data);
             setLoading(false)
 
         } catch (e) {
-            toast.error("An error occurred while loading results", {
+            toast.error("An error occurred while fetching lab", {
                 position: toast.POSITION.TOP_RIGHT
             });
             setLoading(false)
@@ -153,6 +140,28 @@ const Result = (props) => {
     useEffect(() => {
         loadResults()
     }, [loadResults]);
+
+    const sampleStatus = e =>{
+        if(parseInt(e)===1){
+            return <p><Badge  color="success">Completed</Badge></p>
+        }else if(parseInt(e)===2){
+            return <p><Badge  color="danger">Rejected</Badge></p>
+        }else if(parseInt(e)===3){
+            return <p><Badge  color="info">In-Progress</Badge></p>
+        }else if(parseInt(e)===4){
+            return <p><Badge  color="warning">Re-Run</Badge></p>
+        }else{
+            return <p><Badge  color="dark">Sample Received</Badge></p>
+        }
+    }
+
+    const resultTestType = e => {
+        if(parseInt(e)===2){
+            return <p><Badge  color="primary">Viral Load</Badge></p>
+        }else if(parseInt(e)===1){
+            return <p><Badge  color="info">EID</Badge></p>
+        }
+    }
 
   return (
     <div>
@@ -171,64 +180,79 @@ const Result = (props) => {
                </MatButton>
               </Link>
              </p>
-              <hr />
-              <MaterialTable
-               icons={tableIcons}
-                  title="PCR Sample Results"
-                  columns={[
-                      { title: "Sample Id", field: "sampleId" },
-                      { title: "Pickup Date", field: "pickupDate" },
-                      { title: "Created Date", field: "createDate" },
-                      { title: "Receiving Lab", field: "lab" },
-                       { title: "Packaged By", field: "packaged_by" },
-                      {
-                        title: "Status",
-                        field: "status",
-                      },
-                    /*  {
-                        title: "Action",
-                        field: "actions",
-                        filtering: false,
-                      }, */
-                  ]}
-                  isLoading={loading}
-                  data={ results.map((row) => (
-                        {
-                          sampleId: row.manifestID,
-                          pickupDate: row.dateScheduledForPickup.replace('T', ' '),
-                          createDate: row.createDate.replace('T', ' '),
-                          lab: row.receivingLabName,
-                          packaged_by: row.samplePackagedBy,
-                          status: row.manifestStatus,
+             <hr />
+              { results.length  === 0 ? <p> <Spinner color="primary" /> Loading Please Wait</p> :
+                <>
+                  <h2>PCR Sample Results</h2>
+                  <br/>
+                  <Table bordered size="sm">
+                               <tbody>
+                                    <tr>
+                                       <th scope="row">ManifestID:</th>
+                                       <td>{results.manifestID}</td>
+                                       <th scope="row">Facility Name:</th>
+                                       <td>{results.receivingFacilityName}</td>
+                                       <th scope="row">PCR Lab Number:</th>
+                                       <td>{results.sendingPCRLabID}</td>
+                                     </tr>
+                                     <tr>
+                                       <th scope="row"></th>
+                                       <td></td>
+                                       <th scope="row"></th>
+                                       <td></td>
+                                       <th scope="row"></th>
+                                       <td></td>
+                                     </tr>
+                                      <tr>
+                                       <th scope="row">Test Type:</th>
+                                       <td>{resultTestType(results.testType)}</td>
+                                       <th scope="row">Facility Id:</th>
+                                       <td>{results.receivingFacilityID}</td>
+                                       <th scope="row"></th>
+                                       <td></td>
+                                     </tr>
+                               </tbody>
+                             </Table>
+                              <br/>
+                               <div>
+                                        <Table striped bordered size="sm">
+                                         <thead style={{  backgroundColor:'#014d88', color:'#fff' }}>
+                                           <tr>
+                                             <th>Approval Date</th>
+                                             {/*<th>Assay Date</th>
+                                             <th>Date Received at PCR Lab</th>*/}
+                                             <th>Date Result Dispatched</th>
+                                             <th>PCR Sample Number</th>
+                                              {/*<th>Result Date</th>*/}
+                                             <th>Sample ID</th>
+                                             <th>Sample Status</th>
+                                             <th>Sample Testable</th>
+                                             <th>Test Result</th>
+                                              {/*<th>Visit Date</th>*/}
+                                           </tr>
+                                         </thead>
+                                         <tbody>
+                                         { results.viralLoadTestReport.length > 0 && results.viralLoadTestReport.map((data, i) => (
+                                              <tr key={i}>
+                                                 <td scope="row">{data.approvalDate}</td>
+                                                   {/*<td>{data.assayDate}</td>
+                                                 <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
+                                                 <td>{data.dateResultDispatched}</td>
+                                                 <td>{data.pcrLabSampleNumber}</td>
+                                                  {/*<td>{data.resultDate}</td>*/}
+                                                 <td>{data.sampleID}</td>
+                                                 <td>{sampleStatus(data.sampleStatus)}</td>
+                                                 <td>{data.sampleTestable}</td>
+                                                 <td>{data.testResult}</td>
+                                                  {/*<td>{data.visitDate}</td>*/}
+                                              </tr>
+                                         ))}
+                                         </tbody>
+                                       </Table>
+                                 </div>
+                </>
+              }
 
-                         /* actions:
-                            <div>
-                               <SplitActionButton actions={actionItems(row)} />
-                            </div>*/
-
-                        }))}
-
-                      options={{
-                        headerStyle: {
-                            backgroundColor: "#014d88",
-                            color: "#fff",
-                            fontSize:'16px',
-                            padding:'10px'
-                        },
-                        searchFieldStyle: {
-                            width : '200%',
-                            margingLeft: '250px',
-                        },
-                        selection: false,
-                        filtering: false,
-                        exportButton: false,
-                        searchFieldAlignment: 'left',
-                        pageSizeOptions:[10,20,100],
-                        pageSize:10,
-                        debounceInterval: 400
-                    }}
-
-              />
          </Card.Body>
        </Card>
     </div>
