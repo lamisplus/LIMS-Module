@@ -184,26 +184,26 @@ const DownloadManifest = (props) => {
 
               {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
                       {
-                          name:'Get Results',
+                          name:' Get Results',
                           type:'link',
-                          icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+                          icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
                           to:{
                               pathname: "/result",
                               state: { manifestObj: row }
                           }
                       }
                   )},
-//              {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-//                      {
-//                          name:'Delete Patient',
-//                          type:'link',
-//                          icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-//                          to:{
-//                              pathname: "/#",
-//                              state: { patientObj: row, permissions:permissions  }
-//                          }
-//                      }
-//                  )}
+              {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+                      {
+                          name:'Add Result',
+                          type:'link',
+                          icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
+                          to:{
+                              pathname: "/add-result",
+                              state: { manifestObj: row }
+                          }
+                      }
+                  )}
            ]
        }
 

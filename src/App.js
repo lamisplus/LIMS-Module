@@ -15,6 +15,7 @@ import SampleCollection from './main/webapp/jsx/components/SampleCollection/Samp
 import PrintManifest from './main/webapp/jsx/components/SampleCollection/PrintManifest';
 import SampleSearch from './main/webapp/jsx/components/SampleCollection/SampleOrderLists';
 import Result from './main/webapp/jsx/components/SampleCollection/Result'
+import AddResult from './main/webapp/jsx/components/SampleCollection/AddResults'
 
 export default function App() {
   return (
@@ -23,6 +24,9 @@ export default function App() {
         <Switch>
          <Route path="/result">
           <Result />
+         </Route>
+         <Route path="/add-result">
+           <AddResult />
          </Route>
          <Route path="/print-manifest">
              <PrintManifest />
