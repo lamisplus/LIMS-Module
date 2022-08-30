@@ -117,7 +117,7 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    //console.log("maniObj",manifestObj)
+    console.log("maniObj",manifestObj)
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
     const [results, setResults] = useState([])
@@ -125,7 +125,8 @@ const Result = (props) => {
      const loadResults = useCallback(async () => {
         try {
             const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
-            //console.log("results", response);
+            console.log("results", response);
+
             setResults(response.data);
             setLoading(false)
 
@@ -189,9 +190,9 @@ const Result = (props) => {
                                <tbody>
                                     <tr>
                                        <th scope="row">ManifestID:</th>
-                                       <td>{results.manifestID}</td>
+                                       <td>{manifestObj.manifestID}</td>
                                        <th scope="row">Facility Name:</th>
-                                       <td>{results.receivingFacilityName}</td>
+                                       <td>{manifestObj.sendingFacilityName}</td>
                                        <th scope="row">PCR Lab Number:</th>
                                        <td>{results.sendingPCRLabID}</td>
                                      </tr>
@@ -207,7 +208,7 @@ const Result = (props) => {
                                        <th scope="row">Test Type:</th>
                                        <td>{resultTestType(results.testType)}</td>
                                        <th scope="row">Facility Id:</th>
-                                       <td>{results.receivingFacilityID}</td>
+                                       <td>{manifestObj.sendingFacilityID}</td>
                                        <th scope="row"></th>
                                        <td></td>
                                      </tr>
@@ -232,21 +233,24 @@ const Result = (props) => {
                                            </tr>
                                          </thead>
                                          <tbody>
-                                         { results.viralLoadTestReport.length > 0 && results.viralLoadTestReport.map((data, i) => (
-                                              <tr key={i}>
-                                                 <td scope="row">{data.approvalDate}</td>
-                                                   {/*<td>{data.assayDate}</td>
-                                                 <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
-                                                 <td>{data.dateResultDispatched}</td>
-                                                 <td>{data.pcrLabSampleNumber}</td>
-                                                  {/*<td>{data.resultDate}</td>*/}
-                                                 <td>{data.sampleID}</td>
-                                                 <td>{sampleStatus(data.sampleStatus)}</td>
-                                                 <td>{data.sampleTestable}</td>
-                                                 <td>{data.testResult}</td>
-                                                  {/*<td>{data.visitDate}</td>*/}
-                                              </tr>
-                                         ))}
+                                         {
+                                            results.manifestID === null ? <p style={{ textAlign: "center"}}>No Result Available Yet...</p> :
+                                             results.viralLoadTestReport.length > 0 && results.viralLoadTestReport.map((data, i) => (
+                                                  <tr key={i}>
+                                                     <td scope="row">{data.approvalDate}</td>
+                                                       {/*<td>{data.assayDate}</td>
+                                                     <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
+                                                     <td>{data.dateResultDispatched}</td>
+                                                     <td>{data.pcrLabSampleNumber}</td>
+                                                      {/*<td>{data.resultDate}</td>*/}
+                                                     <td>{data.sampleID}</td>
+                                                     <td>{sampleStatus(data.sampleStatus)}</td>
+                                                     <td>{data.sampleTestable}</td>
+                                                     <td>{data.testResult}</td>
+                                                      {/*<td>{data.visitDate}</td>*/}
+                                                  </tr>
+                                             ))
+                                         }
                                          </tbody>
                                        </Table>
                                  </div>

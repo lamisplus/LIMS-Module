@@ -119,7 +119,7 @@ const CreateAManifest = (props) => {
     const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
     const [manifestData, setManifestData] = useState({
-         token: "",
+
          manifestID: "",
          manifestStatus: "Pending",
          sendingFacilityID: "FH7LMnbnVlT",
@@ -166,6 +166,8 @@ const CreateAManifest = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         validateInputs(manifestData)
+
+        console.log("xxx",manifestData);
 
         if (manifestData.dateScheduledForPickup.length === 0) {
              toast.error("Sample Pick up date can not be empty", {

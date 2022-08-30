@@ -87,10 +87,29 @@ const useStyles = makeStyles(theme => ({
 const AddResult = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    console.log("maniObj",manifestObj)
+    //console.log("maniObj",manifestObj)
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
-    const [results, setResults] = useState({})
+    const [results, setResults] = useState({
+         manifestID: manifestObj.manifestID,
+         receivingFacilityID: manifestObj.receivingLabID,
+         receivingFacilityName: manifestObj.receivingLabName,
+         sendingPCRLabID: manifestObj.sendingFacilityID,
+         sendingPCRLabName: manifestObj.sendingFacilityName,
+         testType: "Viral Load",
+         samples: []
+    })
+
+    const [inputFields, setInputFields] = useState([{
+        testResult: "",
+        resultDate: "",
+        pcrLabSampleNumber: "",
+        approvalDate: "",
+        assayDate: "",
+        sampleTestable: "",
+        sampleStatus: "",
+        sampleID: ""
+    }])
 
      const loadResults = useCallback(async () => {
         try {
@@ -109,14 +128,17 @@ const AddResult = (props) => {
         loadResults()
     }, [loadResults]);
 
-     const handleChange = (event) => {
+     const handleChange = (i, event) => {
+           let data = [...inputFields]
            const { name, value } = event.target
-           setResults({ ...results, [name]: value})
+           //console.log(value)
+           data[i][name] = value
+           setResults({ ...results, samples: data})
      }
 
      const handleSubmit = async (e) => {
          e.preventDefault()
-
+        console.log(results)
      }
 
   return (
@@ -162,7 +184,7 @@ const AddResult = (props) => {
 
                          <td>
                             <FormGroup>
-                                <Label for="receivingFacilityID" className={classes.label}>Receiving Facility ID</Label>
+                                <Label for="receivingFacilityID" className={classes.label}>PCR Facility ID</Label>
 
                                 <Input
                                     type="text"
@@ -178,7 +200,7 @@ const AddResult = (props) => {
                         </td>
                          <td>
                             <FormGroup>
-                                <Label for="receivingFacilityName" className={classes.label}>Receiving Facility</Label>
+                                <Label for="receivingFacilityName" className={classes.label}>PCR Facility</Label>
 
                                 <Input
                                     type="text"
@@ -195,7 +217,7 @@ const AddResult = (props) => {
 
                          <td>
                             <FormGroup>
-                                <Label for="sendingPCRLabID" className={classes.label}>Sending PCR Lab ID</Label>
+                                <Label for="sendingPCRLabID" className={classes.label}>Facility ID</Label>
 
                                 <Input
                                     type="text"
@@ -211,7 +233,7 @@ const AddResult = (props) => {
                         </td>
                           <td>
                             <FormGroup>
-                                <Label for="sendingPCRLabName" className={classes.label}>Sending PCR Lab</Label>
+                                <Label for="sendingPCRLabName" className={classes.label}>Facility</Label>
 
                                 <Input
                                     type="text"
@@ -237,15 +259,16 @@ const AddResult = (props) => {
                                     placeholder="Test Type"
                                     className={classes.input}
                                     onChange={handleChange}
+                                    value="Viral Load  "
                                 />
                             </FormGroup>
                         </td>
                       </tr>
-                      {manifestObj.sampleInformation && manifestObj.sampleInformation.map((data) => (
-                        <tr>
+                      {manifestObj.sampleInformation && manifestObj.sampleInformation.map((data, i) => (
+                        <tr key={i}>
                              <td>
                                 <FormGroup>
-                                    <Label for="sampleID" className={classes.label}>Sample ID</Label>
+                                    <Label for="sampleID" className={classes.label}>Sample ID *</Label>
 
                                     <Input
                                         type="text"
@@ -253,9 +276,9 @@ const AddResult = (props) => {
                                         id="sampleID"
                                         placeholder="Sample ID"
                                         className={classes.input}
-                                        onChange={handleChange}
-                                        value={data.sampleID}
-                                        disabled
+                                        //value={data.sampleID}
+                                        onChange={ e => handleChange(i, e)}
+                                        //disabled
                                     />
                                 </FormGroup>
                             </td>
@@ -269,7 +292,7 @@ const AddResult = (props) => {
                                         id="sampleStatus"
                                         placeholder="Sample Status"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
@@ -283,7 +306,7 @@ const AddResult = (props) => {
                                         id="sampleTestable"
                                         placeholder="Sample Testable"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
@@ -297,7 +320,7 @@ const AddResult = (props) => {
                                         id="assayDate"
                                         placeholder="Assay Date"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
@@ -311,13 +334,13 @@ const AddResult = (props) => {
                                         id="approvalDate"
                                         placeholder="Approval Date"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
                              <td>
                                 <FormGroup>
-                                    <Label for="pcrLabSampleNumber" className={classes.label}>Pcr Lab Sample No *</Label>
+                                    <Label for="pcrLabSampleNumber" className={classes.label}>Pcr Lab No *</Label>
 
                                     <Input
                                         type="text"
@@ -325,7 +348,7 @@ const AddResult = (props) => {
                                         id="pcrLabSampleNumber"
                                         placeholder="Pcr Lab Sample Number"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
@@ -339,7 +362,7 @@ const AddResult = (props) => {
                                         id="resultDate"
                                         placeholder="result Date"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
@@ -353,7 +376,7 @@ const AddResult = (props) => {
                                         id="testResult"
                                         placeholder="Test result"
                                         className={classes.input}
-                                        onChange={handleChange}
+                                        onChange={e => handleChange(i, e)}
                                     />
                                 </FormGroup>
                             </td>
