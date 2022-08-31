@@ -264,7 +264,9 @@ const AddResult = (props) => {
                             </FormGroup>
                         </td>
                       </tr>
-                      {manifestObj.sampleInformation && manifestObj.sampleInformation.map((data, i) => (
+                      {
+                      //manifestObj.sampleInformation &&
+                      inputFields.map((data, i) => (
                         <tr key={i}>
                              <td>
                                 <FormGroup>

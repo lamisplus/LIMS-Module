@@ -204,20 +204,24 @@ const CreateAManifest = (props) => {
          await axios.get(`${url}lims/ready-manifests/${manifestsId}`, { headers: {"Authorization" : `Bearer ${token}`} })
             .then((resp) => {
                 console.log("sending manifest", resp)
+                setSend(true)
+                toast.success("Sample manifest sent successfully to PCR Lab.", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
 
-                if (resp.data.errors.length > 0) {
-                    toast.error(resp.data.errors[0].reasons, {
-                        position: toast.POSITION.TOP_RIGHT
-                     });
-                     setSend(true)
-                }
-                else {
-                     toast.success("Sample manifest sent successfully to PCR Lab.", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
-                    setSend(true)
-                    setStatus("Manifest Sent");
-                }
+//                if (resp.data.errors.length > 0) {
+//                    toast.error(resp.data.errors[0].reasons, {
+//                        position: toast.POSITION.TOP_RIGHT
+//                     });
+//                     setSend(true)
+//                }
+//                else {
+//                     toast.success("Sample manifest sent successfully to PCR Lab.", {
+//                        position: toast.POSITION.TOP_RIGHT
+//                    });
+//                    setSend(true)
+//                    setStatus("Manifest Sent");
+//                }
             })
     }
 

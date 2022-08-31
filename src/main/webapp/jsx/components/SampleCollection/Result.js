@@ -152,7 +152,7 @@ const Result = (props) => {
         }else if(parseInt(e)===4){
             return <p><Badge  color="warning">Re-Run</Badge></p>
         }else{
-            return <p><Badge  color="dark">Sample Received</Badge></p>
+            return <p><Badge  color="dark">Result Pending</Badge></p>
         }
     }
 
@@ -194,7 +194,7 @@ const Result = (props) => {
                                        <th scope="row">Facility Name:</th>
                                        <td>{manifestObj.sendingFacilityName}</td>
                                        <th scope="row">PCR Lab Number:</th>
-                                       <td>{results.sendingPCRLabID}</td>
+                                       <td>{manifestObj.receivingLabID}</td>
                                      </tr>
                                      <tr>
                                        <th scope="row"></th>
@@ -206,11 +206,11 @@ const Result = (props) => {
                                      </tr>
                                       <tr>
                                        <th scope="row">Test Type:</th>
-                                       <td>{resultTestType(results.testType)}</td>
+                                       <td>{ results.testType !== null ? resultTestType(results.testType) : <p><Badge  color="primary">Viral Load</Badge></p>}</td>
                                        <th scope="row">Facility Id:</th>
                                        <td>{manifestObj.sendingFacilityID}</td>
-                                       <th scope="row"></th>
-                                       <td></td>
+                                       <th scope="row">PCR Lab Name:</th>
+                                       <td>{manifestObj.receivingLabName}</td>
                                      </tr>
                                </tbody>
                              </Table>
@@ -219,13 +219,13 @@ const Result = (props) => {
                                         <Table striped bordered size="sm">
                                          <thead style={{  backgroundColor:'#014d88', color:'#fff' }}>
                                            <tr>
+                                             <th>Sample ID</th>
                                              <th>Approval Date</th>
                                              {/*<th>Assay Date</th>
                                              <th>Date Received at PCR Lab</th>*/}
                                              <th>Date Result Dispatched</th>
                                              <th>PCR Sample Number</th>
                                               {/*<th>Result Date</th>*/}
-                                             <th>Sample ID</th>
                                              <th>Sample Status</th>
                                              <th>Sample Testable</th>
                                              <th>Test Result</th>
@@ -234,7 +234,24 @@ const Result = (props) => {
                                          </thead>
                                          <tbody>
                                          {
-                                            results.manifestID === null ? <p style={{ textAlign: "center"}}>No Result Available Yet...</p> :
+                                            results.manifestID === null ?
+                                              manifestObj.sampleInformation.length > 0 && manifestObj.sampleInformation.map((data, i) => (
+                                                   <tr key={i}>
+                                                      <td>{data.sampleID}</td>
+                                                      <td scope="row">--:--:--</td>
+                                                        {/*<td>{data.assayDate}</td>
+                                                      <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
+                                                      <td>--:--:--</td>
+                                                      <td>----</td>
+                                                       {/*<td>{data.resultDate}</td>*/}
+
+                                                      <td>{sampleStatus(data.sampleStatus)}</td>
+                                                      <td>Not Available</td>
+                                                      <td>Not Ready</td>
+                                                       {/*<td>{data.visitDate}</td>*/}
+                                                   </tr>
+                                              ))
+                                             :
                                              results.viralLoadTestReport.length > 0 && results.viralLoadTestReport.map((data, i) => (
                                                   <tr key={i}>
                                                      <td scope="row">{data.approvalDate}</td>
