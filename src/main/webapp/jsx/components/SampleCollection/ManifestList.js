@@ -129,6 +129,7 @@ const DownloadManifest = (props) => {
                     { headers: {"Authorization" : `Bearer ${token}`} }
                 )
                 .then((response) => {
+                    console.log("permission", response.data.permissions)
                     setPermissions(response.data.permissions);
 
                 })
@@ -139,7 +140,7 @@ const DownloadManifest = (props) => {
          const loadManifestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("manifest", response);
+                //console.log("manifest", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
 
@@ -160,6 +161,7 @@ const DownloadManifest = (props) => {
 
      const actionItems = row => {
           return  [
+          {...(permissions.includes('view_manifest') || permissions.includes("all_permission") &&
               {
                   name:'View',
                   type:'link',
@@ -168,8 +170,8 @@ const DownloadManifest = (props) => {
                       pathname: "/print-manifest",
                       state: { sampleObj: row, permissions:permissions  }
                   }
-              },
-
+              }
+          )},
 //              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
 //                      {
 //                          name:'Print Manifest',
@@ -182,25 +184,25 @@ const DownloadManifest = (props) => {
 //                      }
 //              )},
 
-              {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+              {...(permissions.includes('get_result') || permissions.includes("all_permission") &&
                       {
-                          name:' Get Results',
+                          name:' Results',
                           type:'link',
                           icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
                           to:{
                               pathname: "/result",
-                              state: { manifestObj: row }
+                              state: { manifestObj: row, permissions:permissions }
                           }
                       }
                   )},
-              {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+              {...(permissions.includes('add_result') || permissions.includes("all_permission") &&
                       {
                           name:'Add Result',
                           type:'link',
                           icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
                           to:{
                               pathname: "/add-result",
-                              state: { manifestObj: row }
+                              state: { manifestObj: row, permissions:permissions }
                           }
                       }
                   )}

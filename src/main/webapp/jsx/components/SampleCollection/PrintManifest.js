@@ -154,11 +154,12 @@ const PrintManifest = (props) => {
                  color="success"
                  className={classes.button}
                  startIcon={<PrintIcon />}
-                 //disabled={saved ? false: true}
+                 disabled={!send ? false : true}
                  onClick={handlePrint}
              >
                  Print
              </MatButton>
+
                <Link color="inherit"
                  to={{pathname: "/"}}
                   >

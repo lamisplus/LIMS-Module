@@ -6,11 +6,13 @@ import MaterialTable from 'material-table';
 import MatButton from '@material-ui/core/Button';
 import HomeIcon from '@mui/icons-material/Home';
 import { Badge, Spinner } from 'reactstrap';
+import Alert from 'react-bootstrap/Alert';
 
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import axios from "axios";
 import { toast } from 'react-toastify';
@@ -117,7 +119,9 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    console.log("maniObj",manifestObj)
+    //console.log("maniObj",manifestObj)
+    const permissions = history.location && history.location.state ? history.location.state.permissions : []
+
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
     const [results, setResults] = useState([])
@@ -127,7 +131,7 @@ const Result = (props) => {
             const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             console.log("results", response);
 
-            setResults(response.data);
+           //setResults([]);
             setLoading(false)
 
         } catch (e) {
@@ -164,11 +168,24 @@ const Result = (props) => {
         }
     }
 
+    const reload = e => {
+        console.log("reload results");
+        loadResults();
+    }
+
   return (
     <div>
       <Card>
          <Card.Body>
            <p style={{textAlign: 'right'}}>
+             <MatButton
+              variant="contained"
+              color="success"
+              className={classes.button}
+              startIcon={<CachedIcon />}
+              onClick={reload}>
+              Refresh
+            </MatButton>
              <Link color="inherit"
                to={{pathname: "/"}}
                 >
@@ -176,25 +193,31 @@ const Result = (props) => {
                    variant="contained"
                    color="primary"
                    className={classes.button}
-                   startIcon={<HomeIcon />}>
+                   startIcon={<HomeIcon />}
+                   >
                    back Home
                </MatButton>
               </Link>
+
              </p>
              <hr />
-              { results.length  === 0 ? <p> <Spinner color="primary" /> Loading Please Wait</p> :
+              {
+
+//                results.length  === 0 ? <p> <Spinner color="primary" /> Loading Please Wait</p> :
                 <>
-                  <h2>PCR Sample Results</h2>
+                   <Alert style={{width:'100%',fontSize:'20px', backgroundColor: '#014d88', color: "#fff", textAlign: 'center'}}>
+                          <Alert.Heading>PCR Sample Result</Alert.Heading>
+                   </Alert>
                   <br/>
-                  <Table bordered size="sm">
+                  <Table bordered size="sm" responsive>
                                <tbody>
                                     <tr>
                                        <th scope="row">ManifestID:</th>
                                        <td>{manifestObj.manifestID}</td>
                                        <th scope="row">Facility Name:</th>
                                        <td>{manifestObj.sendingFacilityName}</td>
-                                       <th scope="row">PCR Lab Number:</th>
-                                       <td>{manifestObj.receivingLabID}</td>
+                                       <th scope="row">Facility Id:</th>
+                                       <td>{manifestObj.sendingFacilityID}</td>
                                      </tr>
                                      <tr>
                                        <th scope="row"></th>
@@ -206,17 +229,17 @@ const Result = (props) => {
                                      </tr>
                                       <tr>
                                        <th scope="row">Test Type:</th>
-                                       <td>{ results.testType !== null ? resultTestType(results.testType) : <p><Badge  color="primary">Viral Load</Badge></p>}</td>
-                                       <th scope="row">Facility Id:</th>
-                                       <td>{manifestObj.sendingFacilityID}</td>
-                                       <th scope="row">PCR Lab Name:</th>
+                                       <td>{<p><Badge  color="primary">Viral Load</Badge></p>}</td>
+                                       <th scope="row">Receiving Lab Name:</th>
                                        <td>{manifestObj.receivingLabName}</td>
+                                       <th scope="row">Receiving Lab Number:</th>
+                                       <td>{manifestObj.receivingLabID}</td>
                                      </tr>
                                </tbody>
                              </Table>
                               <br/>
                                <div>
-                                        <Table striped bordered size="sm">
+                                        <Table striped bordered size="sm" responsive>
                                          <thead style={{  backgroundColor:'#014d88', color:'#fff' }}>
                                            <tr>
                                              <th>Sample ID</th>
@@ -233,11 +256,8 @@ const Result = (props) => {
                                            </tr>
                                          </thead>
                                          <tbody>
-                                         {
-                                            results.manifestID === null ?
-                                              manifestObj.sampleInformation.length > 0 && manifestObj.sampleInformation.map((data, i) => (
-                                                   <tr key={i}>
-                                                      <td>{data.sampleID}</td>
+                                                   <tr>
+                                                      <td>0005</td>
                                                       <td scope="row">--:--:--</td>
                                                         {/*<td>{data.assayDate}</td>
                                                       <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
@@ -245,29 +265,11 @@ const Result = (props) => {
                                                       <td>----</td>
                                                        {/*<td>{data.resultDate}</td>*/}
 
-                                                      <td>{sampleStatus(data.sampleStatus)}</td>
+                                                      <td><p><Badge  color="dark">Result Pending</Badge></p></td>
                                                       <td>Not Available</td>
                                                       <td>Not Ready</td>
                                                        {/*<td>{data.visitDate}</td>*/}
                                                    </tr>
-                                              ))
-                                             :
-                                             results.viralLoadTestReport.length > 0 && results.viralLoadTestReport.map((data, i) => (
-                                                  <tr key={i}>
-                                                     <td scope="row">{data.approvalDate}</td>
-                                                       {/*<td>{data.assayDate}</td>
-                                                     <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
-                                                     <td>{data.dateResultDispatched}</td>
-                                                     <td>{data.pcrLabSampleNumber}</td>
-                                                      {/*<td>{data.resultDate}</td>*/}
-                                                     <td>{data.sampleID}</td>
-                                                     <td>{sampleStatus(data.sampleStatus)}</td>
-                                                     <td>{data.sampleTestable}</td>
-                                                     <td>{data.testResult}</td>
-                                                      {/*<td>{data.visitDate}</td>*/}
-                                                  </tr>
-                                             ))
-                                         }
                                          </tbody>
                                        </Table>
                                  </div>

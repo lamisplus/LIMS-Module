@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState} from 'react';
 import { Link, useHistory } from 'react-router-dom'
-import logo from '../../../images/nglogo.png'
+import {logo} from './pcr'
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
