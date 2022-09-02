@@ -7,6 +7,7 @@ import MatButton from '@material-ui/core/Button';
 import HomeIcon from '@mui/icons-material/Home';
 import { Badge, Spinner } from 'reactstrap';
 import Alert from 'react-bootstrap/Alert';
+import AddResultModal from './AddResultModal';
 
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -38,6 +39,10 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import PrintIcon from '@mui/icons-material/Print';
+import { useReactToPrint } from 'react-to-print';
+import AddIcon from '@mui/icons-material/Add';
+import PrintResults from './PrintResults';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -126,7 +131,15 @@ const Result = (props) => {
     const [loading, setLoading] = useState(true)
     const [results, setResults] = useState([])
 
-     const loadResults = useCallback(async () => {
+    const [open, setOpen] = useState(false)
+
+    const handleOpen = () => setOpen(true);
+
+    const toggleModal = () => setOpen(!open)
+
+    const componentRef = useRef();
+
+    const loadResults = useCallback(async () => {
         try {
             const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             console.log("results", response);
@@ -173,11 +186,24 @@ const Result = (props) => {
         loadResults();
     }
 
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+      });
+
   return (
     <div>
       <Card>
          <Card.Body>
            <p style={{textAlign: 'right'}}>
+             <MatButton
+                   variant="contained"
+                   color="dark"
+                   className={classes.button}
+                   startIcon={<AddIcon />}
+                   onClick={handleOpen}
+               >
+                   Add Result
+               </MatButton>
              <MatButton
               variant="contained"
               color="success"
@@ -186,6 +212,17 @@ const Result = (props) => {
               onClick={reload}>
               Refresh
             </MatButton>
+              <MatButton
+                  variant="contained"
+                  color="success"
+                  className={classes.button}
+                  startIcon={<PrintIcon />}
+
+                  onClick={handlePrint}
+              >
+                  Print
+              </MatButton>
+
              <Link color="inherit"
                to={{pathname: "/"}}
                 >
@@ -202,82 +239,21 @@ const Result = (props) => {
              </p>
              <hr />
               {
-
 //                results.length  === 0 ? <p> <Spinner color="primary" /> Loading Please Wait</p> :
                 <>
                    <Alert style={{width:'100%',fontSize:'20px', backgroundColor: '#014d88', color: "#fff", textAlign: 'center'}}>
                           <Alert.Heading>PCR Sample Result</Alert.Heading>
                    </Alert>
                   <br/>
-                  <Table bordered size="sm" responsive>
-                               <tbody>
-                                    <tr>
-                                       <th scope="row">ManifestID:</th>
-                                       <td>{manifestObj.manifestID}</td>
-                                       <th scope="row">Facility Name:</th>
-                                       <td>{manifestObj.sendingFacilityName}</td>
-                                       <th scope="row">Facility Id:</th>
-                                       <td>{manifestObj.sendingFacilityID}</td>
-                                     </tr>
-                                     <tr>
-                                       <th scope="row"></th>
-                                       <td></td>
-                                       <th scope="row"></th>
-                                       <td></td>
-                                       <th scope="row"></th>
-                                       <td></td>
-                                     </tr>
-                                      <tr>
-                                       <th scope="row">Test Type:</th>
-                                       <td>{<p><Badge  color="primary">Viral Load</Badge></p>}</td>
-                                       <th scope="row">Receiving Lab Name:</th>
-                                       <td>{manifestObj.receivingLabName}</td>
-                                       <th scope="row">Receiving Lab Number:</th>
-                                       <td>{manifestObj.receivingLabID}</td>
-                                     </tr>
-                               </tbody>
-                             </Table>
-                              <br/>
-                               <div>
-                                        <Table striped bordered size="sm" responsive>
-                                         <thead style={{  backgroundColor:'#014d88', color:'#fff' }}>
-                                           <tr>
-                                             <th>Sample ID</th>
-                                             <th>Approval Date</th>
-                                             {/*<th>Assay Date</th>
-                                             <th>Date Received at PCR Lab</th>*/}
-                                             <th>Date Result Dispatched</th>
-                                             <th>PCR Sample Number</th>
-                                              {/*<th>Result Date</th>*/}
-                                             <th>Sample Status</th>
-                                             <th>Sample Testable</th>
-                                             <th>Test Result</th>
-                                              {/*<th>Visit Date</th>*/}
-                                           </tr>
-                                         </thead>
-                                         <tbody>
-                                                   <tr>
-                                                      <td>0005</td>
-                                                      <td scope="row">--:--:--</td>
-                                                        {/*<td>{data.assayDate}</td>
-                                                      <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
-                                                      <td>--:--:--</td>
-                                                      <td>----</td>
-                                                       {/*<td>{data.resultDate}</td>*/}
+                  <PrintResults manifestObj={manifestObj} ref={componentRef}/>
 
-                                                      <td><p><Badge  color="dark">Result Pending</Badge></p></td>
-                                                      <td>Not Available</td>
-                                                      <td>Not Ready</td>
-                                                       {/*<td>{data.visitDate}</td>*/}
-                                                   </tr>
-                                         </tbody>
-                                       </Table>
-                                 </div>
                 </>
               }
 
          </Card.Body>
        </Card>
+       { open ?
+        <AddResultModal modalstatus={open} togglestatus={toggleModal} manifestObj={manifestObj} /> : " "}
     </div>
   );
 }
