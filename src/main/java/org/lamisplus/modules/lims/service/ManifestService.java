@@ -12,6 +12,7 @@ import org.lamisplus.modules.lims.domain.entity.Manifest;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
 import org.lamisplus.modules.lims.repository.ManifestRepository;
+import org.lamisplus.modules.lims.repository.SampleRepository;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -27,6 +28,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ManifestService {
     private final ManifestRepository manifestRepository;
+    private final SampleRepository sampleRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
@@ -39,6 +41,7 @@ public class ManifestService {
     String LIMSPassword = "nmrs@2020!";
     String loginUrl = "https://lims.ng/apidemo/login.php";
     String manifestUrl = "https://lims.ng/apidemo/samples/create.php";
+    String resultsUrl = "https://lims.ng/apidemo/samples/result.php";
 
 
     public ManifestDTO Save(ManifestDTO manifestDTO){
@@ -90,6 +93,24 @@ public class ManifestService {
     }
 
     public LIMSManifestResponseDTO PostManifestToServer(int id) {
+        RestTemplate restTemplate = GetRestTemplate();
+        HttpHeaders headers = GetHTTPHeaders();
+
+        //Login to LIMS
+        LIMSLoginResponseDTO loginResponseDTO = LoginToLIMS(restTemplate, headers);
+
+        //Post request
+        LIMSManifestResponseDTO response  = PostManifestRequest(restTemplate, headers, loginResponseDTO, id);
+
+        //Update manifest status
+        ManifestDTO dto = findById(id);
+        dto.setManifestStatus("Submitted");
+        Save(dto);
+
+        return response;
+    }
+
+    public RestTemplate GetRestTemplate(){
         RestTemplate restTemplate = new RestTemplate();
 
         //set message converters
@@ -99,36 +120,87 @@ public class ManifestService {
         messageConverters.add(converter);
         restTemplate.setMessageConverters(messageConverters);
 
-        //Get token
+        return restTemplate;
+    }
+
+    private LIMSLoginResponseDTO LoginToLIMS(RestTemplate restTemplate, HttpHeaders headers){
         LIMSLoginRequestDTO loginRequestDTO = new LIMSLoginRequestDTO();
         loginRequestDTO.setEmail(LIMSUsername);
         loginRequestDTO.setPassword(LIMSPassword);
 
+        HttpEntity<LIMSLoginRequestDTO> loginEntity = new HttpEntity<>(loginRequestDTO, headers);
+        ResponseEntity<LIMSLoginResponseDTO> loginResponse = restTemplate.exchange(loginUrl, HttpMethod.POST, loginEntity, LIMSLoginResponseDTO.class);
+
+        return loginResponse.getBody();
+    }
+
+    private HttpHeaders GetHTTPHeaders(){
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("user-agent", "Application");
-        HttpEntity<LIMSLoginRequestDTO> loginEntity = new HttpEntity<>(loginRequestDTO, headers);
+        return headers;
+    }
 
-        ResponseEntity<LIMSLoginResponseDTO> loginResponse = restTemplate.exchange(loginUrl, HttpMethod.POST, loginEntity, LIMSLoginResponseDTO.class);
-        LIMSLoginResponseDTO loginResponseDTO = loginResponse.getBody();
-
-        //Post manifest
-        LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(id));
+    private LIMSManifestResponseDTO PostManifestRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId){
+        LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(ManifestId));
         LIMSManifestRequestDTO requestDTO = new LIMSManifestRequestDTO();
         assert loginResponseDTO != null;
         requestDTO.setToken(loginResponseDTO.getJwt());
         requestDTO.setViralLoadManifest(manifest);
 
         HttpEntity<LIMSManifestRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
-        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
-
-        //Update manifest status
-        ManifestDTO dto = findById(id);
-        dto.setManifestStatus("Submitted");
-        Save(dto);
-
+        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(resultsUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
         return manifestResponse.getBody();
+    }
+
+    private LIMSResultsResponseDTO GetResultsRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId){
+        LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(ManifestId));
+        LIMSResultsRequestDTO requestDTO = new LIMSResultsRequestDTO();
+
+        requestDTO.setToken(loginResponseDTO.getJwt());
+        /*
+        requestDTO.setManifestID(manifest.getManifestID());
+        requestDTO.setReceivingPCRLabID(manifest.getReceivingLabID());
+        requestDTO.setReceivingPCRLabName(manifest.getReceivingLabName());
+        requestDTO.setTestType("VL");
+        requestDTO.setSendingFacilityID(manifest.getSendingFacilityID());
+        requestDTO.setSendingFacilityName(manifest.getSendingFacilityName());
+         */
+        requestDTO.setManifestID("LP-543-00012");
+        requestDTO.setReceivingPCRLabID("LIMS250002");
+        requestDTO.setReceivingPCRLabName("OAUTHC Testing Lab");
+        requestDTO.setTestType("VL");
+        requestDTO.setSendingFacilityID("FH7LMnbnVlT");
+        requestDTO.setSendingFacilityName("Braithwaite Memorial Specialist Hospital");
+
+        HttpEntity<LIMSResultsRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
+        ResponseEntity<LIMSResultsResponseDTO> manifestResponse = restTemplate.exchange(resultsUrl, HttpMethod.POST, manifestEntity, LIMSResultsResponseDTO.class);
+        return manifestResponse.getBody();
+    }
+
+    public LIMSResultsResponseDTO DownloadResultsFromLIMS(int id) {
+        RestTemplate restTemplate = GetRestTemplate();
+        HttpHeaders headers = GetHTTPHeaders();
+
+        //Login to LIMS
+        LIMSLoginResponseDTO loginResponseDTO = LoginToLIMS(restTemplate, headers);
+
+        //Get results
+        LIMSResultsResponseDTO response  = GetResultsRequest(restTemplate, headers, loginResponseDTO, id);
+        LOG.info("RESPONSE:"+response);
+
+        try {
+            //Update Lamisplus
+            for (LIMSResultDTO result : response.getViralLoadTestReport()) {
+                LOG.info("RESULT: " + result);
+                sampleRepository.SaveSampleResult(result.getTestResult(), Integer.parseInt(result.getSampleID()));
+            }
+        }catch (Exception e) {
+            LOG.info("ERROR:" + e);
+        }
+
+        return response;
     }
 
     public Long getCurrentUserOrganization() {

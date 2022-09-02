@@ -3,7 +3,7 @@ name: LimsModule
 menus:
   - icon:
     disabled: false
-    name: Lims
+    name: LIMS
     state: lims
     url: /across/resources/static/lims/index.html
 umdLocation: /across/resources/static/lims/index.html
@@ -13,6 +13,6 @@ webModules:
     path: lims
     position: 99
 permissions:
-  - name: lims_dispense_drug
+  - name: lims_Module
     description: LIMS Module
     moduleName: LimsModule
