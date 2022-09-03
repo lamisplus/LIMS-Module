@@ -4,6 +4,7 @@ import { Row, Col, Card,  Tab, Tabs, } from "react-bootstrap";
 import SampleCollection from './SampleCollection/SamplesCollection';
 import ManifestList from './SampleCollection/ManifestList';
 import {labObj} from './sampleObj'
+import Login from './SampleCollection/Login'
 
 const divStyle = {
   borderRadius: "2px",
@@ -19,7 +20,7 @@ const Home = (props) => {
     switch(urlTabs){
       case "existing-manifest": return setKey('manifest-list')
       case "collect-sample": return setKey('collection')
-      case "sample-manifest": return setKey('manifest')
+      case "config": return setKey('config')
       default: return setKey('manifest-list')
     }
   }, [urlTabs]);
@@ -45,7 +46,9 @@ const Home = (props) => {
                         <Tab eventKey="collection" title="Create Manifest">
                          <SampleCollection />
                         </Tab>
-
+                        <Tab eventKey="config" title="Configuration">
+                         <Login />
+                        </Tab>
                     </Tabs>
               </div>
             </Card.Body>
