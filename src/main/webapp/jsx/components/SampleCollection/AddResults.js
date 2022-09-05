@@ -18,6 +18,8 @@ import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import axios from "axios";
 import { toast } from 'react-toastify';
@@ -89,6 +91,11 @@ const AddResult = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
+    const sampleIDs = []
+    manifestObj.sampleInformation.map((e) => {
+        sampleIDs.push(e.sampleID)
+    })
+
     //console.log("maniObj",manifestObj)
     //console.log("permissions",permissions)
     const classes = useStyles();
@@ -103,6 +110,8 @@ const AddResult = (props) => {
          samples: []
     })
 
+    const [initialValue, SetInitialValue] = useState(0)
+
     const [inputFields, setInputFields] = useState([{
         testResult: "",
         resultDate: "",
@@ -111,7 +120,7 @@ const AddResult = (props) => {
         assayDate: "",
         sampleTestable: "",
         sampleStatus: "",
-        sampleID: ""
+        sampleID: sampleIDs[initialValue]
     }])
 
      const loadResults = useCallback(async () => {
@@ -131,9 +140,19 @@ const AddResult = (props) => {
         loadResults()
     }, [loadResults]);
 
+    const assignSampleId = () => {
+
+    }
+
      const handleChange = (i, event) => {
            let data = [...inputFields]
            const { name, value } = event.target
+
+           if (data[i][name] === "sampleID") {
+                sampleIDs.map((e, i) => {
+                    console.log(e, i)
+                })
+           }
            //console.log(value)
            data[i][name] = value
            setResults({ ...results, samples: data})
@@ -141,8 +160,44 @@ const AddResult = (props) => {
 
      const handleSubmit = async (e) => {
          e.preventDefault()
-        console.log(results)
-        history.push("/");
+        console.log("results",results)
+        //history.push("/");
+     }
+
+     const addField = (e) => {
+        e.preventDefault()
+        SetInitialValue(initialValue+1)
+
+        console.log(initialValue)
+        console.log(sampleIDs)
+        console.log(sampleIDs[initialValue])
+
+        if (initialValue > 0) {
+            let newField = {
+                   testResult: "",
+                   resultDate: "",
+                   pcrLabSampleNumber: "",
+                   approvalDate: "",
+                   assayDate: "",
+                   sampleTestable: "",
+                   sampleStatus: "",
+                   sampleID: sampleIDs[initialValue]
+               }
+
+          if (initialValue < sampleIDs.length) {
+               setInputFields([...inputFields, newField])
+           }
+
+        }
+
+     }
+
+     const removeField = (index, e) => {
+        e.preventDefault()
+        SetInitialValue(initialValue-1)
+        let data = [...inputFields];
+            data.splice(index, 1)
+            setInputFields(data)
      }
 
   return (
@@ -273,9 +328,9 @@ const AddResult = (props) => {
                                      id="sampleID"
                                      placeholder="Sample ID"
                                      className={classes.input}
-                                     //value={data.sampleID}
+                                     value={data.sampleID}
                                      onChange={ e => handleChange(i, e)}
-                                     //disabled
+                                     disabled
                                  />
                              </FormGroup></Col>
                             <Col><FormGroup>
@@ -365,14 +420,28 @@ const AddResult = (props) => {
                              />
                          </FormGroup></Col>
                         </Row>
+                        <Row>
+                            <Col style={{textAlign: 'right'}}>
+                                <Button variant="contained" color="error"
+                                   startIcon={<DeleteIcon />} onClick={ e => removeField(i, e)} >
+                                 Remove PCR Sample
+                               </Button>
+                            </Col>
+                        </Row>
+                        <hr />
                     </>
                     ))
                }
-                <hr />
+               { permissions.includes("all_permission") ? <Button variant="contained" color="secondary"
+                      startIcon={<AddIcon />} onClick={addField} >
+                    Add More
+                  </Button> : " "}
+                  {" "}
+
                 { permissions.includes("all_permission") ? <Button variant="contained" color="primary" type="submit"
-                                                                               startIcon={<SaveIcon />} onClick={handleSubmit} >
-                                                                             Save Result
-                                                                           </Button> : " "}
+                   startIcon={<SaveIcon />} onClick={handleSubmit} >
+                 Save Result
+               </Button> : " "}
            </Form>
 
          </Card.Body>

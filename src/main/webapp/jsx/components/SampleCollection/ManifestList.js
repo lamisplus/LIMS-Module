@@ -140,7 +140,7 @@ const DownloadManifest = (props) => {
          const loadManifestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("manifest", response);
+                console.log("manifest", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
 
