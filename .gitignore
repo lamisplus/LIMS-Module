@@ -63,3 +63,9 @@ src/main/resources/views/static/lims/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+node_modules/encoding/node_modules/iconv-lite/.idea/iconv-lite.iml
+node_modules/encoding/node_modules/iconv-lite/.idea/iconv-lite.iml
+node_modules/bowser/.idea/bowser.iml
+gradle/wrapper/gradle-wrapper.properties
+.mvn/wrapper/maven-wrapper.properties
+.idea/misc.xml
