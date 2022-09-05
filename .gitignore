@@ -26,6 +26,13 @@ target/
 /nbdist/
 /.nb-gradle/
 build/
+node/
+node_modules
+.mvn/
+.idea/
+gradlew/
+gradlew.bat
+src/main/resources/views/static/lims/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
