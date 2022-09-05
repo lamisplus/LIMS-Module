@@ -1,27 +1,16 @@
 import React, {useEffect, useCallback, useState} from 'react';
-import Container from '@mui/material/Container';
 import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import "./sample.css";
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import Grid from "@material-ui/core/Grid";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
-import {format} from "date-fns";
 
-import {  Modal, ModalHeader, ModalBody,
+import IconButton from '@material-ui/core/IconButton';
+
+import {  Modal, ModalHeader, ModalBody, Row,
     Col, Card, CardBody, Table,
     Form, FormFeedback, FormGroup, FormText,
     Input,
     Label, Badge
 } from 'reactstrap';
 
-import { forwardRef } from 'react';
 import axios from "axios";
 import { toast } from 'react-toastify';
 import {token, url } from "../../../api";
@@ -231,174 +220,158 @@ const CreateAManifest = (props) => {
             <CardBody>
              <br/>
                 <Form>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6} md={4}>
-                            <FormGroup>
-                                <Label for="dateScheduledForPickup" className={classes.label}>Date & Time *</Label>
+                    <Row>
+                        <Col> <FormGroup>
+                         <Label for="dateScheduledForPickup" className={classes.label}>Date & Time *</Label>
+                         <Input
+                             type="datetime-local"
+                             name="dateScheduledForPickup"
+                             id="dateScheduledForPickup"
+                             placeholder="Date & Time Created"
+                             className={classes.input}
+                             invalid={manifestData.dateScheduledForPickup.length === 0? true: false}
+                             value={manifestData.dateScheduledForPickup}
+                             onChange={handleChange}
 
-                                <Input
-                                    type="datetime-local"
-                                    name="dateScheduledForPickup"
-                                    id="dateScheduledForPickup"
-                                    placeholder="Date & Time Created"
-                                    className={classes.input}
-                                    invalid={manifestData.dateScheduledForPickup.length === 0? true: false}
-                                    value={manifestData.dateScheduledForPickup}
-                                    onChange={handleChange}
-                                />
-                                <FormFeedback>
-                                  Pick up date is a required field
-                                </FormFeedback>
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                             <FormGroup>
-                                <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
-                                <Input
-                                    type="select"
-                                    name="select"
-                                    value={pcrLabCode.name}
-                                    id="receivingLabName"
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                    invalid={pcrLabCode.name.length === 0? true: false}
-                                >
-                                  <option>
-                                    Selcet PCR Lab
-                                  </option>
-                                  {pcr_lab.map((value, i) =>
-                                  <option key={i} value={value.name} >{value.name}</option>)}
-                                </Input>
-                                <FormFeedback>Receiving lab is a required field</FormFeedback>
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                             <FormGroup>
-                                 <Label for="receivingLabID" className={classes.label}>Receiving Lab number *</Label>
-                                 <Input
-                                     type="text"
-                                     name="receivingLabID"
-                                     value={pcrLabCode.labNo}
-                                     id="receivingLabID"
-                                     onChange={handleChange}
-                                     className={classes.input}
-                                     disabled
-                                     invalid={pcrLabCode.labNo.length === 0? true: false}
-                                 />
-                             <FormFeedback>Receiving lab Id is a required field</FormFeedback>
-                             </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                            <FormGroup>
-                                <Label for="courierRiderName" className={classes.label}>Courier Name *</Label>
-                                <Input
-                                    type="text"
-                                    name="courierRiderName"
-                                    id="courierRiderName"
-                                    value={manifestData.courierRiderName}
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                    invalid={manifestData.courierRiderName.length === 0? true: false}
-                                />
-                            <FormFeedback>Courier name is a required field</FormFeedback>
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                            <FormGroup>
-                                <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
-                                <Input
-                                    type="text"
-                                    name="courierContact"
-                                    value={manifestData.courierContact}
-                                    id="courierContact"
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                    invalid={manifestData.courierContact.length === 0? true: false}
-                                />
-                                <FormFeedback>Courier contact is a required field</FormFeedback>
-                            </FormGroup>
-                         </Grid>
-                         <Grid item xs={6} md={4}>
-                              <FormGroup>
-                                 <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
-                                 <Input
-                                     type="text"
-                                     name="samplePackagedBy"
-                                     value={manifestData.samplePackagedBy}
-                                     id="samplePackagedBy"
-                                     onChange={handleChange}
-                                     className={classes.input}
-                                     invalid={manifestData.samplePackagedBy.length === 0? true: false}
-                                 />
-                                 <FormFeedback>Sample package by is a required field</FormFeedback>
-                             </FormGroup>
-                          </Grid>
-                          <Grid item xs={6} md={6}>
-                            <FormGroup>
-                                <Label for="manifest_status" className={classes.label}>Status</Label>
-                                <Input
-                                    type="text"
-                                    name="manifestStatus"
-                                    id="manifestStatus"
-                                    value={status}
-                                    onChange={handleChange}
-                                    disabled
-                                    className={classes.input}
-                                />
+                         />
+                         <FormFeedback>
+                           Pick up date is a required field
+                         </FormFeedback>
+                     </FormGroup></Col>
+                        <Col><FormGroup>
+                         <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
+                         <Input
+                             type="select"
+                             name="select"
+                             value={pcrLabCode.name}
+                             id="receivingLabName"
+                             onChange={handleChange}
+                             className={classes.input}
+                             invalid={pcrLabCode.name.length === 0? true: false}
+                         >
+                           <option>
+                             Selcet PCR Lab
+                           </option>
+                           {pcr_lab.map((value, i) =>
+                           <option key={i} value={value.name} >{value.name}</option>)}
+                         </Input>
+                         <FormFeedback>Receiving lab is a required field</FormFeedback>
+                     </FormGroup></Col>
+                        <Col> <FormGroup>
+                          <Label for="receivingLabID" className={classes.label}>Receiving Lab number *</Label>
+                          <Input
+                              type="text"
+                              name="receivingLabID"
+                              value={pcrLabCode.labNo}
+                              id="receivingLabID"
+                              onChange={handleChange}
+                              className={classes.input}
+                              disabled
+                              invalid={pcrLabCode.labNo.length === 0? true: false}
+                          />
+                      <FormFeedback>Receiving lab Id is a required field</FormFeedback>
+                      </FormGroup></Col>
+                    </Row>
+                     <Row>
+                        <Col><FormGroup>
+                         <Label for="courierRiderName" className={classes.label}>Courier Name *</Label>
+                         <Input
+                             type="text"
+                             name="courierRiderName"
+                             id="courierRiderName"
+                             value={manifestData.courierRiderName}
+                             onChange={handleChange}
+                             className={classes.input}
+                             invalid={manifestData.courierRiderName.length === 0? true: false}
+                         />
+                     <FormFeedback>Courier name is a required field</FormFeedback>
+                     </FormGroup></Col>
+                        <Col> <FormGroup>
+                         <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
+                         <Input
+                             type="text"
+                             name="courierContact"
+                             value={manifestData.courierContact}
+                             id="courierContact"
+                             onChange={handleChange}
+                             className={classes.input}
+                             invalid={manifestData.courierContact.length === 0? true: false}
+                         />
+                         <FormFeedback>Courier contact is a required field</FormFeedback>
+                     </FormGroup></Col>
+                        <Col><FormGroup>
+                      <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
+                      <Input
+                          type="text"
+                          name="samplePackagedBy"
+                          value={manifestData.samplePackagedBy}
+                          id="samplePackagedBy"
+                          onChange={handleChange}
+                          className={classes.input}
+                          invalid={manifestData.samplePackagedBy.length === 0? true: false}
+                      />
+                      <FormFeedback>Sample package by is a required field</FormFeedback>
+                  </FormGroup></Col>
+                    </Row>
+                     <Row>
+                        <Col> <FormGroup>
+                         <Label for="manifest_status" className={classes.label}>Status</Label>
+                         <Input
+                             type="text"
+                             name="manifestStatus"
+                             id="manifestStatus"
+                             value={status}
+                             onChange={handleChange}
+                             disabled
+                             className={classes.input}
+                         />
 
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={6}>
-                              <FormGroup>
-                                  <Label for="temperatureAtPickup" className={classes.label}>Tempaerature at pickup</Label>
-                                  <Input
-                                      type="text"
-                                      name="temperatureAtPickup"
-                                      id="temperatureAtPickup"
-                                      value={manifestData.temperatureAtPickup}
-                                      onChange={handleChange}
-                                      invalid={manifestData.temperatureAtPickup.length === 0? true: false}
-                                      className={classes.input}
-                                  />
-                              <FormFeedback>
-                                Temperature at pickup is a required
-                              </FormFeedback>
-                              </FormGroup>
-                          </Grid>
-                          <Grid item xs={6} md={6}>
-                                <FormGroup>
-                                   <Label for="total_sample" className={classes.label}>Total Sample</Label>
-                                   <Input
-                                       type="text"
-                                       name="total_sample"
-                                       id="total_sample"
-                                       value={localStore.length}
-                                       onChange={handleChange}
-                                       disabled
-                                       className={classes.input}
-                                   />
+                     </FormGroup></Col>
+                        <Col><FormGroup>
+                       <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup</Label>
+                       <Input
+                           type="text"
+                           name="temperatureAtPickup"
+                           id="temperatureAtPickup"
+                           value={manifestData.temperatureAtPickup}
+                           onChange={handleChange}
+                           invalid={manifestData.temperatureAtPickup.length === 0? true: false}
+                           className={classes.input}
+                       />
+                   <FormFeedback>
+                     Temperature at pickup is a required
+                   </FormFeedback>
+                   </FormGroup></Col>
+                    </Row>
+                     <Row>
+                        <Col><FormGroup>
+                        <Label for="total_sample" className={classes.label}>Total Sample</Label>
+                        <Input
+                            type="text"
+                            name="total_sample"
+                            id="total_sample"
+                            value={localStore.length}
+                            onChange={handleChange}
+                            disabled
+                            className={classes.input}
+                        />
 
-                               </FormGroup>
-                            </Grid>
-                          <Grid item xs={6} md={6}>
-                             <FormGroup>
-                               <Label for="test_type" className={classes.label}>Test type</Label>
-                               <Input
-                                   type="text"
-                                   name="test_type"
-                                   id="test_type"
-                                   value="VL"
-                                   onChange={handleChange}
-                                   disabled
-                                   className={classes.input}
-                               />
+                    </FormGroup></Col>
+                        <Col> <FormGroup>
+                        <Label for="test_type" className={classes.label}>Test type</Label>
+                        <Input
+                            type="text"
+                            name="test_type"
+                            id="test_type"
+                            value="VL"
+                            onChange={handleChange}
+                            disabled
+                            className={classes.input}
+                        />
 
-                           </FormGroup>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                    {
+                    </FormGroup></Col>
+                    </Row>
+                     {
                         send ? " " :
                         <>
                             <Button variant="contained" color="primary" type="submit"

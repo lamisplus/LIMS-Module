@@ -129,7 +129,7 @@ const AddResult = (props) => {
             setLoading(false)
 
         } catch (e) {
-            toast.error("An error occurred while fetching lab", {
+            toast.error("An error occurred", {
                 position: toast.POSITION.TOP_RIGHT
             });
             setLoading(false)
@@ -147,13 +147,6 @@ const AddResult = (props) => {
      const handleChange = (i, event) => {
            let data = [...inputFields]
            const { name, value } = event.target
-
-           if (data[i][name] === "sampleID") {
-                sampleIDs.map((e, i) => {
-                    console.log(e, i)
-                })
-           }
-           //console.log(value)
            data[i][name] = value
            setResults({ ...results, samples: data})
      }
@@ -186,7 +179,11 @@ const AddResult = (props) => {
 
           if (initialValue < sampleIDs.length) {
                setInputFields([...inputFields, newField])
-           }
+          }else{
+            toast.error("Manifest has no sample Id", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+          }
 
         }
 
@@ -317,7 +314,7 @@ const AddResult = (props) => {
                   <Alert.Heading>PCR Sample Details</Alert.Heading>
                </Alert>
                {
-                    inputFields.map((data, i) => (
+                    manifestObj.sampleInformation.length > 0 && inputFields.map((data, i) => (
                     <>
                           <Row>
                             <Col>  <FormGroup>
@@ -433,7 +430,7 @@ const AddResult = (props) => {
                     ))
                }
                { permissions.includes("all_permission") ? <Button variant="contained" color="secondary"
-                      startIcon={<AddIcon />} onClick={addField} >
+                      startIcon={<AddIcon />} onClick={addField}>
                     Add More
                   </Button> : " "}
                   {" "}
