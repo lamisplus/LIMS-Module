@@ -97,6 +97,8 @@ const Login = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
     const [login, setLogin] = useState({
+        configName: "",
+        url: "",
         email: "",
         password: ""
     })
@@ -144,9 +146,42 @@ const Login = (props) => {
                     </Alert>
 
                    <Row>
-                        <Col>
+                        <Col xs={6} md={5}>
 
                             <Form>
+                                 <FormGroup>
+                                   <Label for="configName" className={classes.label}>Configuration Name</Label>
+                                   <Input
+                                       type="select"
+                                       name="configName"
+                                       id="configName"
+                                       className={classes.input}
+                                       onChange={handleChange}
+                                   >
+                                    <option hidden>
+                                        Select Configuration Name
+                                    </option>
+                                    <option value="Demo Server">
+                                        Demo Server
+                                    </option>
+                                    <option value="Live Server">
+                                        Live Server
+                                    </option>
+                                   </Input>
+                               </FormGroup>
+                               <FormGroup>
+                                  <Label for="url" className={classes.label}>URL</Label>
+
+                                  <Input
+                                      type="text"
+                                      name="url"
+                                      id="url"
+                                      placeholder="URL"
+                                      className={classes.input}
+                                      onChange={handleChange}
+                                      value={login.url}
+                                  />
+                              </FormGroup>
                                 <FormGroup>
                                    <Label for="email" className={classes.label}>Email</Label>
 
@@ -158,7 +193,6 @@ const Login = (props) => {
                                        className={classes.input}
                                        onChange={handleChange}
                                        value={login.email}
-                                       disabled
                                    />
                                </FormGroup>
 
@@ -173,7 +207,6 @@ const Login = (props) => {
                                       className={classes.input}
                                       onChange={handleChange}
                                       value={login.password}
-                                      disabled
                                   />
                               </FormGroup>
                               <Button variant="contained" color="primary" type="submit"
@@ -182,11 +215,13 @@ const Login = (props) => {
                              </Button>
                             </Form>
                         </Col>
-                        <Col>
+                        <Col xs={6} md={7}>
                             <Table bordered size="sm" responsive>
                                 <thead style={{  backgroundColor:'#014d88', color:'#fff', textAlign: 'center' }}>
                                     <tr>
                                         <th>S/N</th>
+                                        <th>Configuration Name</th>
+                                        <th>URL</th>
                                         <th>Email</th>
                                         <th>Login Date</th>
                                     </tr>
@@ -194,6 +229,8 @@ const Login = (props) => {
                                 <tbody style={{ textAlign: 'center' }}>
                                     <tr>
                                         <td>1</td>
+                                        <td>Demo Server</td>
+                                        <td>https://lims.ng/apidemo/</td>
                                         <td>nmrs@lims.ng</td>
                                         <td>20:12:2022</td>
                                     </tr>
