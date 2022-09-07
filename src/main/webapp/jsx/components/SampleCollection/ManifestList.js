@@ -140,7 +140,7 @@ const DownloadManifest = (props) => {
          const loadManifestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("manifest", response);
+                console.log("manifest", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
 
@@ -238,6 +238,7 @@ const DownloadManifest = (props) => {
                       { title: "Created Date", field: "createDate" },
                       { title: "Receiving Lab", field: "lab" },
                        { title: "Packaged By", field: "packaged_by" },
+                       { title: "Total Samples", field: "samples" },
                       {
                         title: "Status",
                         field: "status",
@@ -256,6 +257,7 @@ const DownloadManifest = (props) => {
                           createDate: row.createDate.replace('T', ' '),
                           lab: row.receivingLabName,
                           packaged_by: row.samplePackagedBy,
+                          samples: row.sampleInformation.length,
                           status: row.manifestStatus,
 
                           actions:

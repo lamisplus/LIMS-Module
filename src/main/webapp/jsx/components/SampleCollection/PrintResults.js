@@ -9,7 +9,7 @@ import {  Modal, ModalHeader, ModalBody,
     Label,Card, CardBody, Table
 } from 'reactstrap';
 
-let today = new Date().toLocaleDateString()
+let today = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
 
 
 class PrintResults extends React.Component {
@@ -76,6 +76,7 @@ class PrintResults extends React.Component {
                                </tr>
                      </tbody>
                    </Table>
+                   <span>LAMISPlus 2.0: {today}</span>
                  </Row>
                  <hr />
               </CardBody>

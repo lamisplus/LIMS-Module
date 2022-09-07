@@ -18,6 +18,8 @@ import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import axios from "axios";
 import { toast } from 'react-toastify';
@@ -89,6 +91,11 @@ const AddResult = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
+    const sampleIDs = []
+    manifestObj.sampleInformation.map((e) => {
+        sampleIDs.push(e.sampleID)
+    })
+
     //console.log("maniObj",manifestObj)
     //console.log("permissions",permissions)
     const classes = useStyles();
@@ -103,6 +110,8 @@ const AddResult = (props) => {
          samples: []
     })
 
+    const [initialValue, SetInitialValue] = useState(0)
+
     const [inputFields, setInputFields] = useState([{
         testResult: "",
         resultDate: "",
@@ -111,7 +120,7 @@ const AddResult = (props) => {
         assayDate: "",
         sampleTestable: "",
         sampleStatus: "",
-        sampleID: ""
+        sampleID: sampleIDs[initialValue]
     }])
 
      const loadResults = useCallback(async () => {
@@ -120,7 +129,7 @@ const AddResult = (props) => {
             setLoading(false)
 
         } catch (e) {
-            toast.error("An error occurred while fetching lab", {
+            toast.error("An error occurred", {
                 position: toast.POSITION.TOP_RIGHT
             });
             setLoading(false)
@@ -131,18 +140,61 @@ const AddResult = (props) => {
         loadResults()
     }, [loadResults]);
 
+    const assignSampleId = () => {
+
+    }
+
      const handleChange = (i, event) => {
            let data = [...inputFields]
            const { name, value } = event.target
-           //console.log(value)
            data[i][name] = value
            setResults({ ...results, samples: data})
      }
 
      const handleSubmit = async (e) => {
          e.preventDefault()
-        console.log(results)
-        history.push("/");
+        console.log("results",results)
+        //history.push("/");
+     }
+
+     const addField = (e) => {
+        e.preventDefault()
+        SetInitialValue(initialValue+1)
+
+        console.log(initialValue)
+        console.log(sampleIDs)
+        console.log(sampleIDs[initialValue])
+
+        if (initialValue > 0) {
+            let newField = {
+                   testResult: "",
+                   resultDate: "",
+                   pcrLabSampleNumber: "",
+                   approvalDate: "",
+                   assayDate: "",
+                   sampleTestable: "",
+                   sampleStatus: "",
+                   sampleID: sampleIDs[initialValue]
+               }
+
+          if (initialValue < sampleIDs.length) {
+               setInputFields([...inputFields, newField])
+          }else{
+            toast.error("Manifest has no sample Id", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+          }
+
+        }
+
+     }
+
+     const removeField = (index, e) => {
+        e.preventDefault()
+        SetInitialValue(initialValue-1)
+        let data = [...inputFields];
+            data.splice(index, 1)
+            setInputFields(data)
      }
 
   return (
@@ -262,45 +314,66 @@ const AddResult = (props) => {
                   <Alert.Heading>PCR Sample Details</Alert.Heading>
                </Alert>
                {
-                    inputFields.map((data, i) => (
+                    manifestObj.sampleInformation.length > 0 && inputFields.map((data, i) => (
                     <>
                           <Row>
-                            <Col>  <FormGroup>
-                                 <Label for="sampleID" className={classes.label}>Sample ID *</Label>
-                                 <Input
-                                     type="text"
-                                     name="sampleID"
-                                     id="sampleID"
-                                     placeholder="Sample ID"
-                                     className={classes.input}
-                                     //value={data.sampleID}
-                                     onChange={ e => handleChange(i, e)}
-                                     //disabled
-                                 />
-                             </FormGroup></Col>
-                            <Col><FormGroup>
-                                 <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
-                                 <Input
-                                     type="text"
-                                     name="sampleStatus"
-                                     id="sampleStatus"
-                                     placeholder="Sample Status"
-                                     className={classes.input}
-                                     onChange={e => handleChange(i, e)}
-                                 />
-                             </FormGroup></Col>
-                            <Col><FormGroup>
-                                 <Label for="surName" className={classes.label}>Sample Testable *</Label>
+                             <Col>
+                              <FormGroup>
+                                    <Label for="sampleID" className={classes.label}>Sample ID *</Label>
+                                    <Input
+                                        type="select"
+                                        name="sampleID"
+                                        id="sampleID"
+                                        className={classes.input}
+                                        onChange={ e => handleChange(i, e)}
+                                    >
+                                     <option hidden>
+                                         Select Sample Id
+                                     </option>
+                                     { sampleIDs && sampleIDs.map((sample, i) =>
+                                     <option key={i} value={sample} >{sample}</option>)}
+                                    </Input>
+                                </FormGroup>
+                             </Col>
+                              <Col>
+                               <FormGroup>
+                                     <Label for="surName" className={classes.label}>Sample Testable *</Label>
+                                     <Input
+                                         type="select"
+                                         name="sampleTestable"
+                                         id="sampleTestable"
+                                         className={classes.input}
+                                         onChange={ e => handleChange(i, e)}
+                                     >
+                                      <option hidden>
+                                          Is Sample Testable ?
+                                      </option>
+                                      <option value="true" >True</option>
+                                      <option value="false" >False</option>
+                                     </Input>
+                                 </FormGroup>
+                              </Col>
 
-                                 <Input
-                                     type="text"
-                                     name="sampleTestable"
-                                     id="sampleTestable"
-                                     placeholder="Sample Testable"
-                                     className={classes.input}
-                                     onChange={e => handleChange(i, e)}
-                                 />
-                             </FormGroup></Col>
+                             <Col>
+                               <FormGroup>
+                                     <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
+                                     <Input
+                                         type="select"
+                                         name="sampleStatus"
+                                         id="sampleStatus"
+                                         className={classes.input}
+                                         onChange={ e => handleChange(i, e)}
+                                     >
+                                      <option hidden>
+                                          Select Sample status
+                                      </option>
+                                      <option value="1" >Completed</option>
+                                      <option value="2" >Rejected</option>
+                                      <option value="3" >In-Progress</option>
+                                      <option value="4" >Re-run</option>
+                                     </Input>
+                                 </FormGroup>
+                              </Col>
                             <Col> <FormGroup>
                                  <Label for="assayDate" className={classes.label}>Assay Date *</Label>
 
@@ -365,14 +438,28 @@ const AddResult = (props) => {
                              />
                          </FormGroup></Col>
                         </Row>
+                        <Row>
+                            <Col style={{textAlign: 'right'}}>
+                                <Button variant="contained" color="error"
+                                   startIcon={<DeleteIcon />} onClick={ e => removeField(i, e)} >
+                                 Remove PCR Sample
+                               </Button>
+                            </Col>
+                        </Row>
+                        <hr />
                     </>
                     ))
                }
-                <hr />
+               { permissions.includes("all_permission") ? <Button variant="contained" color="secondary"
+                      startIcon={<AddIcon />} onClick={addField}>
+                    Add More
+                  </Button> : " "}
+                  {" "}
+
                 { permissions.includes("all_permission") ? <Button variant="contained" color="primary" type="submit"
-                                                                               startIcon={<SaveIcon />} onClick={handleSubmit} >
-                                                                             Save Result
-                                                                           </Button> : " "}
+                   startIcon={<SaveIcon />} onClick={handleSubmit} >
+                 Save Result
+               </Button> : " "}
            </Form>
 
          </Card.Body>

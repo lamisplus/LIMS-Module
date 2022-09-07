@@ -85,6 +85,11 @@ const AddResultModal = (props) => {
     const classes = useStyles()
     const { manifestObj} = props
 
+    const sampleIDs = []
+    manifestObj.sampleInformation.map((e) => {
+        sampleIDs.push(e.sampleID)
+    })
+
     const [results, setResults] = useState({
              manifestID: manifestObj.manifestID,
              receivingFacilityID: manifestObj.receivingLabID,
@@ -119,7 +124,6 @@ const AddResultModal = (props) => {
     }, []);
 
     const handleChange = (event) => {
-
            const { name, value } = event.target
            setInputFields({ ...inputFields, [name]: value})
      }
@@ -146,47 +150,64 @@ const AddResultModal = (props) => {
                             <ModalHeader toggle={props.togglestatus}>Add PCR Sample Results </ModalHeader>
                             <ModalBody>
                                 <Row>
-                                    <Col>  <FormGroup>
-                                         <Label for="sampleID" className={classes.label}>Sample ID *</Label>
-                                         <Input
-                                             type="text"
-                                             name="sampleID"
-                                             id="sampleID"
-                                             placeholder="Sample ID"
-                                             className={classes.input}
-                                             value={inputFields.sampleID}
-                                             onChange={handleChange}
-                                             //disabled
-                                         />
-                                     </FormGroup></Col>
-                                    <Col><FormGroup>
-                                         <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
-                                         <Input
-                                             type="text"
-                                             name="sampleStatus"
-                                             id="sampleStatus"
-                                             placeholder="Sample Status"
-                                             className={classes.input}
-                                             onChange={handleChange}
-                                             value={inputFields.sampleStatus}
-                                         />
-                                     </FormGroup></Col>
-
+                                    <Col>
+                                      <FormGroup>
+                                            <Label for="sampleID" className={classes.label}>Sample ID *</Label>
+                                            <Input
+                                                type="select"
+                                                name="sampleID"
+                                                id="sampleID"
+                                                className={classes.input}
+                                                onChange={ e => handleChange(e)}
+                                            >
+                                             <option hidden>
+                                                 Select Sample Id
+                                             </option>
+                                             { sampleIDs && sampleIDs.map((sample, i) =>
+                                             <option key={i} value={sample} >{sample}</option>)}
+                                            </Input>
+                                        </FormGroup>
+                                     </Col>
+                                    <Col>
+                                       <FormGroup>
+                                             <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
+                                             <Input
+                                                 type="select"
+                                                 name="sampleStatus"
+                                                 id="sampleStatus"
+                                                 className={classes.input}
+                                                 onChange={ e => handleChange(e)}
+                                             >
+                                              <option hidden>
+                                                  Select Sample status
+                                              </option>
+                                              <option value="1" >Completed</option>
+                                              <option value="2" >Rejected</option>
+                                              <option value="3" >In-Progress</option>
+                                              <option value="4" >Re-run</option>
+                                             </Input>
+                                         </FormGroup>
+                                      </Col>
                                   </Row>
                                 <Row>
-                                     <Col><FormGroup>
-                                         <Label for="surName" className={classes.label}>Sample Testable *</Label>
-
-                                         <Input
-                                             type="text"
-                                             name="sampleTestable"
-                                             id="sampleTestable"
-                                             placeholder="Sample Testable"
-                                             className={classes.input}
-                                             onChange={handleChange}
-                                             value={inputFields.sampleTestable}
-                                         />
-                                     </FormGroup></Col>
+                                   <Col>
+                                    <FormGroup>
+                                          <Label for="surName" className={classes.label}>Sample Testable *</Label>
+                                          <Input
+                                              type="select"
+                                              name="sampleTestable"
+                                              id="sampleTestable"
+                                              className={classes.input}
+                                              onChange={ e => handleChange(e)}
+                                          >
+                                           <option hidden>
+                                               Is Sample Testable ?
+                                           </option>
+                                           <option value="true" >True</option>
+                                           <option value="false" >False</option>
+                                          </Input>
+                                      </FormGroup>
+                                   </Col>
                                     <Col> <FormGroup>
                                          <Label for="assayDate" className={classes.label}>Assay Date *</Label>
 
