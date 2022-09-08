@@ -198,8 +198,6 @@ const CreateAManifest = (props) => {
         }
     }
 
-
-
   return (
       <>
         <Card>
@@ -365,7 +363,8 @@ const CreateAManifest = (props) => {
                  }
              </CardBody>
         </Card>
-        <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={manifestsId} saved={saved} />
+        { open ?
+        <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={manifestsId} saved={saved} /> : " "}
       </>
   );
 }

@@ -3,6 +3,7 @@ import Container from '@mui/material/Container';
 import { Link, useHistory } from 'react-router-dom'
 import { connect } from "react-redux";
 import { Row, Col, Card } from "react-bootstrap";
+import Alert from 'react-bootstrap/Alert';
 
 import "./sample.css";
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -85,7 +86,7 @@ const useStyles = makeStyles(theme => ({
 const PrintManifest = (props) => {
     let history = useHistory();
     const sampleObj = history.location && history.location.state ? history.location.state.sampleObj : {}
-    //console.log("props",sampleObj)
+    console.log("props",sampleObj)
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
@@ -134,7 +135,12 @@ const PrintManifest = (props) => {
       <div>
       <Card>
          <Card.Body>
-
+         { Object.keys(localStore).length === 0 ?
+               <Alert variant='danger' style={{width:'100%',fontSize:'18px', textAlign: 'center'}}>
+                 <b>Sample Manifest</b> not created yet. pls complete the manifest form.
+               </Alert>
+             :
+            <>
             <p style={{textAlign: 'right'}}>
             { localStore.manifestStatus === "Ready" ?
                 <MatButton
@@ -184,6 +190,8 @@ const PrintManifest = (props) => {
                     </Link>
                </p>
             <ManifestPrint sampleObj={localStore} ref={componentRef}/>
+            </>
+            }
          </Card.Body>
        </Card>
     </div>

@@ -211,7 +211,7 @@ const Login = (props) => {
                               </FormGroup>
                               <Button variant="contained" color="primary" type="submit"
                                  startIcon={<SaveIcon />} onClick={handleSubmit} >
-                               Login
+                               Save
                              </Button>
                             </Form>
                         </Col>
@@ -223,7 +223,7 @@ const Login = (props) => {
                                         <th>Configuration Name</th>
                                         <th>URL</th>
                                         <th>Email</th>
-                                        <th>Login Date</th>
+                                        <th>Created Date</th>
                                     </tr>
                                 </thead>
                                 <tbody style={{ textAlign: 'center' }}>
@@ -232,7 +232,7 @@ const Login = (props) => {
                                         <td>Demo Server</td>
                                         <td>https://lims.ng/apidemo/</td>
                                         <td>nmrs@lims.ng</td>
-                                        <td>20:12:2022</td>
+                                        <td>09/09/2022</td>
                                     </tr>
                                 </tbody>
                             </Table>

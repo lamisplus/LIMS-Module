@@ -242,7 +242,7 @@ const Result = (props) => {
 //                results.length  === 0 ? <p> <Spinner color="primary" /> Loading Please Wait</p> :
                 <>
                    <Alert style={{width:'100%',fontSize:'20px', backgroundColor: '#014d88', color: "#fff", textAlign: 'center'}}>
-                          <Alert.Heading>PCR Sample Result</Alert.Heading>
+                          <Alert.Heading>PCR Sample Results</Alert.Heading>
                    </Alert>
                   <br/>
                   <PrintResults manifestObj={manifestObj} ref={componentRef}/>

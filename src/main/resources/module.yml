@@ -1,7 +1,7 @@
 basePackage: org.lamisplus.modules.lims
 name: LimsModule
 menus:
-  - icon:
+  - icon: fa-sharp fa-solid fa-vial-virus
     disabled: false
     name: Lims
     state: lims
