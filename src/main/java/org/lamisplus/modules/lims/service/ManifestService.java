@@ -1,6 +1,5 @@
 package org.lamisplus.modules.lims.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
@@ -8,12 +7,13 @@ import org.lamisplus.modules.base.domain.entities.User;
 import org.lamisplus.modules.base.service.OrganisationUnitService;
 import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.lims.domain.dto.*;
+import org.lamisplus.modules.lims.domain.entity.Config;
 import org.lamisplus.modules.lims.domain.entity.Manifest;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
+import org.lamisplus.modules.lims.repository.ConfigRepository;
 import org.lamisplus.modules.lims.repository.ManifestRepository;
 import org.lamisplus.modules.lims.repository.SampleRepository;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -32,17 +32,13 @@ public class ManifestService {
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
+    private final ConfigRepository configRepository;
 
-
-    //TODO: move this to config file
     String FacilityDATIMCode = "FH7LMnbnVlT";
     String FacilityMFLCode = "543";
-    String LIMSUsername = "nmrs@lims.ng";
-    String LIMSPassword = "nmrs@2020!";
-    String loginUrl = "https://lims.ng/apidemo/login.php";
-    String manifestUrl = "https://lims.ng/apidemo/samples/create.php";
-    String resultsUrl = "https://lims.ng/apidemo/samples/result.php";
-
+    String loginUrl = "/login.php";
+    String manifestUrl = "/samples/create.php";
+    String resultsUrl = "/samples/result.php";
 
     public ManifestDTO Save(ManifestDTO manifestDTO){
         Manifest manifest = limsMapper.tomManifest(manifestDTO);
@@ -92,15 +88,17 @@ public class ManifestService {
         return "LP-"+FacilityCode +"-"+ String.format("%05d", manifestDTOList.size()+1);
     }
 
-    public LIMSManifestResponseDTO PostManifestToServer(int id) {
+    public LIMSManifestResponseDTO PostManifestToServer(int id, int configId) {
         RestTemplate restTemplate = GetRestTemplate();
         HttpHeaders headers = GetHTTPHeaders();
+        Config config = configRepository.findById(configId).orElse(null);
 
         //Login to LIMS
-        LIMSLoginResponseDTO loginResponseDTO = LoginToLIMS(restTemplate, headers);
+        assert config != null;
+        LIMSLoginResponseDTO loginResponseDTO = LoginToLIMS(restTemplate, headers, config);
 
         //Post request
-        LIMSManifestResponseDTO response  = PostManifestRequest(restTemplate, headers, loginResponseDTO, id);
+        LIMSManifestResponseDTO response  = PostManifestRequest(restTemplate, headers, loginResponseDTO, id, config);
 
         //Update manifest status
         ManifestDTO dto = findById(id);
@@ -123,13 +121,13 @@ public class ManifestService {
         return restTemplate;
     }
 
-    private LIMSLoginResponseDTO LoginToLIMS(RestTemplate restTemplate, HttpHeaders headers){
+    private LIMSLoginResponseDTO LoginToLIMS(RestTemplate restTemplate, HttpHeaders headers, Config config){
         LIMSLoginRequestDTO loginRequestDTO = new LIMSLoginRequestDTO();
-        loginRequestDTO.setEmail(LIMSUsername);
-        loginRequestDTO.setPassword(LIMSPassword);
+        loginRequestDTO.setEmail(config.getConfigEmail());
+        loginRequestDTO.setPassword(config.getConfigPassword());
 
         HttpEntity<LIMSLoginRequestDTO> loginEntity = new HttpEntity<>(loginRequestDTO, headers);
-        ResponseEntity<LIMSLoginResponseDTO> loginResponse = restTemplate.exchange(loginUrl, HttpMethod.POST, loginEntity, LIMSLoginResponseDTO.class);
+        ResponseEntity<LIMSLoginResponseDTO> loginResponse = restTemplate.exchange(config.getServerUrl()+loginUrl, HttpMethod.POST, loginEntity, LIMSLoginResponseDTO.class);
 
         return loginResponse.getBody();
     }
@@ -142,7 +140,7 @@ public class ManifestService {
         return headers;
     }
 
-    private LIMSManifestResponseDTO PostManifestRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId){
+    private LIMSManifestResponseDTO PostManifestRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId, Config config){
         LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(ManifestId));
         LIMSManifestRequestDTO requestDTO = new LIMSManifestRequestDTO();
         assert loginResponseDTO != null;
@@ -150,44 +148,38 @@ public class ManifestService {
         requestDTO.setViralLoadManifest(manifest);
 
         HttpEntity<LIMSManifestRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
-        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(resultsUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
+        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(config.getServerUrl()+manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
         return manifestResponse.getBody();
     }
 
-    private LIMSResultsResponseDTO GetResultsRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId){
+    private LIMSResultsResponseDTO GetResultsRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId, Config config){
         LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(ManifestId));
         LIMSResultsRequestDTO requestDTO = new LIMSResultsRequestDTO();
 
         requestDTO.setToken(loginResponseDTO.getJwt());
-        /*
         requestDTO.setManifestID(manifest.getManifestID());
         requestDTO.setReceivingPCRLabID(manifest.getReceivingLabID());
         requestDTO.setReceivingPCRLabName(manifest.getReceivingLabName());
         requestDTO.setTestType("VL");
         requestDTO.setSendingFacilityID(manifest.getSendingFacilityID());
         requestDTO.setSendingFacilityName(manifest.getSendingFacilityName());
-         */
-        requestDTO.setManifestID("LP-543-00012");
-        requestDTO.setReceivingPCRLabID("LIMS250002");
-        requestDTO.setReceivingPCRLabName("OAUTHC Testing Lab");
-        requestDTO.setTestType("VL");
-        requestDTO.setSendingFacilityID("FH7LMnbnVlT");
-        requestDTO.setSendingFacilityName("Braithwaite Memorial Specialist Hospital");
 
         HttpEntity<LIMSResultsRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
-        ResponseEntity<LIMSResultsResponseDTO> manifestResponse = restTemplate.exchange(resultsUrl, HttpMethod.POST, manifestEntity, LIMSResultsResponseDTO.class);
+        ResponseEntity<LIMSResultsResponseDTO> manifestResponse = restTemplate.exchange(config.getServerUrl()+resultsUrl, HttpMethod.POST, manifestEntity, LIMSResultsResponseDTO.class);
         return manifestResponse.getBody();
     }
 
-    public LIMSResultsResponseDTO DownloadResultsFromLIMS(int id) {
+    public LIMSResultsResponseDTO DownloadResultsFromLIMS(int id, int configId) {
         RestTemplate restTemplate = GetRestTemplate();
         HttpHeaders headers = GetHTTPHeaders();
+        Config config = configRepository.findById(configId).orElse(null);
 
         //Login to LIMS
-        LIMSLoginResponseDTO loginResponseDTO = LoginToLIMS(restTemplate, headers);
+        assert config != null;
+        LIMSLoginResponseDTO loginResponseDTO = LoginToLIMS(restTemplate, headers, config);
 
         //Get results
-        LIMSResultsResponseDTO response  = GetResultsRequest(restTemplate, headers, loginResponseDTO, id);
+        LIMSResultsResponseDTO response  = GetResultsRequest(restTemplate, headers, loginResponseDTO, id, config);
         LOG.info("RESPONSE:"+response);
 
         try {

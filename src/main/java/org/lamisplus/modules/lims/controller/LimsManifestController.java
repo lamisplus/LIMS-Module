@@ -44,13 +44,13 @@ public class LimsManifestController {
         return manifestService.findAllManifests();
     }
 
-    @GetMapping("/ready-manifests/{id}")
-    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id) {
-        return manifestService.PostManifestToServer(id);
+    @GetMapping("/ready-manifests/{id}/{configId}")
+    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id, @PathVariable int configId) {
+        return manifestService.PostManifestToServer(id, configId);
     }
 
-    @GetMapping("/manifest-results/{id}")
-    public LIMSResultsResponseDTO DownloadResults(@PathVariable int id) {
-        return manifestService.DownloadResultsFromLIMS(id);
+    @GetMapping("/manifest-results/{id}/{configId}")
+    public LIMSResultsResponseDTO DownloadResults(@PathVariable int id, @PathVariable int configId) {
+        return manifestService.DownloadResultsFromLIMS(id, configId);
     }
 }
