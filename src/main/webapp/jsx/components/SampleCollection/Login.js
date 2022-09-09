@@ -6,6 +6,7 @@ import MaterialTable from 'material-table';
 import MatButton from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save'
 import HomeIcon from '@mui/icons-material/Home';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import Alert from 'react-bootstrap/Alert';
 import AddResultModal from './AddResultModal';
@@ -98,20 +99,22 @@ const Login = (props) => {
     const [loading, setLoading] = useState(true)
     const [login, setLogin] = useState({
         configName: "",
-        url: "",
-        email: "",
-        password: ""
+        serverUrl: "",
+        configEmail: "",
+        configPassword: ""
     })
+
+    const [logins, setLogins] = useState([])
 
     const loadResults = useCallback(async () => {
         try {
-            //const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
-            //console.log("results", response);
-           //setResults([]);
+            const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+            console.log("configs", response);
+            setLogins(response.data)
             setLoading(false)
 
         } catch (e) {
-            toast.error("An error occurred while fetching lab", {
+            toast.error("An error occurred while fetching config details", {
                 position: toast.POSITION.TOP_RIGHT
             });
             setLoading(false)
@@ -124,15 +127,57 @@ const Login = (props) => {
 
     const handleChange = (event) => {
            const { name, value } = event.target
-           //console.log(value)
            setLogin({ ...login, [name] : value})
      }
 
      const handleSubmit = async (e) => {
          e.preventDefault()
-        console.log(login)
+         try {
+             await axios.post(`${url}lims/configs`, login,
+                { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                    console.log("login details", resp)
+
+                    toast.success("LIMS Credentials saved successfully!!", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+
+                     setLogin({
+                         configName: "",
+                         serverUrl: "",
+                         configEmail: "",
+                         configPassword: ""
+                     })
+                });
+
+            loadResults()
+
+        } catch (e) {
+            toast.error("An error occurred while saving LIMS Credentials", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
         history.push("/");
      }
+
+     const deleteConfig = async (e, id) => {
+      e.preventDefault();
+        try {
+            const response = await axios.delete(`${url}lims/configs/${id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            console.log(" delete config", response);
+            loadResults()
+            toast.success("LIMS Credentials deleted successfully!!", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+
+        } catch (e) {
+            toast.error("An error occurred while deleting a config", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
+     }
+
 
   return (
     <div>
@@ -146,7 +191,7 @@ const Login = (props) => {
                     </Alert>
 
                    <Row>
-                        <Col xs={6} md={5}>
+                        <Col xs={6} md={4}>
 
                             <Form>
                                  <FormGroup>
@@ -157,6 +202,7 @@ const Login = (props) => {
                                        id="configName"
                                        className={classes.input}
                                        onChange={handleChange}
+                                       value={login.configName}
                                    >
                                     <option hidden>
                                         Select Configuration Name
@@ -170,43 +216,43 @@ const Login = (props) => {
                                    </Input>
                                </FormGroup>
                                <FormGroup>
-                                  <Label for="url" className={classes.label}>URL</Label>
+                                  <Label for="serverUrl" className={classes.label}>URL</Label>
 
                                   <Input
                                       type="text"
-                                      name="url"
-                                      id="url"
-                                      placeholder="URL"
+                                      name="serverUrl"
+                                      id="serverUrl"
+                                      placeholder="Server URL"
                                       className={classes.input}
                                       onChange={handleChange}
-                                      value={login.url}
+                                      value={login.serverUrl}
                                   />
                               </FormGroup>
                                 <FormGroup>
-                                   <Label for="email" className={classes.label}>Email</Label>
+                                   <Label for="configEmail" className={classes.label}>Email</Label>
 
                                    <Input
                                        type="text"
-                                       name="email"
-                                       id="email"
+                                       name="configEmail"
+                                       id="configEmail"
                                        placeholder="E-Mail"
                                        className={classes.input}
                                        onChange={handleChange}
-                                       value={login.email}
+                                       value={login.configEmail}
                                    />
                                </FormGroup>
 
                                <FormGroup>
-                                  <Label for="password" className={classes.label}>Password</Label>
+                                  <Label for="configPassword" className={classes.label}>Password</Label>
 
                                   <Input
-                                      type="text"
-                                      name="password"
-                                      id="password"
-                                      placeholder="password"
+                                      type="password"
+                                      name="configPassword"
+                                      id="configPassword"
+                                      placeholder="configuration password"
                                       className={classes.input}
                                       onChange={handleChange}
-                                      value={login.password}
+                                      value={login.configPassword}
                                   />
                               </FormGroup>
                               <Button variant="contained" color="primary" type="submit"
@@ -215,7 +261,7 @@ const Login = (props) => {
                              </Button>
                             </Form>
                         </Col>
-                        <Col xs={6} md={7}>
+                        <Col xs={6} md={8}>
                             <Table bordered size="sm" responsive>
                                 <thead style={{  backgroundColor:'#014d88', color:'#fff', textAlign: 'center' }}>
                                     <tr>
@@ -224,16 +270,24 @@ const Login = (props) => {
                                         <th>URL</th>
                                         <th>Email</th>
                                         <th>Created Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody style={{ textAlign: 'center' }}>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Demo Server</td>
-                                        <td>https://lims.ng/apidemo/</td>
-                                        <td>nmrs@lims.ng</td>
+                                { logins && logins.map((data, i) => (
+                                     <tr key={i}>
+                                        <td>{++i}</td>
+                                        <td>{data.configName}</td>
+                                        <td>{data.serverUrl}</td>
+                                        <td>{data.configEmail}</td>
                                         <td>09/09/2022</td>
+                                        <td>
+                                        <Button variant="contained" color="error"
+                                             startIcon={<DeleteIcon />} onClick={ e => deleteConfig( e, data.id)}>
+                                         </Button>
+                                        </td>
                                     </tr>
+                                ))}
                                 </tbody>
                             </Table>
                         </Col>
