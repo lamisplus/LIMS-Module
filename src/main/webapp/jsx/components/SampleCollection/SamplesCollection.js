@@ -26,7 +26,7 @@ const [permissions, setPermissions] = useState([]);
                     { headers: {"Authorization" : `Bearer ${token}`} }
                 )
                 .then((response) => {
-                    console.log("permission", response.data.permissions)
+                    //console.log("permission", response.data.permissions)
                     setPermissions(response.data.permissions);
 
                 })

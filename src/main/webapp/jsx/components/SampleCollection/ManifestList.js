@@ -129,7 +129,7 @@ const DownloadManifest = (props) => {
                     { headers: {"Authorization" : `Bearer ${token}`} }
                 )
                 .then((response) => {
-                    console.log("permission", response.data.permissions)
+                    //console.log("permission", response.data.permissions)
                     setPermissions(response.data.permissions);
 
                 })
@@ -140,7 +140,7 @@ const DownloadManifest = (props) => {
          const loadManifestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("manifest", response);
+                //console.log("manifest", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
 
@@ -184,7 +184,7 @@ const DownloadManifest = (props) => {
 //                      }
 //              )},
 
-              {...(permissions.includes('get_result') || permissions.includes("all_permission") &&
+              {...(permissions.includes('view_result') || permissions.includes("all_permission") &&
                       {
                           name:' Results',
                           type:'link',

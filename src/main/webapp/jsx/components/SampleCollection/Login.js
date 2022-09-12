@@ -109,7 +109,7 @@ const Login = (props) => {
     const loadResults = useCallback(async () => {
         try {
             const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
-            console.log("configs", response);
+            //console.log("configs", response);
             setLogins(response.data)
             setLoading(false)
 

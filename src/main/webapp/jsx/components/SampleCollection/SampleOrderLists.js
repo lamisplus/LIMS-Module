@@ -142,7 +142,7 @@ const SampleSearch = (props) => {
      const loadLabTestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("samples", response);
+                //console.log("samples", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
                 localStorage.clear();
@@ -180,7 +180,7 @@ const SampleSearch = (props) => {
         sample.filter((item) => {
             var i = samples.findIndex(x => (x.patientId === item.patientId && x.sampleId === item.sampleId && x.sampleType === item.sampleType));
             if(i <= -1){
-                    console.log("items", item)
+                    //console.log("items", item)
 
                     samples.push({
                       patientID: [{
@@ -285,7 +285,7 @@ const SampleSearch = (props) => {
               title="Sample Collection List"
               columns={[
                   { title: "Type code", field: "typecode" },
-                  { title: "Patient ID", field: "patientId" },
+                  { title: "Hospital ID", field: "patientId" },
                   { title: "First Name", field: "firstname" },
                   { title: "Surname", field: "surname" },
                   { title: "Sex", field: "sex" },
