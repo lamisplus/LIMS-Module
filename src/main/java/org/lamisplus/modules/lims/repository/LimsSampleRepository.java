@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface SampleRepository extends JpaRepository<Sample, Integer> {
+public interface LimsSampleRepository extends JpaRepository<Sample, Integer> {
     List<Sample> findAllByManifestRecordID(Integer id);
     @Query(value = "select c.id, '0' as manifest_record_id\n" +
             ", c.id as sample_id\n" +

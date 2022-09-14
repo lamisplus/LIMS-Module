@@ -86,6 +86,7 @@ CREATE TABLE public.lims_result
     date_result_dispatched character varying(100),
     sample_status character varying(100),
     sample_testable character varying(100),
+    manifest_record_id bigint,
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_result_id_seq OWNED BY lims_result.id;

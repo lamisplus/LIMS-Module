@@ -40,4 +40,6 @@ public class Result {
     private String sampleStatus;
     @Column(name = "sample_testable")
     private String sampleTestable;
+    @Column(name = "manifest_record_id")
+    private int manifestRecordID;
 }

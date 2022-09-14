@@ -9,11 +9,13 @@ import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.lims.domain.dto.*;
 import org.lamisplus.modules.lims.domain.entity.Config;
 import org.lamisplus.modules.lims.domain.entity.Manifest;
+import org.lamisplus.modules.lims.domain.entity.Result;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
-import org.lamisplus.modules.lims.repository.ConfigRepository;
-import org.lamisplus.modules.lims.repository.ManifestRepository;
-import org.lamisplus.modules.lims.repository.SampleRepository;
+import org.lamisplus.modules.lims.repository.LimsConfigRepository;
+import org.lamisplus.modules.lims.repository.LimsManifestRepository;
+import org.lamisplus.modules.lims.repository.LimsResultRepository;
+import org.lamisplus.modules.lims.repository.LimsSampleRepository;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -26,13 +28,14 @@ import java.util.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ManifestService {
-    private final ManifestRepository manifestRepository;
-    private final SampleRepository sampleRepository;
+public class LimsManifestService {
+    private final LimsManifestRepository limsManifestRepository;
+    private final LimsResultRepository resultRepository;
+    private final LimsSampleRepository sampleRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
-    private final ConfigRepository configRepository;
+    private final LimsConfigRepository limsConfigRepository;
 
     String FacilityDATIMCode = "FH7LMnbnVlT";
     String FacilityMFLCode = "543";
@@ -61,7 +64,7 @@ public class ManifestService {
             }
         }
 
-        return limsMapper.toManifestDto( manifestRepository.save(manifest));
+        return limsMapper.toManifestDto( limsManifestRepository.save(manifest));
     }
 
     public ManifestDTO Update(ManifestDTO manifestDTO){
@@ -69,17 +72,17 @@ public class ManifestService {
     }
 
     public String Delete(Integer id){
-        Manifest manifest = manifestRepository.findById(id).orElse(null);
-        manifestRepository.delete(manifest);
+        Manifest manifest = limsManifestRepository.findById(id).orElse(null);
+        limsManifestRepository.delete(manifest);
         return id + " deleted successfully";
     }
 
     public ManifestDTO findById(Integer id) {
-        return limsMapper.toManifestDto(manifestRepository.findById(id).orElse(null));
+        return limsMapper.toManifestDto(limsManifestRepository.findById(id).orElse(null));
     }
 
     public List<ManifestDTO> findAllManifests(){
-        List<ManifestDTO> dtos = limsMapper.toManifestDtoList(manifestRepository.findAll());
+        List<ManifestDTO> dtos = limsMapper.toManifestDtoList(limsManifestRepository.findAll());
         return dtos;
     }
 
@@ -91,7 +94,7 @@ public class ManifestService {
     public LIMSManifestResponseDTO PostManifestToServer(int id, int configId) {
         RestTemplate restTemplate = GetRestTemplate();
         HttpHeaders headers = GetHTTPHeaders();
-        Config config = configRepository.findById(configId).orElse(null);
+        Config config = limsConfigRepository.findById(configId).orElse(null);
 
         //Login to LIMS
         assert config != null;
@@ -172,7 +175,7 @@ public class ManifestService {
     public LIMSResultsResponseDTO DownloadResultsFromLIMS(int id, int configId) {
         RestTemplate restTemplate = GetRestTemplate();
         HttpHeaders headers = GetHTTPHeaders();
-        Config config = configRepository.findById(configId).orElse(null);
+        Config config = limsConfigRepository.findById(configId).orElse(null);
 
         //Login to LIMS
         assert config != null;

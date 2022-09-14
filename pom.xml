@@ -229,7 +229,18 @@
 			<version>4.3.4</version>
 		</dependency>
 
-<!--		<dependency>-->
+		<dependency>
+			<groupId>org.lamisplus.modules</groupId>
+			<artifactId>Laboratory</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lamisplus.modules</groupId>
+			<artifactId>laboratory</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!--		<dependency>-->
 <!--			<groupId>org.springframework</groupId>-->
 <!--			<artifactId>spring-webflux</artifactId>-->
 <!--		</dependency>-->
