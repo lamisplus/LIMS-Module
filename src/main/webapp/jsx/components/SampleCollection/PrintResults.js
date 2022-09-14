@@ -11,12 +11,25 @@ import {  Modal, ModalHeader, ModalBody,
 
 let today = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
 
+const sampleStatus = e =>{
+        if(parseInt(e)===1){
+            return <p><Badge  color="success">Completed</Badge></p>
+        }else if(parseInt(e)===2){
+            return <p><Badge  color="danger">Rejected</Badge></p>
+        }else if(parseInt(e)===3){
+            return <p><Badge  color="info">In-Progress</Badge></p>
+        }else if(parseInt(e)===4){
+            return <p><Badge  color="warning">Re-Run</Badge></p>
+        }else{
+            return <p><Badge  color="dark">Result Pending</Badge></p>
+        }
+    }
 
 class PrintResults extends React.Component {
 
   render() {
-    const { manifestObj } = this.props;
-    //console.log(manifestObj)
+    const { manifestObj, results } = this.props;
+    //console.log(results)
     return (
              <Card>
               <CardBody>
@@ -60,22 +73,45 @@ class PrintResults extends React.Component {
                                 <th>Test Result</th>
                                  {/*<th>Visit Date</th>*/}
                               </tr>
-                               <tr>
-                                  <td>0005</td>
-                                  <td scope="row">--:--:--</td>
-                                    {/*<td>{data.assayDate}</td>
-                                  <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
-                                  <td>--:--:--</td>
-                                  <td>----</td>
-                                   {/*<td>{data.resultDate}</td>*/}
+                              {
+                              //<p> <Spinner color="primary" /> Loading Please Wait</p>
+                              results.length  === 0 ?
 
-                                  <td><p><Badge  color="dark">Result Pending</Badge></p></td>
-                                  <td>True</td>
-                                  <td>Not Ready</td>
-                                   {/*<td>{data.visitDate}</td>*/}
-                               </tr>
+                               manifestObj.sampleInformation.map((result) => (
+                                        <tr>
+                                          <td scope="row">{result.sampleID}</td>
+                                          <td>-- -- --</td>
+                                          <td>-- -- --</td>
+                                          <td>-- -- --</td>
+                                          <td>{sampleStatus(result.sampleStatus)}</td>
+                                          <td>true</td>
+                                          <td>-- -- --</td>
+
+                                       </tr>
+
+                                  ))
+                                :
+                                results.length !== 0  ? results.map((result) => (
+                                    <tr>
+                                      <td scope="row">{result.sampleID}</td>
+                                      <td>{result.approvalDate}</td>
+                                        {/*<td>{data.assayDate}</td>
+                                      <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
+                                      <td>{result.dateResultDispatched}</td>
+                                      <td>{result.pcrLabSampleNumber}</td>
+                                       {/*<td>{data.resultDate}</td>*/}
+
+                                      <td>{sampleStatus(result.sampleStatus)}</td>
+                                      <td>{result.sampleTestable}</td>
+                                      <td>{result.testResult}</td>
+                                       {/*<td>{data.visitDate}</td>*/}
+                                   </tr>
+
+                              ))  : <><br/><p style={{ textAlign: 'center'}}>No sample results available.</p></>}
+
                      </tbody>
                    </Table>
+                   {results.length === 0  ? <p> <Spinner color="primary" /> Please Wait, Syncing with LIMS server... </p> : " "}
                    <span>LAMISPlus 2.0: {today}</span>
                  </Row>
                  <hr />

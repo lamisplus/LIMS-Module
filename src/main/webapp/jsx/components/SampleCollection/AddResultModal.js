@@ -90,16 +90,6 @@ const AddResultModal = (props) => {
         sampleIDs.push(e.sampleID)
     })
 
-    const [results, setResults] = useState({
-             manifestID: manifestObj.manifestID,
-             receivingFacilityID: manifestObj.receivingLabID,
-             receivingFacilityName: manifestObj.receivingLabName,
-             sendingPCRLabID: manifestObj.sendingFacilityID,
-             sendingPCRLabName: manifestObj.sendingFacilityName,
-             testType: "Viral Load",
-             samples: []
-        })
-
     const [loading, setLoading] = useState(false)
     const [visible, setVisible] = useState(true);
     const onDismiss = () => setVisible(false);
@@ -109,6 +99,8 @@ const AddResultModal = (props) => {
 
     const [errors, setErrors] = useState({});
     const [inputFields, setInputFields] = useState({
+            manifestRecordID: manifestObj.id,
+            //id: 0,
             dateResultDispatched: "",
             dateSampleReceivedAtPcrLab: "",
             testResult: "",
@@ -138,7 +130,7 @@ const AddResultModal = (props) => {
          try {
              console.log(inputFields)
 
-              await axios.post(`${url}lims/results`, inputFields,
+              await axios.post(`${url}lims/results`, [inputFields],
                  { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                      console.log("results", resp)
 

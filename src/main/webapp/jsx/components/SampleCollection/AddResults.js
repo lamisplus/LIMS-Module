@@ -7,6 +7,7 @@ import MatButton from '@material-ui/core/Button';
 import HomeIcon from '@mui/icons-material/Home';
 import SaveIcon from '@material-ui/icons/Save'
 import Alert from 'react-bootstrap/Alert';
+import {format} from "date-fns";
 
 import { CardBody,
     Form, FormFeedback, FormGroup, FormText,
@@ -113,6 +114,9 @@ const AddResult = (props) => {
     const [initialValue, SetInitialValue] = useState(0)
 
     const [inputFields, setInputFields] = useState([{
+        manifestRecordID: manifestObj.id,
+        dateResultDispatched: "",
+        dateSampleReceivedAtPcrLab: "",
         testResult: "",
         resultDate: "",
         pcrLabSampleNumber: "",
@@ -120,42 +124,44 @@ const AddResult = (props) => {
         assayDate: "",
         sampleTestable: "",
         sampleStatus: "",
-        sampleID: sampleIDs[initialValue]
+        sampleID: sampleIDs[initialValue],
+        uuid: "",
+        visitDate: format(new Date(), 'yyyy-MM-dd'),
     }])
-
-     const loadResults = useCallback(async () => {
-        try {
-
-            setLoading(false)
-
-        } catch (e) {
-            toast.error("An error occurred", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-            setLoading(false)
-        }
-    }, []);
-
-    useEffect(() => {
-        loadResults()
-    }, [loadResults]);
-
-    const assignSampleId = () => {
-
-    }
 
      const handleChange = (i, event) => {
            let data = [...inputFields]
            const { name, value } = event.target
+           data[i].manifestRecordID = manifestObj.id
            data[i][name] = value
-           setResults({ ...results, samples: data})
+           data[i].uuid = ""
+           data[i].visitDate = format(new Date(), 'yyyy-MM-dd')
+
+           setInputFields(data)
      }
 
      const handleSubmit = async (e) => {
          e.preventDefault()
-        console.log("results",results)
-        //history.push("/");
-     }
+         console.log("inputFields",inputFields)
+         try {
+             console.log(inputFields)
+
+              await axios.post(`${url}lims/results`, inputFields,
+                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                     console.log("results", resp)
+
+                     toast.success("PCR Sample results added successfully!!", {
+                         position: toast.POSITION.TOP_RIGHT
+                     });
+
+                 });
+                 history.push("/");
+             } catch (e) {
+                toast.error("An error occurred while adding PCR Sample results", {
+                     position: toast.POSITION.TOP_RIGHT
+                 });
+             }
+         }
 
      const addField = (e) => {
         e.preventDefault()
@@ -387,8 +393,32 @@ const AddResult = (props) => {
                                  />
                              </FormGroup></Col>
                           </Row>
-                        <Row>
-                          <Col>
+                            <Row>
+                              <Col><FormGroup>
+                                   <Label for="dateSampleReceivedAtPcrLab" className={classes.label}>Date sample at PCR Lab *</Label>
+
+                                   <Input
+                                       type="date"
+                                       name="dateSampleReceivedAtPcrLab"
+                                       id="dateSampleReceivedAtPcrLab"
+                                       placeholder="result Date"
+                                       className={classes.input}
+                                       onChange={e => handleChange(i, e)}
+                                   />
+                               </FormGroup></Col>
+                               <Col><FormGroup>
+                                <Label for="dateResultDispatched" className={classes.label}>Date Result Dispatched *</Label>
+
+                                <Input
+                                    type="date"
+                                    name="dateResultDispatched"
+                                    id="dateResultDispatched"
+                                    placeholder="result Date"
+                                    className={classes.input}
+                                    onChange={e => handleChange(i, e)}
+                                />
+                            </FormGroup></Col>
+                            <Col>
                              <FormGroup>
                                  <Label for="approvalDate" className={classes.label}>Approval Date *</Label>
 
@@ -401,18 +431,20 @@ const AddResult = (props) => {
                                      onChange={e => handleChange(i, e)}
                                  />
                              </FormGroup></Col>
-                          <Col><FormGroup>
-                             <Label for="pcrLabSampleNumber" className={classes.label}>Pcr Lab Sample No *</Label>
+                              <Col><FormGroup>
+                                  <Label for="pcrLabSampleNumber" className={classes.label}>Pcr Lab Sample No *</Label>
 
-                             <Input
-                                 type="text"
-                                 name="pcrLabSampleNumber"
-                                 id="pcrLabSampleNumber"
-                                 placeholder="Pcr Lab Sample Number"
-                                 className={classes.input}
-                                 onChange={e => handleChange(i, e)}
-                             />
-                         </FormGroup></Col>
+                                  <Input
+                                      type="text"
+                                      name="pcrLabSampleNumber"
+                                      id="pcrLabSampleNumber"
+                                      placeholder="Pcr Lab Sample Number"
+                                      className={classes.input}
+                                      onChange={e => handleChange(i, e)}
+                                  />
+                              </FormGroup></Col>
+                          </Row>
+                        <Row>
                           <Col><FormGroup>
                              <Label for="resultDate" className={classes.label}>Result Date *</Label>
 
@@ -437,7 +469,10 @@ const AddResult = (props) => {
                                  onChange={e => handleChange(i, e)}
                              />
                          </FormGroup></Col>
+                         <Col></Col>
+                         <Col></Col>
                         </Row>
+
                         <Row>
                             <Col style={{textAlign: 'right'}}>
                                 <Button variant="contained" color="error"
