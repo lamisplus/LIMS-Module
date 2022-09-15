@@ -129,7 +129,7 @@ const DownloadManifest = (props) => {
                     { headers: {"Authorization" : `Bearer ${token}`} }
                 )
                 .then((response) => {
-                    console.log("permission", response.data.permissions)
+                    //console.log("permission", response.data.permissions)
                     setPermissions(response.data.permissions);
 
                 })
@@ -184,7 +184,7 @@ const DownloadManifest = (props) => {
 //                      }
 //              )},
 
-              {...(permissions.includes('get_result') || permissions.includes("all_permission") &&
+              {...(permissions.includes('view_result') || permissions.includes("all_permission") &&
                       {
                           name:' Results',
                           type:'link',
@@ -231,7 +231,7 @@ const DownloadManifest = (props) => {
        <div>
               <MaterialTable
                icons={tableIcons}
-                  title="Manifests"
+                  title="Previous Manifests"
                   columns={[
                       { title: "Manifest Id", field: "manifestId" },
                       { title: "Pickup Date", field: "pickupDate" },

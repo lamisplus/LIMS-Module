@@ -141,16 +141,17 @@ const Result = (props) => {
 
     const loadResults = useCallback(async () => {
         try {
-            const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
-            console.log("results", response);
+            const response = await axios.get(`${url}lims/results/manifests/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            console.log("results", response.data);
 
-           //setResults([]);
-            setLoading(false)
-
+            if ( typeof response.data.results !== 'undefined') {
+                   setResults(response.data.results);
+                   setLoading(false)
+            }
         } catch (e) {
-            toast.error("An error occurred while fetching lab", {
-                position: toast.POSITION.TOP_RIGHT
-            });
+//            toast.error("An error occurred while getting manifest results", {
+//                position: toast.POSITION.TOP_RIGHT
+//            });
             setLoading(false)
         }
     }, []);
@@ -159,19 +160,7 @@ const Result = (props) => {
         loadResults()
     }, [loadResults]);
 
-    const sampleStatus = e =>{
-        if(parseInt(e)===1){
-            return <p><Badge  color="success">Completed</Badge></p>
-        }else if(parseInt(e)===2){
-            return <p><Badge  color="danger">Rejected</Badge></p>
-        }else if(parseInt(e)===3){
-            return <p><Badge  color="info">In-Progress</Badge></p>
-        }else if(parseInt(e)===4){
-            return <p><Badge  color="warning">Re-Run</Badge></p>
-        }else{
-            return <p><Badge  color="dark">Result Pending</Badge></p>
-        }
-    }
+
 
     const resultTestType = e => {
         if(parseInt(e)===2){
@@ -239,13 +228,13 @@ const Result = (props) => {
              </p>
              <hr />
               {
-//                results.length  === 0 ? <p> <Spinner color="primary" /> Loading Please Wait</p> :
+
                 <>
                    <Alert style={{width:'100%',fontSize:'20px', backgroundColor: '#014d88', color: "#fff", textAlign: 'center'}}>
-                          <Alert.Heading>PCR Sample Result</Alert.Heading>
+                          <Alert.Heading>PCR Sample Results</Alert.Heading>
                    </Alert>
                   <br/>
-                  <PrintResults manifestObj={manifestObj} ref={componentRef}/>
+                  <PrintResults manifestObj={manifestObj} results={results} ref={componentRef}/>
 
                 </>
               }
@@ -253,7 +242,7 @@ const Result = (props) => {
          </Card.Body>
        </Card>
        { open ?
-        <AddResultModal modalstatus={open} togglestatus={toggleModal} manifestObj={manifestObj} /> : " "}
+        <AddResultModal modalstatus={open} togglestatus={toggleModal} manifestObj={manifestObj} results={results}/> : " "}
     </div>
   );
 }

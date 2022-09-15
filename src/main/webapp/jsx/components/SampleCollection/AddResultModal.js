@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {Modal,ModalHeader, ModalBody,Form,FormFeedback,Row,Alert,Col,Input,FormGroup,Label,Card,CardBody,} from "reactstrap";
 import axios from "axios";
-
+import {format} from "date-fns";
 import MatButton from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
@@ -90,16 +90,6 @@ const AddResultModal = (props) => {
         sampleIDs.push(e.sampleID)
     })
 
-    const [results, setResults] = useState({
-             manifestID: manifestObj.manifestID,
-             receivingFacilityID: manifestObj.receivingLabID,
-             receivingFacilityName: manifestObj.receivingLabName,
-             sendingPCRLabID: manifestObj.sendingFacilityID,
-             sendingPCRLabName: manifestObj.sendingFacilityName,
-             testType: "Viral Load",
-             samples: []
-        })
-
     const [loading, setLoading] = useState(false)
     const [visible, setVisible] = useState(true);
     const onDismiss = () => setVisible(false);
@@ -108,7 +98,11 @@ const AddResultModal = (props) => {
     const [saveButtonStatus, setSaveButtonStatus] = useState(false);
 
     const [errors, setErrors] = useState({});
-    const [inputFields, setInputFields] = useState([{
+    const [inputFields, setInputFields] = useState({
+            manifestRecordID: manifestObj.id,
+            //id: 0,
+            dateResultDispatched: "",
+            dateSampleReceivedAtPcrLab: "",
             testResult: "",
             resultDate: "",
             pcrLabSampleNumber: "",
@@ -116,8 +110,10 @@ const AddResultModal = (props) => {
             assayDate: "",
             sampleTestable: "",
             sampleStatus: "",
-            sampleID: ""
-    }])
+            sampleID: "",
+            uuid: "",
+            visitDate: format(new Date(), 'yyyy-MM-dd'),
+    })
 
     useEffect(() => {
 
@@ -133,9 +129,33 @@ const AddResultModal = (props) => {
 
          try {
              console.log(inputFields)
-             history.push("/");
+
+              await axios.post(`${url}lims/results`, [inputFields],
+                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                     console.log("results", resp)
+
+                     toast.success("PCR Sample results added successfully!!", {
+                         position: toast.POSITION.TOP_RIGHT
+                     });
+
+                      setInputFields({
+                          dateResultDispatched: "",
+                          dateSampleReceivedAtPcrLab: "",
+                          testResult: "",
+                          resultDate: "",
+                          pcrLabSampleNumber: "",
+                          approvalDate: "",
+                          assayDate: "",
+                          sampleTestable: "",
+                          sampleStatus: "",
+                          sampleID: "",
+                          uuid: "",
+                          visitDate: format(new Date(), 'yyyy-MM-dd'),
+                      })
+                 });
+             //history.push("/");
          } catch (e) {
-            toast.error("An error occurred during sample collection", {
+            toast.error("An error occurred while adding PCR Sample results", {
                  position: toast.POSITION.TOP_RIGHT
              });
          }
@@ -149,6 +169,32 @@ const AddResultModal = (props) => {
                         <Form onSubmit={saveSample}>
                             <ModalHeader toggle={props.togglestatus}>Add PCR Sample Results </ModalHeader>
                             <ModalBody>
+                                 <Row>
+                                        <Col><FormGroup>
+                                            <Label for="dateResultDispatched" className={classes.label}>Date Result Dispatched *</Label>
+
+                                            <Input
+                                                type="date"
+                                                name="dateResultDispatched"
+                                                id="dateResultDispatched"
+                                                className={classes.input}
+                                                onChange={handleChange}
+                                                value={inputFields.dateResultDispatched}
+                                            />
+                                        </FormGroup></Col>
+                                       <Col><FormGroup>
+                                        <Label for="dateSampleReceivedAtPcrLab" className={classes.label}>Date Sample Received at PCR Lab *</Label>
+
+                                        <Input
+                                            type="date"
+                                            name="dateSampleReceivedAtPcrLab"
+                                            id="dateSampleReceivedAtPcrLab"
+                                            className={classes.input}
+                                            onChange={handleChange}
+                                            value={inputFields.dateSampleReceivedAtPcrLab}
+                                        />
+                                    </FormGroup></Col>
+                                </Row>
                                 <Row>
                                     <Col>
                                       <FormGroup>
@@ -159,6 +205,7 @@ const AddResultModal = (props) => {
                                                 id="sampleID"
                                                 className={classes.input}
                                                 onChange={ e => handleChange(e)}
+                                                value={inputFields.sampleID}
                                             >
                                              <option hidden>
                                                  Select Sample Id
@@ -177,6 +224,7 @@ const AddResultModal = (props) => {
                                                  id="sampleStatus"
                                                  className={classes.input}
                                                  onChange={ e => handleChange(e)}
+                                                 value={inputFields.sampleStatus}
                                              >
                                               <option hidden>
                                                   Select Sample status
@@ -199,6 +247,7 @@ const AddResultModal = (props) => {
                                               id="sampleTestable"
                                               className={classes.input}
                                               onChange={ e => handleChange(e)}
+                                              value={inputFields.sampleTestable}
                                           >
                                            <option hidden>
                                                Is Sample Testable ?

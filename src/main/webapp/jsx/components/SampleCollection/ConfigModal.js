@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {Modal,ModalHeader, ModalBody,Form,FormFeedback,Row,Alert,Col,Input,FormGroup,Label,Card,CardBody,} from "reactstrap";
 import axios from "axios";
 
@@ -88,40 +88,54 @@ const ConfigModal = (props) => {
     const [loading, setLoading] = useState(false)
     const [visible, setVisible] = useState(true);
     const onDismiss = () => setVisible(false);
-    const [config, setConfig] = useState({});
+    const [config, setConfig] = useState({
+        config: ""
+    });
 
     const [saveButtonStatus, setSaveButtonStatus] = useState(false);
 
     const [errors, setErrors] = useState({});
 
-    useEffect(() => {
+    const [logins, setLogins] = useState([])
 
+    const [configId, setConfigId] = useState(0);
+
+    const loadResults = useCallback(async () => {
+        try {
+            const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+            //console.log("configs", response);
+            setLogins(response.data)
+            setLoading(false)
+        } catch (e) {
+            toast.error("An error occurred while fetching config details", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
     }, []);
 
+    useEffect(() => {
+        loadResults()
+    }, [loadResults]);
+
     const handleChange = (event) => {
-           const { name, value } = event.target
-           setConfig({ ...config, [name]: value})
+       const { name, value } = event.target
+       setConfigId(parseInt(value));
+       //setConfig({ ...config, [name]: value})
+       //console.log("config",config)
      }
 
     const saveSample = async (e) => {
         e.preventDefault();
-
-         try {
-             console.log(config)
-             setSaved(true);
-             history.push("/");
-         } catch (e) {
-            toast.error("An error occurred during sample collection", {
-                 position: toast.POSITION.TOP_RIGHT
-             });
-         }
+         console.log(configId)
+         setSaved(true);
     };
 
     const sendManifest = async (e) => {
         e.preventDefault()
         console.log("sending manifest")
         props.togglestatus();
-         await axios.get(`${url}lims/ready-manifests/${manifestsId}`, { headers: {"Authorization" : `Bearer ${token}`} })
+         await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
             .then((resp) => {
                 console.log("sending manifest", resp)
                 //setSend(true)
@@ -159,20 +173,19 @@ const ConfigModal = (props) => {
                                            <Label for="configName" className={classes.label}>Configuration Setting</Label>
                                            <Input
                                                type="select"
-                                               name="configName"
-                                               id="configName"
+                                               name="config"
+                                               id="config"
                                                className={classes.input}
                                                onChange={handleChange}
                                            >
                                             <option hidden>
                                                 Which server are you sending to?
                                             </option>
-                                            <option value="Demo Server">
-                                                Demo Server
-                                            </option>
-                                            <option value="Live Server">
-                                                Live Server
-                                            </option>
+                                            { logins && logins.map((data, i) => (
+                                                <option key={i} value={data.id}>
+                                                    {data.configName}
+                                                </option>
+                                            ))}
                                            </Input>
                                        </FormGroup>
                                     </Col>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
 import ConfigModal from './ConfigModal';
 import Alert from 'react-bootstrap/Alert';
+import PhoneInput from 'react-phone-input-2'
 
 import IconButton from '@material-ui/core/IconButton';
 
@@ -198,8 +199,6 @@ const CreateAManifest = (props) => {
         }
     }
 
-
-
   return (
       <>
         <Card>
@@ -278,6 +277,7 @@ const CreateAManifest = (props) => {
                              name="courierContact"
                              value={manifestData.courierContact}
                              id="courierContact"
+                             placeholder="(234)7099999999"
                              onChange={handleChange}
                              className={classes.input}
                          />
@@ -286,7 +286,7 @@ const CreateAManifest = (props) => {
                         <Col><FormGroup>
                       <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
                       <Input
-                          type="text"
+                          type="tel"
                           name="samplePackagedBy"
                           value={manifestData.samplePackagedBy}
                           id="samplePackagedBy"
@@ -365,7 +365,8 @@ const CreateAManifest = (props) => {
                  }
              </CardBody>
         </Card>
-        <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={manifestsId} saved={saved} />
+        { open ?
+        <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={manifestsId} saved={saved} /> : " "}
       </>
   );
 }

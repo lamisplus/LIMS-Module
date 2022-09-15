@@ -26,7 +26,7 @@ const [permissions, setPermissions] = useState([]);
                     { headers: {"Authorization" : `Bearer ${token}`} }
                 )
                 .then((response) => {
-                    console.log("permission", response.data.permissions)
+                    //console.log("permission", response.data.permissions)
                     setPermissions(response.data.permissions);
 
                 })
@@ -87,9 +87,6 @@ return(
                            <Button variant="outlined" color="primary" onClick={() => nextStep()}
                            disabled={activeStep == 2 ? true : false}>Next Step</Button>
                     </Stack> : " " }
-
-
-
         </>
     </div>
 );
