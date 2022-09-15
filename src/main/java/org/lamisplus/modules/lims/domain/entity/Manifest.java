@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,8 +20,8 @@ public class Manifest {
     private int id;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
-    @Column(name = "manifest_number")
-    private String manifestNumber;
+    @Column(name = "manifest_id")
+    private String manifestID;
     @Column(name = "sending_facility_id")
     private String sendingFacilityID;
     @Column(name = "sending_facility_name")
@@ -41,8 +42,10 @@ public class Manifest {
     private String courierContact;
     @Column(name = "manifest_status")
     private String manifestStatus;
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
 
-    @JoinColumn(name = "manifest_id")
+    @JoinColumn(name = "manifest_record_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sample> sampleList;
+    private List<Sample> sampleInformation;
 }
