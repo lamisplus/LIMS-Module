@@ -231,7 +231,7 @@ const DownloadManifest = (props) => {
        <div>
               <MaterialTable
                icons={tableIcons}
-                  title="Existing Manifest List"
+                  title="Manifests"
                   columns={[
                       { title: "Manifest Id", field: "manifestId" },
                       { title: "Pickup Date", field: "pickupDate" },

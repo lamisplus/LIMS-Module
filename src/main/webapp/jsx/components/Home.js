@@ -40,7 +40,7 @@ const Home = (props) => {
                     onSelect={(k) => setKey(k)}
                     className="mb-3"
                     >
-                       <Tab eventKey="manifest-list" title="Existing Manifest">
+                       <Tab eventKey="manifest-list" title="Manifest List">
                          <ManifestList />
                         </Tab>
                         <Tab eventKey="collection" title="Create Manifest">
