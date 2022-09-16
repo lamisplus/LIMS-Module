@@ -143,11 +143,9 @@ const Result = (props) => {
         try {
             const response = await axios.get(`${url}lims/results/manifests/${manifestObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             console.log("results", response.data);
+            setResults(response.data.results);
+            setLoading(false)
 
-            if ( typeof response.data.results !== 'undefined') {
-                   setResults(response.data.results);
-                   setLoading(false)
-            }
         } catch (e) {
 //            toast.error("An error occurred while getting manifest results", {
 //                position: toast.POSITION.TOP_RIGHT

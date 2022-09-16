@@ -153,6 +153,7 @@ const AddResultModal = (props) => {
                           visitDate: format(new Date(), 'yyyy-MM-dd'),
                       })
                  });
+                 props.togglestatus()
              //history.push("/");
          } catch (e) {
             toast.error("An error occurred while adding PCR Sample results", {
