@@ -27,7 +27,6 @@ public class LimsSampleService {
     private final PersonService personService;
     private final JsonNodeTransformer jsonNodeTransformer;
 
-
     public SampleDTO Save(SampleDTO sampleDTO){
         Sample sample = limsMapper.toSample(sampleDTO);
         sample.setUuid(UUID.randomUUID().toString());

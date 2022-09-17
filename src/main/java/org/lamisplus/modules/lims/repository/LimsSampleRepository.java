@@ -2,6 +2,7 @@ package org.lamisplus.modules.lims.repository;
 
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -41,10 +42,6 @@ public interface LimsSampleRepository extends JpaRepository<Sample, Integer> {
             "inner join base_application_codeset e on c.sample_type_id = e.id\n" +
             "left join base_application_codeset f on b.viral_load_indication = e.id\n" +
             "where d.lab_test_name='Viral Load'\n" +
-            "and b.lab_test_order_status in (1,2) ", nativeQuery = true)
+            "and b.lab_test_order_status in (1,2,3) ", nativeQuery = true)
     List<Sample> findPendingVLSamples();
-
-    @Query(value="update laboratory_result set result_reported=:result where test_id = " +
-            "(select test_id from laboratory_sample where id=:sampleId limit 1)", nativeQuery = true)
-    String SaveSampleResult(@Param("result") String result, @Param("sampleId") int sampleId);
 }

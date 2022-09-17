@@ -13,10 +13,7 @@ import org.lamisplus.modules.lims.domain.entity.Config;
 import org.lamisplus.modules.lims.domain.entity.Manifest;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
-import org.lamisplus.modules.lims.repository.LimsConfigRepository;
-import org.lamisplus.modules.lims.repository.LimsManifestRepository;
-import org.lamisplus.modules.lims.repository.LimsResultRepository;
-import org.lamisplus.modules.lims.repository.LimsSampleRepository;
+import org.lamisplus.modules.lims.repository.*;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -33,9 +30,11 @@ public class LimsManifestService {
     private final LimsManifestRepository limsManifestRepository;
     private final LimsResultRepository resultRepository;
     private final LimsSampleRepository sampleRepository;
+    private final LimsTestRepository testRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
+    private final LimsResultService resultService;
     private final LimsConfigRepository limsConfigRepository;
 
     String FacilityDATIMCode = "FH7LMnbnVlT";
@@ -207,7 +206,7 @@ public class LimsManifestService {
             //Post result in laboratory module
             for (LIMSResultDTO result : response.getViralLoadTestReport()) {
                 LOG.info("RESULT: " + result);
-                sampleRepository.SaveSampleResult(result.getTestResult(), Integer.parseInt(result.getSampleID()));
+                resultService.SaveResultInLabModule(limsMapper.toResult(result));
             }
         }catch (Exception e) {
             LOG.error("ERROR:" + e);

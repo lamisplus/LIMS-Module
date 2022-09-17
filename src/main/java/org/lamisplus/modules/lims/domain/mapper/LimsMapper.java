@@ -3,6 +3,7 @@ package org.lamisplus.modules.lims.domain.mapper;
 import org.lamisplus.modules.lims.domain.dto.*;
 import org.lamisplus.modules.lims.domain.entity.Config;
 import org.lamisplus.modules.lims.domain.entity.Manifest;
+import org.lamisplus.modules.lims.domain.entity.Result;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.mapstruct.Mapper;
 
@@ -29,4 +30,6 @@ public interface LimsMapper {
     Config toConfig(ConfigDTO configDTO);
     List<ConfigDTO> toConfigDtoList(List<Config> configList);
     List<Config> toConfigList(List<ConfigDTO> configDTOList);
+
+    Result toResult(LIMSResultDTO resultDTO);
 }
