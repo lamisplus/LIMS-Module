@@ -1,5 +1,7 @@
 package org.lamisplus.modules.lims.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
@@ -9,13 +11,9 @@ import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.lims.domain.dto.*;
 import org.lamisplus.modules.lims.domain.entity.Config;
 import org.lamisplus.modules.lims.domain.entity.Manifest;
-import org.lamisplus.modules.lims.domain.entity.Result;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
-import org.lamisplus.modules.lims.repository.LimsConfigRepository;
-import org.lamisplus.modules.lims.repository.LimsManifestRepository;
-import org.lamisplus.modules.lims.repository.LimsResultRepository;
-import org.lamisplus.modules.lims.repository.LimsSampleRepository;
+import org.lamisplus.modules.lims.repository.*;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -32,9 +30,11 @@ public class LimsManifestService {
     private final LimsManifestRepository limsManifestRepository;
     private final LimsResultRepository resultRepository;
     private final LimsSampleRepository sampleRepository;
+    private final LimsTestRepository testRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
+    private final LimsResultService resultService;
     private final LimsConfigRepository limsConfigRepository;
 
     String FacilityDATIMCode = "FH7LMnbnVlT";
@@ -91,10 +91,20 @@ public class LimsManifestService {
         return "LP-"+FacilityCode +"-"+ String.format("%05d", manifestDTOList.size()+1);
     }
 
+    private void LogInfo(String title, Object object) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            LOG.info(title+": " + objectMapper.writeValueAsString(object));
+        } catch (JsonProcessingException exception) {
+            LOG.info(title+": " + exception.getMessage());
+        }
+    }
+
     public LIMSManifestResponseDTO PostManifestToServer(int id, int configId) {
         RestTemplate restTemplate = GetRestTemplate();
         HttpHeaders headers = GetHTTPHeaders();
         Config config = limsConfigRepository.findById(configId).orElse(null);
+        LogInfo("CONFIG", config);
 
         //Login to LIMS
         assert config != null;
@@ -131,6 +141,7 @@ public class LimsManifestService {
 
         HttpEntity<LIMSLoginRequestDTO> loginEntity = new HttpEntity<>(loginRequestDTO, headers);
         ResponseEntity<LIMSLoginResponseDTO> loginResponse = restTemplate.exchange(config.getServerUrl()+loginUrl, HttpMethod.POST, loginEntity, LIMSLoginResponseDTO.class);
+        LogInfo("LOGIN_RESPONSE", loginResponse.getBody());
 
         return loginResponse.getBody();
     }
@@ -143,15 +154,18 @@ public class LimsManifestService {
         return headers;
     }
 
-    private LIMSManifestResponseDTO PostManifestRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId, Config config){
+    private LIMSManifestResponseDTO PostManifestRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId, Config config) {
         LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(ManifestId));
         LIMSManifestRequestDTO requestDTO = new LIMSManifestRequestDTO();
         assert loginResponseDTO != null;
         requestDTO.setToken(loginResponseDTO.getJwt());
         requestDTO.setViralLoadManifest(manifest);
+        LogInfo("MANIFEST_REQUEST", requestDTO);
 
         HttpEntity<LIMSManifestRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
         ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(config.getServerUrl()+manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
+        LogInfo("MANIFEST_RESPONSE", manifestResponse.getBody());
+
         return manifestResponse.getBody();
     }
 
@@ -166,9 +180,12 @@ public class LimsManifestService {
         requestDTO.setTestType("VL");
         requestDTO.setSendingFacilityID(manifest.getSendingFacilityID());
         requestDTO.setSendingFacilityName(manifest.getSendingFacilityName());
+        LogInfo("RESULTS_REQUEST", requestDTO);
 
         HttpEntity<LIMSResultsRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
         ResponseEntity<LIMSResultsResponseDTO> manifestResponse = restTemplate.exchange(config.getServerUrl()+resultsUrl, HttpMethod.POST, manifestEntity, LIMSResultsResponseDTO.class);
+        LogInfo("RESULTS_RESPONSE", manifestResponse.getBody());
+
         return manifestResponse.getBody();
     }
 
@@ -186,13 +203,13 @@ public class LimsManifestService {
         LOG.info("RESPONSE:"+response);
 
         try {
-            //Update Lamisplus
+            //Post result in laboratory module
             for (LIMSResultDTO result : response.getViralLoadTestReport()) {
                 LOG.info("RESULT: " + result);
-                sampleRepository.SaveSampleResult(result.getTestResult(), Integer.parseInt(result.getSampleID()));
+                resultService.SaveResultInLabModule(limsMapper.toResult(result));
             }
         }catch (Exception e) {
-            LOG.info("ERROR:" + e);
+            LOG.error("ERROR:" + e);
         }
 
         return response;

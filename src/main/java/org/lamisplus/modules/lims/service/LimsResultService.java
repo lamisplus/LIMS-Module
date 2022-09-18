@@ -2,36 +2,35 @@ package org.lamisplus.modules.lims.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.Laboratory.domain.dto.ResultDTO;
-import org.lamisplus.modules.Laboratory.domain.dto.SampleDTO;
-import org.lamisplus.modules.Laboratory.service.ResultService;
-import org.lamisplus.modules.Laboratory.service.SampleService;
 import org.lamisplus.modules.lims.domain.dto.ManifestDTO;
 import org.lamisplus.modules.lims.domain.entity.Result;
+import org.lamisplus.modules.lims.domain.entity.Test;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
 import org.lamisplus.modules.lims.repository.LimsManifestRepository;
 import org.lamisplus.modules.lims.repository.LimsResultRepository;
+import org.lamisplus.modules.lims.repository.LimsTestRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class LimsResultService {
     private final LimsResultRepository resultRepository;
     private final LimsManifestRepository manifestRepository;
-    private final SampleService labSampleService;
-    private final ResultService labResultService;
+    private final LimsTestRepository testRepository;
     private final LimsMapper limsMapper;
 
     private Result Save(Result result){
         result.setUuid(UUID.randomUUID().toString());
+        LOG.info("1. RESULT: " + result);
         SaveResultInLabModule(result);
         return resultRepository.save(result);
     }
@@ -67,17 +66,21 @@ public class LimsResultService {
         return dto;
     }
 
-    private void SaveResultInLabModule(Result limsResult){
+    public void SaveResultInLabModule(Result result){
         try {
-            SampleDTO sampleDTO = labSampleService.FindById(Integer.parseInt(limsResult.getSampleID()));
-            ResultDTO resultDTO = new ResultDTO();
-            resultDTO.setTestId(sampleDTO.getTestId());
-            resultDTO.setResultReported(limsResult.getTestResult());
-            resultDTO.setTimeAssayed(LocalTime.parse("00:00:00"));
-            resultDTO.setDateAssayed(LocalDate.parse(limsResult.getAssayDate()));
-            resultDTO.setTimeResultReported(LocalTime.parse("00:00:00"));
-            resultDTO.setDateResultReported(LocalDate.parse(limsResult.getDateResultDispatched()));
-            labResultService.Save(resultDTO);
+            Test test = testRepository.findBySampleId(Integer.valueOf(result.getSampleID())).get(0);
+            LOG.info("TEST: " + test);
+
+            resultRepository.SaveSampleResult(UUID.randomUUID().toString(),
+                    LocalDate.parse(result.getAssayDate()),
+                    LocalTime.parse("00:00:00"),
+                    LocalDate.parse(result.getDateResultDispatched()),
+                    LocalTime.parse("00:00:00"),
+                    result.getTestResult(),
+                    test.getId(),
+                    test.getPatientUuid(),
+                    test.getFacilityId().toString(),
+                    test.getPatientId());
         }catch (Exception exception) {
             LOG.info("ERROR SAVING RESULT: " + exception.getMessage());
         }
