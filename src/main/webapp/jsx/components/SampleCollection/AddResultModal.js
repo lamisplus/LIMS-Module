@@ -83,7 +83,8 @@ const AddResultModal = (props) => {
     const history = useHistory();
 
     const classes = useStyles()
-    const { manifestObj} = props
+
+    const { manifestObj } = props
 
     const sampleIDs = []
     manifestObj.sampleInformation.map((e) => {
@@ -99,20 +100,20 @@ const AddResultModal = (props) => {
 
     const [errors, setErrors] = useState({});
     const [inputFields, setInputFields] = useState({
-            manifestRecordID: manifestObj.id,
-            //id: 0,
-            dateResultDispatched: "",
-            dateSampleReceivedAtPcrLab: "",
-            testResult: "",
-            resultDate: "",
-            pcrLabSampleNumber: "",
-            approvalDate: "",
-            assayDate: "",
-            sampleTestable: "",
-            sampleStatus: "",
-            sampleID: "",
-            uuid: "",
-            visitDate: format(new Date(), 'yyyy-MM-dd'),
+        manifestRecordID: manifestObj.id,
+        //id: 0,
+        dateResultDispatched: "",
+        dateSampleReceivedAtPcrLab: "",
+        testResult: "",
+        resultDate: "",
+        pcrLabSampleNumber: "",
+        approvalDate: "",
+        assayDate: "",
+        sampleTestable: "",
+        sampleStatus: "",
+        sampleID: "",
+        uuid: "",
+        visitDate: format(new Date(), 'yyyy-MM-dd'),
     })
 
     useEffect(() => {
@@ -120,8 +121,8 @@ const AddResultModal = (props) => {
     }, []);
 
     const handleChange = (event) => {
-           const { name, value } = event.target
-           setInputFields({ ...inputFields, [name]: value})
+       const { name, value } = event.target
+       setInputFields({ ...inputFields, [name]: value})
      }
 
     const saveSample = async (e) => {
@@ -153,6 +154,7 @@ const AddResultModal = (props) => {
                           visitDate: format(new Date(), 'yyyy-MM-dd'),
                       })
                  });
+
                  props.togglestatus()
              //history.push("/");
          } catch (e) {
