@@ -11,6 +11,12 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import {format} from "date-fns";
 
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+
 import { forwardRef } from 'react';
 import axios from "axios";
 import { toast } from 'react-toastify';
@@ -117,12 +123,26 @@ const SampleSearch = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
-    const samples = []
+    let samples = [];
+    const [ dateFilter, setDateFilter] = useState({
+        startDate: null,
+        endDate: null
+    })
+
+    const [value, setValue] = React.useState([null, null]);
+
+     let start_date = value[0] != null ? value[0].$d : null;
+     let end_date = value[1] != null ? value[1].$d : null;
+
+    const handleChange = e => {
+        const {name, value} = e.target;
+        setDateFilter({...dateFilter, [name]: value})
+    }
 
      const loadLabTestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("samples", response);
+                //console.log("samples", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
                 localStorage.clear();
@@ -157,12 +177,12 @@ const SampleSearch = (props) => {
            };
 
      const handleSampleChanges = (sample) => {
+        //console.log("sample clicked", sample);
         sample.filter((item) => {
-            var i = samples.findIndex(x => (x.patientId === item.patientId && x.sampleId === item.sampleId && x.sampleType === item.sampleType));
-            if(i <= -1){
-                    console.log("items", item)
+            var i = samples.findIndex(x => (x.sampleId !== item.sampleId && x.sampleType === item.sampleType));
 
-                    samples.push({
+            if(i === -1){
+                  samples.push({
                       patientID: [{
                           idNumber: item.patientId,
                           idTypeCode: item.typecode
@@ -192,11 +212,10 @@ const SampleSearch = (props) => {
                   });
 
                   localStorage.setItem('samples', JSON.stringify(samples));
-
               }
              return null;
         })
-
+        console.log(samples)
      }
 
   return (
@@ -204,39 +223,60 @@ const SampleSearch = (props) => {
       <Card>
          <Card.Body>
             <Grid container spacing={2}>
-              <Grid item xs={2}>
+                 <LocalizationProvider
+                  dateAdapter={AdapterDayjs}
+                  localeText={{ start: 'Start-Date', end: 'End-Date' }}
+                >
+                  <DateRangePicker
+                    value={value}
+                    onChange={(newValue) => {
+                      setValue(newValue);
+                    }}
+                    renderInput={(startProps, endProps) => (
+                      <React.Fragment>
+                        <TextField {...startProps} />
+                        <Box sx={{ mx: 2 }}> to </Box>
+                        <TextField {...endProps} />
+                      </React.Fragment>
+                    )}
+                  />
+                </LocalizationProvider>
+
+           {/*   <Grid item xs={2}>
                    <FormGroup>
-                       <Label for="dateScheduledForPickup" className={classes.label}>Start date</Label>
+                       <Label for="startDate" className={classes.label}>Start date</Label>
 
                        <Input
                            type="date"
-                           name="dateScheduledForPickup"
+                           name="startDate"
 
-                           id="dateScheduledForPickup"
-                           placeholder="Date & Time Created"
-
+                           id="startDate"
+                           placeholder="Start Date"
+                           onChange={handleChange}
                            className={classes.input}
                        />
                    </FormGroup>
               </Grid>
               <Grid item xs={2}>
                     <FormGroup>
-                      <Label for="dateScheduledForPickup" className={classes.label}>End date</Label>
+                      <Label for="endDate" className={classes.label}>End date</Label>
 
                       <Input
                           type="date"
-                          name="dateScheduledForPickup"
+                          name="endDate"
 
-                          id="dateScheduledForPickup"
-                          placeholder="Date & Time Created"
-
+                          id="endDate"
+                          placeholder="End Date"
+                          onChange={handleChange}
                           className={classes.input}
                       />
                   </FormGroup>
               </Grid>
+
               <Grid item xs={2}>
 
               </Grid>
+              */}
             </Grid>
           <br />
           <MaterialTable
@@ -244,7 +284,7 @@ const SampleSearch = (props) => {
               title="Sample Collection List"
               columns={[
                   { title: "Type code", field: "typecode" },
-                  { title: "Patient ID", field: "patientId" },
+                  { title: "Hospital ID", field: "patientId" },
                   { title: "First Name", field: "firstname" },
                   { title: "Surname", field: "surname" },
                   { title: "Sex", field: "sex" },
@@ -260,18 +300,26 @@ const SampleSearch = (props) => {
                     field: "sampleType",
                   },
                   { title: "Sample Orderby", field: "orderby" },
-                  { title: "Orderby Date", field: "orderbydate" },
+                  { title: "Orderby Date", field: "orderbydate", type: "date" , filtering: false },
                   { title: "Collected By", field: "collectedby" },
                   { title: "Date Collected", field: "datecollected", type: "date" , filtering: false},
                   { title: "Time Collected", field: "timecollected", type: "time" , filtering: false},
-//                  {
-//                    title: "Action",
-//                    field: "actions",
-//                    filtering: false,
-//                  },
+
               ]}
               isLoading={loading}
-              data={ collectedSamples.map((row) => (
+              data={ collectedSamples.filter( row => {
+                   let filterPass = true
+
+                   const date = new Date(row.sampleCollectionDate)
+
+                   if (start_date != null) {
+                     filterPass = filterPass && (new Date(start_date) <= date)
+                   }
+                   if (end_date != null) {
+                     filterPass = filterPass && (new Date(end_date) >= date)
+                   }
+                   return filterPass
+              }).map((row) => (
                     {
                       typecode: row.patientID.idTypeCode,
                       patientId: row.patientID.idNumber,
@@ -287,20 +335,7 @@ const SampleSearch = (props) => {
                       orderbydate: row.sampleOrderDate,
                       collectedby: row.sampleCollectedBy,
                       datecollected: row.sampleCollectionDate,
-                      timecollected: row.sampleCollectionTime,
-
-//                      actions:  <Link to ={{
-//                                      pathname: "/samples-collection",
-//                                      state: row
-//                                  }}
-//                                      style={{ cursor: "pointer", color: "blue", fontStyle: "bold"}}
-//                                >
-//                                    <Tooltip title="Collect Sample">
-//                                        <IconButton aria-label="Collect Sample" >
-//                                            <VisibilityIcon color="primary"/>
-//                                        </IconButton>
-//                                    </Tooltip>
-//                                </Link>
+                      timecollected: row.sampleCollectionTime
                     })
               )}
 
@@ -324,38 +359,7 @@ const SampleSearch = (props) => {
                     debounceInterval: 400
                 }}
                  onSelectionChange={(rows) => handleSampleChanges(rows)}
-
           />
-           {/*  <div>
-                 <Stack direction="row" spacing={2}
-                 m={1}
-                 display="flex"
-                 justifyContent="flex-end"
-                 alignItems="flex-end">
-                      <Link color="inherit"
-                          to={{pathname: "/"}}
-                           >
-                          <Button variant="outlined" color="primary">
-                             PrevPage
-                          </Button>
-                      </Link>
-                      {" "}
-                      { <Link color="inherit"
-                             to={{
-                             pathname: "/create-manifest",
-                             state:{ sampleObj: samples }
-                             }}
-
-                              >
-                             <Button variant="outlined" color="success">
-                                NextPage
-                             </Button>
-                         </Link>
-                         }
-
-                  </Stack>
-                 <br />
-             </div>*/}
          </Card.Body>
        </Card>
     </div>

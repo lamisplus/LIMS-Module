@@ -1,56 +1,54 @@
 import React, {useEffect, useCallback, useState} from 'react';
 import { Link, useHistory } from 'react-router-dom'
-import nglogo from '../../../../../assets/images/nglogo.png'
+import {logo} from './pcr'
 
 import {  Modal, ModalHeader, ModalBody,
-    Col,Input,
+    Row, Col,Input,
     FormGroup,
     Label,Card, CardBody, Table
 } from 'reactstrap';
 
-let today = new Date().toLocaleDateString()
-
+let today = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
 
 class ManifestPrint extends React.Component {
-
   render() {
-    console.log(this.props.sampleObj)
+    //console.log(this.props.sampleObj)
     return (
              <Card>
               <CardBody>
-                  <div>
+               <Row>
                   <span>{today}</span>
-                         <Table size="sm">
-                              <tbody>
-                                   <tr>
-                                      <th scope="row"></th>
+                     <Table size="sm">
+                          <tbody>
+                               <tr>
+                                  <th scope="row"></th>
 
-                                      <th scope="row"></th>
+                                  <th scope="row"></th>
 
-                                      <th scope="row" className="text-center">
-                                        <img src={nglogo} style={{width: "80px", height: "80px"}}/>
-                                      </th>
+                                  <th scope="row" className="text-center">
+                                    <img src={logo} style={{width: "80px", height: "80px"}}/>
+                                  </th>
 
-                                    </tr>
-                                    <tr>
-                                      <th scope="row"></th>
+                                </tr>
+                                <tr>
+                                  <th scope="row"></th>
 
-                                      <th scope="row"><h2 className="text-center">NISRN TRANSPORTATION MANIFEST</h2></th>
+                                  <th scope="row"><h2 className="text-center">NISRN TRANSPORTATION MANIFEST</h2></th>
 
-                                      <th scope="row"></th>
+                                  <th scope="row"></th>
 
-                                    </tr>
-                              </tbody>
-                            </Table>
-                      </div>
+                                </tr>
+                          </tbody>
+                        </Table>
+                  </Row>
                 <br/>
-              <br />
-            <div>
+                <br />
+            <Row>
                    <Table bordered size="sm">
                       <tbody>
                            <tr>
-                              <th scope="row">Date/Time:</th>
-                              <td>{this.props.sampleObj.dateScheduledForPickup}</td>
+                              <th scope="row">Pick Up Date:</th>
+                              <td>{this.props.sampleObj.dateScheduledForPickup === null ? " " : this.props.sampleObj.dateScheduledForPickup?.replace("T", " ")}</td>
                               <th scope="row">Destination:</th>
                               <td>{this.props.sampleObj.receivingLabName}</td>
                               <th scope="row">PCR Lab Number:</th>
@@ -58,7 +56,7 @@ class ManifestPrint extends React.Component {
                             </tr>
                             <tr>
                               <th scope="row">Status:</th>
-                              <td>Pending</td>
+                              <td>{this.props.sampleObj.manifestStatus}</td>
                               <th scope="row">Manifest Id:</th>
                               <td>{this.props.sampleObj.manifestID}</td>
                               <th scope="row">Sample Temperature:</th>
@@ -74,9 +72,9 @@ class ManifestPrint extends React.Component {
                             </tr>
                       </tbody>
                     </Table>
-              </div>
+              </Row>
               <br/>
-              <div>
+              <Row>
                      <Table striped bordered size="sm">
                         <thead style={{  backgroundColor:'#014d88', color:'#fff' }}>
                           <tr>
@@ -88,19 +86,18 @@ class ManifestPrint extends React.Component {
                           </tr>
                         </thead>
                         <tbody>
-                        { this.props.sampleObj.sampleInformation && this.props.sampleObj.sampleInformation.map((data, i) => (
-                             <tr key={i}>
-                                <td scope="row">{this.props.sampleObj.sendingFacilityName}</td>
-                                <td>{data.patientID[0].idNumber}</td>
-                                <td>{data.sampleID}</td>
-                                <td>{data.sampleType}</td>
-                                <td>{data.sampleCollectionDate}</td>
-                              </tr>
-                        ))}
-
+                            { this.props.sampleObj.sampleInformation && this.props.sampleObj.sampleInformation.map((data, i) => (
+                                 <tr key={i}>
+                                    <td scope="row">{this.props.sampleObj.sendingFacilityName}</td>
+                                    <td>{data.patientID[0].idNumber}</td>
+                                    <td>{data.sampleID}</td>
+                                    <td>{data.sampleType}</td>
+                                    <td>{data.sampleCollectionDate}</td>
+                                  </tr>
+                            ))}
                         </tbody>
                       </Table>
-                </div>
+                </Row>
                 <br />
                 <span>LAMISPlus 2.0</span>
               </CardBody>

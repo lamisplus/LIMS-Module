@@ -8,6 +8,7 @@ import { MdDashboard, MdDeleteForever, MdModeEdit, MdPerson } from "react-icons/
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import { alpha } from '@material-ui/core/styles'
 import SplitActionButton from './SplitActionButton';
+import Alert from 'react-bootstrap/Alert';
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -118,17 +119,20 @@ const DownloadManifest = (props) => {
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
     const [permissions, setPermissions] = useState([]);
+    const [config, setConfig] = useState([]);
 
      useEffect(() => {
+            loadResults();
             userPermission();
           }, []);
 
-        const userPermission =()=>{
+       const userPermission =()=>{
             axios
                 .get(`${url}account`,
                     { headers: {"Authorization" : `Bearer ${token}`} }
                 )
                 .then((response) => {
+                    //console.log("permission", response.data.permissions)
                     setPermissions(response.data.permissions);
 
                 })
@@ -136,7 +140,21 @@ const DownloadManifest = (props) => {
                 });
         }
 
-       const loadManifestData = useCallback(async () => {
+       const loadResults = useCallback(async () => {
+            try {
+                const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+                //console.log("configs", response);
+                setConfig(response.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error("An error occurred while fetching config details", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+                setLoading(false)
+            }
+        }, []);
+
+         const loadManifestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
                 console.log("manifest", response);
@@ -158,74 +176,65 @@ const DownloadManifest = (props) => {
 
          }, [loadManifestData]);
 
-       function actionItemss(row){
-            return  [            {
-                type:'single',
-                actions:[
-                    {
-                        name:'Print Manifest',
-                        type:'link',
-
-                        to:{
-                            pathname: "/print-manifest",
-                            state:{ sampleObj: [] }
-                        }
-                    },
-                ]
-            }
-            ]
-       }
-
      const actionItems = row => {
           return  [
+          {...(permissions.includes('view_manifest') || permissions.includes("all_permission") &&
               {
                   name:'View',
                   type:'link',
                   icon:<FaEye  size="22"/>,
                   to:{
-                      pathname: "/register-patient",
-                      state: { patientId : row.id, permissions:permissions  }
+                      pathname: "/print-manifest",
+                      state: { sampleObj: row, permissions:permissions  }
                   }
-              },
-              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
+              }
+          )},
+//              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
+//                      {
+//                          name:'Print Manifest',
+//                          type:'link',
+//                          icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+//                          to:{
+//                              pathname: "/print-manifest",
+//                              state: { sampleObj: row, permissions:permissions  }
+//                          }
+//                      }
+//              )},
+
+              {...(permissions.includes('view_result') || permissions.includes("all_permission") &&
                       {
-                          name:'Print Manifest',
+                          name:' Results',
                           type:'link',
-                          icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+                          icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
                           to:{
-                              pathname: "/print-manifest",
-                              state: { sampleObj: [], permissions:permissions  }
-                          }
-                      }
-              )},
-              {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
-                      {
-                          name:'Add Results',
-                          type:'link',
-                          icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-                          to:{
-                              pathname: "/register-patient",
-                              state: { sampleObj: [], permissions:permissions  }
+                              pathname: "/result",
+                              state: { manifestObj: row, permissions:permissions }
                           }
                       }
                   )},
-//              {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-//                      {
-//                          name:'Delete Patient',
-//                          type:'link',
-//                          icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-//                          to:{
-//                              pathname: "/#",
-//                              state: { patientObj: row, permissions:permissions  }
-//                          }
-//                      }
-//                  )}
+              {...(permissions.includes('add_result') || permissions.includes("all_permission") &&
+                      {
+                          name:'Add Result',
+                          type:'link',
+                          icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
+                          to:{
+                              pathname: "/add-result",
+                              state: { manifestObj: row, permissions:permissions }
+                          }
+                      }
+                  )}
            ]
        }
 
   return (
     <>
        <div>
+           { config.length === 0 ?
+                <Alert variant='danger'>
+                  Kindly set the LIMS server configurations
+                </Alert>
+                : " "
+           }
            {/*<Stack direction="row" spacing={2}
            m={1}
            display="flex"
@@ -245,13 +254,14 @@ const DownloadManifest = (props) => {
        <div>
               <MaterialTable
                icons={tableIcons}
-                  title="Existing Manifest List"
+                  title="Previous Manifests"
                   columns={[
                       { title: "Manifest Id", field: "manifestId" },
                       { title: "Pickup Date", field: "pickupDate" },
                       { title: "Created Date", field: "createDate" },
                       { title: "Receiving Lab", field: "lab" },
                        { title: "Packaged By", field: "packaged_by" },
+                       { title: "Total Samples", field: "samples" },
                       {
                         title: "Status",
                         field: "status",
@@ -270,11 +280,14 @@ const DownloadManifest = (props) => {
                           createDate: row.createDate.replace('T', ' '),
                           lab: row.receivingLabName,
                           packaged_by: row.samplePackagedBy,
+                          samples: row.sampleInformation.length,
                           status: row.manifestStatus,
 
                           actions:
                             <div>
+                                { config.length !== 0 ?
                                <SplitActionButton actions={actionItems(row)} />
+                               : " "}
                             </div>
 
                         }))}
