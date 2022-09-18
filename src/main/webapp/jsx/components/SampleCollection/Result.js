@@ -242,7 +242,7 @@ const Result = (props) => {
          </Card.Body>
        </Card>
        { open ?
-        <AddResultModal modalstatus={open} togglestatus={toggleModal} manifestObj={manifestObj} results={results}/> : " "}
+        <AddResultModal modalstatus={open} togglestatus={toggleModal} manifestObj={manifestObj} results={results} reload={reload} /> : " "}
     </div>
   );
 }
