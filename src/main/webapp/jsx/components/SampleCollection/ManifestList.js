@@ -122,8 +122,8 @@ const DownloadManifest = (props) => {
     const [config, setConfig] = useState([]);
 
      useEffect(() => {
-            userPermission();
             loadResults();
+            userPermission();
           }, []);
 
        const userPermission =()=>{

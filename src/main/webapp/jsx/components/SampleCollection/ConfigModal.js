@@ -133,7 +133,10 @@ const ConfigModal = (props) => {
 
     const sendManifest = async (e) => {
         e.preventDefault()
-        console.log("sending manifest")
+        //for now
+        toast.success("Sample manifest sent to PCR Lab.", {
+            position: toast.POSITION.TOP_RIGHT
+        });
         props.togglestatus();
          await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
             .then((resp) => {

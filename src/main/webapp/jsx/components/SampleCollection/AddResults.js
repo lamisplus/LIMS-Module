@@ -171,6 +171,12 @@ const AddResult = (props) => {
         console.log(sampleIDs)
         console.log(sampleIDs[initialValue])
 
+        if (initialValue === 0) {
+            toast.success("click the Add More button to add more fields...", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+
         if (initialValue > 0) {
             let newField = {
                    testResult: "",
@@ -186,7 +192,7 @@ const AddResult = (props) => {
           if (initialValue < sampleIDs.length) {
                setInputFields([...inputFields, newField])
           }else{
-            toast.error("Manifest has no sample Id", {
+            toast.error("Total Number of samples reached for this manifest", {
                 position: toast.POSITION.TOP_RIGHT
             });
           }
