@@ -83,7 +83,7 @@ const AddResultModal = (props) => {
     const history = useHistory();
 
     const classes = useStyles()
-    const { manifestObj} = props
+    const { manifestObj, reload } = props
 
     const sampleIDs = []
     manifestObj.sampleInformation.map((e) => {
@@ -128,7 +128,7 @@ const AddResultModal = (props) => {
         e.preventDefault();
 
          try {
-             console.log(inputFields)
+             //console.log(inputFields)
 
               await axios.post(`${url}lims/results`, [inputFields],
                  { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
@@ -154,6 +154,8 @@ const AddResultModal = (props) => {
                       })
                  });
              //history.push("/");
+             props.togglestatus();
+             reload();
          } catch (e) {
             toast.error("An error occurred while adding PCR Sample results", {
                  position: toast.POSITION.TOP_RIGHT
@@ -177,6 +179,7 @@ const AddResultModal = (props) => {
                                                 type="date"
                                                 name="dateResultDispatched"
                                                 id="dateResultDispatched"
+                                                max={new Date().toISOString().slice(0, 10)}
                                                 className={classes.input}
                                                 onChange={handleChange}
                                                 value={inputFields.dateResultDispatched}
@@ -189,6 +192,7 @@ const AddResultModal = (props) => {
                                             type="date"
                                             name="dateSampleReceivedAtPcrLab"
                                             id="dateSampleReceivedAtPcrLab"
+                                            max={new Date().toISOString().slice(0, 10)}
                                             className={classes.input}
                                             onChange={handleChange}
                                             value={inputFields.dateSampleReceivedAtPcrLab}
@@ -265,6 +269,7 @@ const AddResultModal = (props) => {
                                              name="assayDate"
                                              id="assayDate"
                                              placeholder="Assay Date"
+                                             max={new Date().toISOString().slice(0, 10)}
                                              className={classes.input}
                                              onChange={handleChange}
                                              value={inputFields.assayDate}
@@ -281,6 +286,7 @@ const AddResultModal = (props) => {
                                              name="approvalDate"
                                              id="approvalDate"
                                              placeholder="Approval Date"
+                                             max={new Date().toISOString().slice(0, 10)}
                                              className={classes.input}
                                              onChange={handleChange}
                                              value={inputFields.approvalDate}
@@ -309,6 +315,7 @@ const AddResultModal = (props) => {
                                                 name="resultDate"
                                                 id="resultDate"
                                                 placeholder="result Date"
+                                                max={new Date().toISOString().slice(0, 10)}
                                                 className={classes.input}
                                                 onChange={handleChange}
                                                 value={inputFields.resultDate}

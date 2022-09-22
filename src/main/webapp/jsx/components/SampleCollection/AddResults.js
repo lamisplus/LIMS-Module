@@ -387,6 +387,8 @@ const AddResult = (props) => {
                                      type="date"
                                      name="assayDate"
                                      id="assayDate"
+                                     max={new Date().toISOString().slice(0, 10)}
+                                     //min={new Date(datasample.dateSampleVerified)}
                                      placeholder="Assay Date"
                                      className={classes.input}
                                      onChange={e => handleChange(i, e)}
@@ -402,6 +404,7 @@ const AddResult = (props) => {
                                        name="dateSampleReceivedAtPcrLab"
                                        id="dateSampleReceivedAtPcrLab"
                                        placeholder="result Date"
+                                       max={new Date().toISOString().slice(0, 10)}
                                        className={classes.input}
                                        onChange={e => handleChange(i, e)}
                                    />
@@ -414,6 +417,7 @@ const AddResult = (props) => {
                                     name="dateResultDispatched"
                                     id="dateResultDispatched"
                                     placeholder="result Date"
+                                    max={new Date().toISOString().slice(0, 10)}
                                     className={classes.input}
                                     onChange={e => handleChange(i, e)}
                                 />
@@ -427,6 +431,7 @@ const AddResult = (props) => {
                                      name="approvalDate"
                                      id="approvalDate"
                                      placeholder="Approval Date"
+                                     max={new Date().toISOString().slice(0, 10)}
                                      className={classes.input}
                                      onChange={e => handleChange(i, e)}
                                  />
@@ -453,6 +458,7 @@ const AddResult = (props) => {
                                  name="resultDate"
                                  id="resultDate"
                                  placeholder="result Date"
+                                 max={new Date().toISOString().slice(0, 10)}
                                  className={classes.input}
                                  onChange={e => handleChange(i, e)}
                              />
