@@ -62,9 +62,15 @@ const useStyles = makeStyles(theme => ({
         }
     },
     input: {
-        border:'2px solid #014d88',
+        border:'1px solid #014d88',
         borderRadius:'0px',
-        fontSize:'16px',
+        fontSize:'14px',
+        color:'#000'
+    },
+    arial: {
+        border:'1px solid #014d88',
+        borderRadius:'0px',
+        fontSize:'15px',
         color:'#000'
     },
     error: {
@@ -81,11 +87,11 @@ const useStyles = makeStyles(theme => ({
         color:'#fff',
         borderRadius:'0px'
     },
-    label:{
-        fontSize:'16px',
-        color:'rgb(153, 46, 98)',
-        fontWeight:'600'
-    }
+   label:{
+       fontSize:'14px',
+       color:'#014d88',
+       fontWeight:'bold'
+   }
 }))
 
 const AddResult = (props) => {
@@ -326,11 +332,17 @@ const AddResult = (props) => {
                              <Col>
                               <FormGroup>
                                     <Label for="sampleID" className={classes.label}>Sample ID *</Label>
-                                    <Input
-                                        type="select"
+                                    <select
+                                        className="form-control"
                                         name="sampleID"
                                         id="sampleID"
-                                        className={classes.input}
+                                        style={{
+                                          border: "1px solid #014d88",
+                                          borderRadius:'0px',
+                                          fontSize:'14px',
+                                          color:'#000'
+                                        }}
+
                                         onChange={ e => handleChange(i, e)}
                                     >
                                      <option hidden>
@@ -338,17 +350,22 @@ const AddResult = (props) => {
                                      </option>
                                      { sampleIDs && sampleIDs.map((sample, i) =>
                                      <option key={i} value={sample} >{sample}</option>)}
-                                    </Input>
+                                    </select>
                                 </FormGroup>
                              </Col>
                               <Col>
                                <FormGroup>
-                                     <Label for="surName" className={classes.label}>Sample Testable *</Label>
-                                     <Input
-                                         type="select"
+                                     <Label for="sampleTestable" className={classes.label}>Sample Testable *</Label>
+                                     <select
+                                         className="form-control"
                                          name="sampleTestable"
                                          id="sampleTestable"
-                                         className={classes.input}
+                                         style={{
+                                           border: "1px solid #014d88",
+                                           borderRadius:'0px',
+                                           fontSize:'14px',
+                                           color:'#000'
+                                         }}
                                          onChange={ e => handleChange(i, e)}
                                      >
                                       <option hidden>
@@ -356,18 +373,23 @@ const AddResult = (props) => {
                                       </option>
                                       <option value="true" >True</option>
                                       <option value="false" >False</option>
-                                     </Input>
+                                     </select>
                                  </FormGroup>
                               </Col>
 
                              <Col>
                                <FormGroup>
                                      <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
-                                     <Input
-                                         type="select"
+                                     <select
+                                         className="form-control"
                                          name="sampleStatus"
                                          id="sampleStatus"
-                                         className={classes.input}
+                                         style={{
+                                            border: "1px solid #014d88",
+                                            borderRadius:'0px',
+                                            fontSize:'14px',
+                                            color:'#000'
+                                          }}
                                          onChange={ e => handleChange(i, e)}
                                      >
                                       <option hidden>
@@ -377,7 +399,7 @@ const AddResult = (props) => {
                                       <option value="2" >Rejected</option>
                                       <option value="3" >In-Progress</option>
                                       <option value="4" >Re-run</option>
-                                     </Input>
+                                     </select>
                                  </FormGroup>
                               </Col>
                             <Col> <FormGroup>
