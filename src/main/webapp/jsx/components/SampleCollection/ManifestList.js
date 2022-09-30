@@ -8,6 +8,7 @@ import { MdDashboard, MdDeleteForever, MdModeEdit, MdPerson } from "react-icons/
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import { alpha } from '@material-ui/core/styles'
 import SplitActionButton from './SplitActionButton';
+import Alert from 'react-bootstrap/Alert';
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -118,12 +119,14 @@ const DownloadManifest = (props) => {
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
     const [permissions, setPermissions] = useState([]);
+    const [config, setConfig] = useState([]);
 
      useEffect(() => {
+            loadResults();
             userPermission();
           }, []);
 
-        const userPermission =()=>{
+       const userPermission =()=>{
             axios
                 .get(`${url}account`,
                     { headers: {"Authorization" : `Bearer ${token}`} }
@@ -136,6 +139,20 @@ const DownloadManifest = (props) => {
                 .catch((error) => {
                 });
         }
+
+       const loadResults = useCallback(async () => {
+            try {
+                const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+                //console.log("configs", response);
+                setConfig(response.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error("An error occurred while fetching config details", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+                setLoading(false)
+            }
+        }, []);
 
          const loadManifestData = useCallback(async () => {
             try {
@@ -212,6 +229,12 @@ const DownloadManifest = (props) => {
   return (
     <>
        <div>
+           { config.length === 0 ?
+                <Alert variant='danger'>
+                  Kindly set the LIMS server configurations
+                </Alert>
+                : " "
+           }
            {/*<Stack direction="row" spacing={2}
            m={1}
            display="flex"
@@ -262,7 +285,9 @@ const DownloadManifest = (props) => {
 
                           actions:
                             <div>
+                                { config.length !== 0 ?
                                <SplitActionButton actions={actionItems(row)} />
+                               : " "}
                             </div>
 
                         }))}

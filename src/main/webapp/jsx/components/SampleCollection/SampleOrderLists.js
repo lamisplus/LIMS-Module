@@ -123,7 +123,7 @@ const SampleSearch = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
-    const samples = [];
+    let samples = [];
     const [ dateFilter, setDateFilter] = useState({
         startDate: null,
         endDate: null
@@ -177,12 +177,12 @@ const SampleSearch = (props) => {
            };
 
      const handleSampleChanges = (sample) => {
+        //console.log("sample clicked", sample);
         sample.filter((item) => {
-            var i = samples.findIndex(x => (x.patientId === item.patientId && x.sampleId === item.sampleId && x.sampleType === item.sampleType));
-            if(i <= -1){
-                    //console.log("items", item)
+            var i = samples.findIndex(x => (x.sampleId !== item.sampleId && x.sampleType === item.sampleType));
 
-                    samples.push({
+            if(i === -1){
+                  samples.push({
                       patientID: [{
                           idNumber: item.patientId,
                           idTypeCode: item.typecode
@@ -212,11 +212,10 @@ const SampleSearch = (props) => {
                   });
 
                   localStorage.setItem('samples', JSON.stringify(samples));
-
               }
              return null;
         })
-
+        console.log(samples)
      }
 
   return (
