@@ -1,16 +1,14 @@
 package org.lamisplus.modules.lims.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.PatientIdDTO;
 import org.lamisplus.modules.lims.domain.dto.SampleDTO;
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
-import org.lamisplus.modules.lims.repository.SampleRepository;
+import org.lamisplus.modules.lims.repository.LimsSampleRepository;
 import org.lamisplus.modules.lims.util.JsonNodeTransformer;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
 import org.lamisplus.modules.patient.service.PersonService;
@@ -23,8 +21,8 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SampleService {
-    private final SampleRepository sampleRepository;
+public class LimsSampleService {
+    private final LimsSampleRepository sampleRepository;
     private final LimsMapper limsMapper;
     private final PersonService personService;
     private final JsonNodeTransformer jsonNodeTransformer;

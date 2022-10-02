@@ -2,11 +2,13 @@ package org.lamisplus.modules.lims.repository;
 
 import org.lamisplus.modules.lims.domain.entity.Sample;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface SampleRepository extends JpaRepository<Sample, Integer> {
+public interface LimsSampleRepository extends JpaRepository<Sample, Integer> {
     List<Sample> findAllByManifestRecordID(Integer id);
     @Query(value = "select c.id, '0' as manifest_record_id\n" +
             ", c.id as sample_id\n" +
@@ -40,6 +42,6 @@ public interface SampleRepository extends JpaRepository<Sample, Integer> {
             "inner join base_application_codeset e on c.sample_type_id = e.id\n" +
             "left join base_application_codeset f on b.viral_load_indication = e.id\n" +
             "where d.lab_test_name='Viral Load'\n" +
-            "and b.lab_test_order_status in (1,2) ", nativeQuery = true)
+            "and b.lab_test_order_status in (1,2,3) ", nativeQuery = true)
     List<Sample> findPendingVLSamples();
 }

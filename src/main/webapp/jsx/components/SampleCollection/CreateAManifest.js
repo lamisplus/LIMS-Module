@@ -1,26 +1,20 @@
 import React, {useEffect, useCallback, useState} from 'react';
-import Container from '@mui/material/Container';
 import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import "./sample.css";
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import Grid from "@material-ui/core/Grid";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
-import {format} from "date-fns";
+import ConfigModal from './ConfigModal';
+import Alert from 'react-bootstrap/Alert';
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
-import {  Modal, ModalHeader, ModalBody,
-    Col,Input,
-    FormGroup,
-    Label,Card, CardBody, Table, Badge
+import IconButton from '@material-ui/core/IconButton';
+
+import {  Modal, ModalHeader, ModalBody, Row,
+    Col, Card, CardBody, Table,
+    Form, FormFeedback, FormGroup, FormText,
+    Input,
+    Label, Badge
 } from 'reactstrap';
 
-import { forwardRef } from 'react';
 import axios from "axios";
 import { toast } from 'react-toastify';
 import {token, url } from "../../../api";
@@ -62,9 +56,9 @@ const useStyles = makeStyles(theme => ({
         }
     },
     input: {
-        border:'2px solid #014d88',
+        border:'1px solid #014d88',
         borderRadius:'0px',
-        fontSize:'16px',
+        fontSize:'14px',
         color:'#000'
     },
     error: {
@@ -82,8 +76,8 @@ const useStyles = makeStyles(theme => ({
         borderRadius:'0px'
     },
     label:{
-        fontSize:'16px',
-        color:'rgb(153, 46, 98)',
+        fontSize:'14px',
+        color:'#014d88',
         fontWeight:'600'
     }
 }))
@@ -99,6 +93,14 @@ const CreateAManifest = (props) => {
     const [manifestsId, setManifestsId] = useState(0);
     const [status, setStatus] = useState("Pending")
 
+    const [errors, setErrors] = useState({});
+
+    const [open, setOpen] = useState(false)
+
+    const handleOpen = () => setOpen(true);
+
+    const toggleModal = () => setOpen(!open)
+
     useEffect(() => {
       const collectedSamples = JSON.parse(localStorage.getItem('samples'));
       if (collectedSamples) {
@@ -109,7 +111,7 @@ const CreateAManifest = (props) => {
     const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
     const [manifestData, setManifestData] = useState({
-         token: "",
+
          manifestID: "",
          manifestStatus: "Pending",
          sendingFacilityID: "FH7LMnbnVlT",
@@ -117,7 +119,7 @@ const CreateAManifest = (props) => {
          receivingLabID: pcrLabCode.labNo,
          receivingLabName: pcrLabCode.name,
          dateScheduledForPickup: "",
-         temperatureAtPickup: 0,
+         temperatureAtPickup: "",
          samplePackagedBy: "",
          courierRiderName: "",
          courierContact: "",
@@ -127,12 +129,18 @@ const CreateAManifest = (props) => {
          uuid: ""
      })
 
+    const [contactPhone, setContactPhone] = useState("");
+
+    const checkPhoneNumber=(e)=> {
+        setContactPhone(e)
+    }
+
     const handleChange = (event) => {
            checkPCRLab(event.target.value)
            const { name, value } = event.target
            setManifestData({ ...manifestData, [name]: value, receivingLabID: pcrLabCode.labNo,
            receivingLabName: pcrLabCode.name, sampleInformation: localStore })
-     }
+    }
 
     const checkPCRLab = (name) => {
         pcr_lab.map(( val ) => {
@@ -142,37 +150,45 @@ const CreateAManifest = (props) => {
         })
     }
 
+   const validateInputs = () => {
+        let temp = { ...errors }
+
+        temp.dateScheduledForPickup = manifestData.dateScheduledForPickup ? "" : "Pick-Up date is required."
+        temp.temperatureAtPickup = manifestData.temperatureAtPickup ? "" : "Temperature is required."
+        temp.receivingLabID = manifestData.receivingLabID ? "" : "Receiving lab Id is required."
+        temp.receivingLabName = manifestData.receivingLabName ? "" : "Receiving lab name is required."
+        temp.courierRiderName = manifestData.courierRiderName ? "" : "Courier rider name is required."
+        temp.courierContact = manifestData.courierContact ? "" : "Courier rider contact is required."
+        temp.samplePackagedBy = manifestData.samplePackagedBy ? "" : "Sample packaged by is required."
+
+        setErrors({
+              ...temp
+          })
+          return Object.values(temp).every(x => x == "")
+   }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
-        //console.log(`manifest created...${JSON.stringify(manifestData)}`)
-           await axios.post(`${url}lims/manifests`, manifestData,
-            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                setManifestsId(resp.data.id)
-                 console.log("response", resp)
-                  setSaved(true);
-                toast.success("Sample manifest saved successfully!!", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-                manifestData.manifestID = resp.data.manifestID
-                manifestData.sendingFacilityID = resp.data.sendingFacilityID
-                manifestData.sendingFacilityName = resp.data.sendingFacilityName
+        manifestData.courierContact = contactPhone;
+            if (validateInputs()) {
+               //console.log("submit", manifestData);
+               await axios.post(`${url}lims/manifests`, manifestData,
+                { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                    setManifestsId(resp.data.id)
+                     console.log("response", resp)
+                    setSaved(true);
+                    toast.success("Sample manifest saved successfully!!", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                    manifestData.manifestID = resp.data.manifestID
+                    manifestData.sendingFacilityID = resp.data.sendingFacilityID
+                    manifestData.sendingFacilityName = resp.data.sendingFacilityName
 
-                localStorage.setItem('manifest', JSON.stringify(manifestData));
-                localStorage.removeItem("samples");
-            });
-    }
-
-    const sendManifest = async (e) => {
-        e.preventDefault()
-         await axios.get(`${url}lims/ready-manifests/${manifestsId}`, { headers: {"Authorization" : `Bearer ${token}`} })
-            .then((resp) => {
-                console.log("sending manifest", resp)
-                 toast.success("Sample manifest sent successfully to PCR Lab.", {
-                    position: toast.POSITION.TOP_RIGHT
+                    localStorage.setItem('manifest', JSON.stringify(manifestData));
+                    localStorage.removeItem("samples");
+                    handleOpen()
                 });
-                setSend(true)
-                setStatus("Manifest Sent");
-            })
+            }
     }
 
   return (
@@ -180,177 +196,191 @@ const CreateAManifest = (props) => {
         <Card>
             <CardBody>
              <br/>
-                <form>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6} md={4}>
-                            <FormGroup>
-                                <Label for="dateScheduledForPickup" className={classes.label}>Date & Time *</Label>
+             { localStore.length === 0 ?
+                <Alert variant='danger' style={{width:'100%',fontSize:'18px', textAlign: 'center'}}>
+                  <b>Manifest</b> has no sample logged. pls use the previous button to add samples.
+                </Alert>
+              :
+                <Form>
+                    <Row>
+                        <Col> <FormGroup>
+                         <Label for="dateScheduledForPickup" className={classes.label}>Date & Time *</Label>
+                         <Input
+                             type="datetime-local"
+                             name="dateScheduledForPickup"
+                             id="dateScheduledForPickup"
+                             placeholder="Date & Time Created"
+                             className={classes.input}
+                             value={manifestData.dateScheduledForPickup}
+                             onChange={handleChange}
 
-                                <Input
-                                    type="datetime-local"
-                                    name="dateScheduledForPickup"
-                                    value={manifestData.dateScheduledForPickup}
-                                    id="dateScheduledForPickup"
-                                    placeholder="Date & Time Created"
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                />
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                             <FormGroup>
-                                <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
-                                <Input
-                                    type="select"
-                                    name="select"
-                                    value={pcrLabCode.name}
-                                    id="receivingLabName"
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                >
-                                  <option>
-                                    Selcet PCR Lab
-                                  </option>
-                                  {pcr_lab.map((value, i) =>
-                                  <option key={i} value={value.name} >{value.name}</option>)}
-                                </Input>
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                             <FormGroup>
-                                 <Label for="receivingLabID" className={classes.label}>Receiving Lab number *</Label>
-                                 <Input
-                                     type="text"
-                                     name="receivingLabID"
-                                     value={pcrLabCode.labNo}
-                                     id="receivingLabID"
-                                     onChange={handleChange}
-                                     className={classes.input}
-                                     disabled={true}
-                                 />
+                         />
 
-                             </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                            <FormGroup>
-                                <Label for="courierRiderName" className={classes.label}>Courier Name *</Label>
-                                <Input
-                                    type="text"
-                                    name="courierRiderName"
-                                    id="courierRiderName"
-                                    value={manifestData.courierRiderName}
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                />
+                             {errors.dateScheduledForPickup !="" ? (
+                               <span className={classes.error}>{errors.dateScheduledForPickup}</span>
+                             ) : "" }
+                     </FormGroup></Col>
+                        <Col><FormGroup>
+                         <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
+                         <select
+                             className="form-control"
+                             style={{
+                              border: "1px solid #014d88",
+                              borderRadius:'0px',
+                              fontSize:'14px',
+                              color:'#000'
+                              }}
+                             name="receivingLabName"
+                             value={pcrLabCode.name}
+                             id="receivingLabName"
+                             onChange={handleChange}
+                         >
+                           <option>
+                             Select PCR Lab
+                           </option>
+                           {pcr_lab.map((value, i) =>
+                           <option key={i} value={value.name} >{value.name}</option>)}
+                         </select>
 
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={4}>
-                            <FormGroup>
-                                <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
-                                <Input
-                                    type="text"
-                                    name="courierContact"
-                                    value={manifestData.courierContact}
-                                    id="courierContact"
-                                    onChange={handleChange}
-                                    className={classes.input}
-                                />
-                            </FormGroup>
-                         </Grid>
-                         <Grid item xs={6} md={4}>
-                              <FormGroup>
-                                 <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
-                                 <Input
-                                     type="text"
-                                     name="samplePackagedBy"
-                                     value={manifestData.samplePackagedBy}
-                                     id="samplePackagedBy"
-                                     onChange={handleChange}
-                                     className={classes.input}
-                                 />
-                             </FormGroup>
-                          </Grid>
-                          <Grid item xs={6} md={6}>
-                            <FormGroup>
-                                <Label for="manifest_status" className={classes.label}>Status</Label>
-                                <Input
-                                    type="text"
-                                    name="manifestStatus"
-                                    id="manifestStatus"
-                                    value={status}
-                                    onChange={handleChange}
-                                    disabled={true}
-                                    className={classes.input}
-                                />
+                          {errors.receivingLabName !="" ? (
+                            <span className={classes.error}>{errors.receivingLabName}</span>
+                          ) : "" }
+                     </FormGroup></Col>
+                        <Col> <FormGroup>
+                          <Label for="receivingLabID" className={classes.label}>Receiving Lab number *</Label>
+                          <Input
+                              type="text"
+                              name="receivingLabID"
+                              value={pcrLabCode.labNo}
+                              id="receivingLabID"
+                              onChange={handleChange}
+                              className={classes.input}
+                              disabled
+                          />
+                       {errors.receivingLabID !="" ? (
+                          <span className={classes.error}>{errors.receivingLabID}</span>
+                        ) : "" }
+                      </FormGroup></Col>
+                    </Row>
+                     <Row>
+                        <Col><FormGroup>
+                         <Label for="courierRiderName" className={classes.label}>Courier Name *</Label>
+                         <Input
+                             type="text"
+                             name="courierRiderName"
+                             id="courierRiderName"
+                             value={manifestData.courierRiderName}
+                             onChange={handleChange}
+                             className={classes.input}
+                         />
+                      {errors.courierRiderName !="" ? (
+                           <span className={classes.error}>{errors.courierRiderName}</span>
+                         ) : "" }
+                     </FormGroup></Col>
+                        <Col> <FormGroup>
+                         <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
+                         <PhoneInput
+                             containerStyle={{width:'100%', border: "1px solid #014d88"}}
+                             inputStyle={{width:'100%',borderRadius:'0px', height: 45}}
+                             country={'ng'}
+                             masks={{ng: '...-...-....', at: '(....) ...-....'}}
+                             placeholder="(234)7099999999"
+                             value={manifestData.courierContact}
+                             onChange={ e => checkPhoneNumber(e)}
+                         />
+                        {errors.courierContact !="" ? (
+                           <span className={classes.error}>{errors.courierContact}</span>
+                         ) : "" }
+                     </FormGroup></Col>
+                        <Col><FormGroup>
+                      <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
+                      <Input
+                          type="text"
+                          name="samplePackagedBy"
+                          value={manifestData.samplePackagedBy}
+                          id="samplePackagedBy"
+                          onChange={handleChange}
+                          className={classes.input}
+                      />
+                       {errors.samplePackagedBy !="" ? (
+                         <span className={classes.error}>{errors.samplePackagedBy}</span>
+                       ) : "" }
+                  </FormGroup></Col>
+                    </Row>
+                     <Row>
+                        {/*<Col> <FormGroup>
+                         <Label for="manifest_status" className={classes.label}>Status</Label>
+                         <Input
+                             type="text"
+                             name="manifestStatus"
+                             id="manifestStatus"
+                             value={status}
+                             onChange={handleChange}
+                             disabled
+                             className={classes.input}
+                         />
 
-                            </FormGroup>
-                        </Grid>
-                        <Grid item xs={6} md={6}>
-                              <FormGroup>
-                                  <Label for="temperatureAtPickup" className={classes.label}>Tempaerature at pickup</Label>
-                                  <Input
-                                      type="text"
-                                      name="temperatureAtPickup"
-                                      id="temperatureAtPickup"
-                                      value={manifestData.temperatureAtPickup}
-                                      onChange={handleChange}
-                                      disabled={false}
-                                      className={classes.input}
-                                  />
+                     </FormGroup></Col>*/}
 
-                              </FormGroup>
-                          </Grid>
-                          <Grid item xs={6} md={6}>
-                                <FormGroup>
-                                   <Label for="total_sample" className={classes.label}>Total Sample</Label>
-                                   <Input
-                                       type="text"
-                                       name="total_sample"
-                                       id="total_sample"
-                                       value={localStore.length}
-                                       onChange={handleChange}
-                                       disabled={true}
-                                       className={classes.input}
-                                   />
+                    </Row>
+                     <Row>
+                        <Col><FormGroup>
+                        <Label for="total_sample" className={classes.label}>Total Sample</Label>
+                        <Input
+                            type="text"
+                            name="total_sample"
+                            id="total_sample"
+                            value={localStore.length}
+                            onChange={handleChange}
+                            disabled
+                            className={classes.input}
+                        />
 
-                               </FormGroup>
-                            </Grid>
-                          <Grid item xs={6} md={6}>
-                             <FormGroup>
-                               <Label for="test_type" className={classes.label}>Test type</Label>
-                               <Input
-                                   type="text"
-                                   name="test_type"
-                                   id="test_type"
-                                   value="VL"
-                                   onChange={handleChange}
-                                   disabled={true}
-                                   className={classes.input}
-                               />
+                    </FormGroup></Col>
+                        <Col> <FormGroup>
+                        <Label for="test_type" className={classes.label}>Test type</Label>
+                        <Input
+                            type="text"
+                            name="test_type"
+                            id="test_type"
+                            value="VL"
+                            onChange={handleChange}
+                            disabled
+                            className={classes.input}
+                        />
 
-                           </FormGroup>
-                        </Grid>
-                      </Grid>
-                    </Box>
+                    </FormGroup></Col>
+                      <Col><FormGroup>
+                           <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup</Label>
+                           <Input
+                               type="number"
+                               name="temperatureAtPickup"
+                               id="temperatureAtPickup"
+                               value={manifestData.temperatureAtPickup}
+                               onChange={handleChange}
+                               className={classes.input}
+                           />
+                       {errors.temperatureAtPickup !="" ? (
+                          <span className={classes.error}>{errors.temperatureAtPickup}</span>
+                        ) : "" }
+                       </FormGroup></Col>
+                    </Row>
                     {
-                        send ? " " :
-                        <>
+                        !saved ?
+                         <>
                             <Button variant="contained" color="primary" type="submit"
-                            startIcon={<SaveIcon />} onClick={handleSubmit} disabled={!saved ? false : true}>
+                            startIcon={<SaveIcon />} onClick={handleSubmit}>
                               Save
                             </Button>
-                            {" "}
-                            <Button variant="contained" color="secondary" startIcon={<SendIcon />}
-                            type="submit" onClick={sendManifest} disabled={saved ? false : true}>
-                              Send
-                            </Button>
-                        </>
+
+                        </> : ""
                     }
-                </form>
+                </Form>
+                 }
              </CardBody>
         </Card>
+        { open ?
+        <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={manifestsId} saved={saved} /> : " "}
       </>
   );
 }

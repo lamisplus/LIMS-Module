@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useEffect, useCallback, useState} from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -9,9 +9,30 @@ import SampleOrderLists from './SampleOrderLists';
 import CreateAManifest from './CreateAManifest';
 import PrintManifest from './PrintManifest';
 import Stack from '@mui/material/Stack';
+import axios from "axios";
+import {token, url } from "../../../api";
 
 function SampleCollection() {
 const [activeStep, setActiveStep] = React.useState(0)
+const [permissions, setPermissions] = useState([]);
+
+ useEffect(() => {
+            userPermission();
+          }, []);
+
+        const userPermission =()=>{
+            axios
+                .get(`${url}account`,
+                    { headers: {"Authorization" : `Bearer ${token}`} }
+                )
+                .then((response) => {
+                    //console.log("permission", response.data.permissions)
+                    setPermissions(response.data.permissions);
+
+                })
+                .catch((error) => {
+                });
+        }
 
 const nextStep = () => {
     if (activeStep < 2)
@@ -54,7 +75,7 @@ return(
             {renderContent(activeStep)}
             <br />
             <br />
-
+                { permissions.includes("all_permission") ?
                     <Stack direction="row" spacing={2}
                            m={1}
                            display="flex"
@@ -65,10 +86,7 @@ return(
                            {" "}
                            <Button variant="outlined" color="primary" onClick={() => nextStep()}
                            disabled={activeStep == 2 ? true : false}>Next Step</Button>
-                    </Stack>
-
-
-
+                    </Stack> : " " }
         </>
     </div>
 );
