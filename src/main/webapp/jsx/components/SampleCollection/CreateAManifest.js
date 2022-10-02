@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import ConfigModal from './ConfigModal';
 import Alert from 'react-bootstrap/Alert';
 import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 import IconButton from '@material-ui/core/IconButton';
 
@@ -55,9 +56,9 @@ const useStyles = makeStyles(theme => ({
         }
     },
     input: {
-        border:'2px solid #014d88',
+        border:'1px solid #014d88',
         borderRadius:'0px',
-        fontSize:'16px',
+        fontSize:'14px',
         color:'#000'
     },
     error: {
@@ -75,8 +76,8 @@ const useStyles = makeStyles(theme => ({
         borderRadius:'0px'
     },
     label:{
-        fontSize:'16px',
-        color:'rgb(153, 46, 98)',
+        fontSize:'14px',
+        color:'#014d88',
         fontWeight:'600'
     }
 }))
@@ -91,15 +92,8 @@ const CreateAManifest = (props) => {
     const [localStore, SetLocalStore] = useState([]);
     const [manifestsId, setManifestsId] = useState(0);
     const [status, setStatus] = useState("Pending")
-    const [validate, setValidate] = useState({
-        dateScheduledForPickupSucess: false,
-        dateScheduledForPickupFail: false,
-        temperatureAtPickup: false,
-        receivingLabID: "",
-        receivingLabName: "",
-        courierRiderName: "",
-        courierContact: ""
-    })
+
+    const [errors, setErrors] = useState({});
 
     const [open, setOpen] = useState(false)
 
@@ -135,13 +129,18 @@ const CreateAManifest = (props) => {
          uuid: ""
      })
 
+    const [contactPhone, setContactPhone] = useState("");
+
+    const checkPhoneNumber=(e)=> {
+        setContactPhone(e)
+    }
 
     const handleChange = (event) => {
            checkPCRLab(event.target.value)
            const { name, value } = event.target
            setManifestData({ ...manifestData, [name]: value, receivingLabID: pcrLabCode.labNo,
            receivingLabName: pcrLabCode.name, sampleInformation: localStore })
-     }
+    }
 
     const checkPCRLab = (name) => {
         pcr_lab.map(( val ) => {
@@ -151,35 +150,28 @@ const CreateAManifest = (props) => {
         })
     }
 
-   const validateInputs = (manifestData) => {
-        //console.log("mani",manifestData)
-        if (manifestData.dateScheduledForPickup.length === 0) {
-            validate.dateScheduledForPickupFail = true;
-        }
+   const validateInputs = () => {
+        let temp = { ...errors }
 
-        setValidate({validate})
-       //console.log("after",validate)
-    }
+        temp.dateScheduledForPickup = manifestData.dateScheduledForPickup ? "" : "Pick-Up date is required."
+        temp.temperatureAtPickup = manifestData.temperatureAtPickup ? "" : "Temperature is required."
+        temp.receivingLabID = manifestData.receivingLabID ? "" : "Receiving lab Id is required."
+        temp.receivingLabName = manifestData.receivingLabName ? "" : "Receiving lab name is required."
+        temp.courierRiderName = manifestData.courierRiderName ? "" : "Courier rider name is required."
+        temp.courierContact = manifestData.courierContact ? "" : "Courier rider contact is required."
+        temp.samplePackagedBy = manifestData.samplePackagedBy ? "" : "Sample packaged by is required."
+
+        setErrors({
+              ...temp
+          })
+          return Object.values(temp).every(x => x == "")
+   }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        validateInputs(manifestData)
-
-        console.log("xxx",manifestData);
-
-        if (manifestData.dateScheduledForPickup.length === 0) {
-             toast.error("Sample Pick up date can not be empty", {
-                position: toast.POSITION.TOP_RIGHT
-             });
-        }
-
-        if ( manifestData.receivingLabName.length === 0) {
-             toast.error("Receiving lab can not be empty", {
-                position: toast.POSITION.TOP_RIGHT
-             });
-        }
-        else{
+        manifestData.courierContact = contactPhone;
+            if (validateInputs()) {
+               //console.log("submit", manifestData);
                await axios.post(`${url}lims/manifests`, manifestData,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     setManifestsId(resp.data.id)
@@ -196,7 +188,7 @@ const CreateAManifest = (props) => {
                     localStorage.removeItem("samples");
                     handleOpen()
                 });
-        }
+            }
     }
 
   return (
@@ -223,25 +215,36 @@ const CreateAManifest = (props) => {
                              onChange={handleChange}
 
                          />
-                          <FormText>Pick up date is a required field.</FormText>
+
+                             {errors.dateScheduledForPickup !="" ? (
+                               <span className={classes.error}>{errors.dateScheduledForPickup}</span>
+                             ) : "" }
                      </FormGroup></Col>
                         <Col><FormGroup>
                          <Label for="receivingLabName" className={classes.label}>Receiving Lab *</Label>
-                         <Input
-                             type="select"
+                         <select
+                             className="form-control"
+                             style={{
+                              border: "1px solid #014d88",
+                              borderRadius:'0px',
+                              fontSize:'14px',
+                              color:'#000'
+                              }}
                              name="receivingLabName"
                              value={pcrLabCode.name}
                              id="receivingLabName"
                              onChange={handleChange}
-                             className={classes.input}
                          >
                            <option>
                              Select PCR Lab
                            </option>
                            {pcr_lab.map((value, i) =>
                            <option key={i} value={value.name} >{value.name}</option>)}
-                         </Input>
-                         <FormText>Receiving lab is a required field.</FormText>
+                         </select>
+
+                          {errors.receivingLabName !="" ? (
+                            <span className={classes.error}>{errors.receivingLabName}</span>
+                          ) : "" }
                      </FormGroup></Col>
                         <Col> <FormGroup>
                           <Label for="receivingLabID" className={classes.label}>Receiving Lab number *</Label>
@@ -254,7 +257,9 @@ const CreateAManifest = (props) => {
                               className={classes.input}
                               disabled
                           />
-                      <FormText>Receiving lab Id is a required field.</FormText>
+                       {errors.receivingLabID !="" ? (
+                          <span className={classes.error}>{errors.receivingLabID}</span>
+                        ) : "" }
                       </FormGroup></Col>
                     </Row>
                      <Row>
@@ -268,32 +273,38 @@ const CreateAManifest = (props) => {
                              onChange={handleChange}
                              className={classes.input}
                          />
-                     <FormText>Courier name is a required field.</FormText>
+                      {errors.courierRiderName !="" ? (
+                           <span className={classes.error}>{errors.courierRiderName}</span>
+                         ) : "" }
                      </FormGroup></Col>
                         <Col> <FormGroup>
                          <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
-                         <Input
-                             type="text"
-                             name="courierContact"
-                             value={manifestData.courierContact}
-                             id="courierContact"
+                         <PhoneInput
+                             containerStyle={{width:'100%', border: "1px solid #014d88"}}
+                             inputStyle={{width:'100%',borderRadius:'0px', height: 39}}
+                             country={'ng'}
+                             masks={{ng: '...-...-....', at: '(....) ...-....'}}
                              placeholder="(234)7099999999"
-                             onChange={handleChange}
-                             className={classes.input}
+                             value={manifestData.courierContact}
+                             onChange={ e => checkPhoneNumber(e)}
                          />
-                         <FormText>Courier contact is a required field.</FormText>
+                        {errors.courierContact !="" ? (
+                           <span className={classes.error}>{errors.courierContact}</span>
+                         ) : "" }
                      </FormGroup></Col>
                         <Col><FormGroup>
                       <Label for="samplePackagedBy" className={classes.label}>Sample Packaged By *</Label>
                       <Input
-                          type="tel"
+                          type="text"
                           name="samplePackagedBy"
                           value={manifestData.samplePackagedBy}
                           id="samplePackagedBy"
                           onChange={handleChange}
                           className={classes.input}
                       />
-                      <FormText>Sample package by is a required field.</FormText>
+                       {errors.samplePackagedBy !="" ? (
+                         <span className={classes.error}>{errors.samplePackagedBy}</span>
+                       ) : "" }
                   </FormGroup></Col>
                     </Row>
                      <Row>
@@ -313,14 +324,16 @@ const CreateAManifest = (props) => {
                         <Col><FormGroup>
                        <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup</Label>
                        <Input
-                           type="text"
+                           type="number"
                            name="temperatureAtPickup"
                            id="temperatureAtPickup"
                            value={manifestData.temperatureAtPickup}
                            onChange={handleChange}
                            className={classes.input}
                        />
-                   <FormText>Temperature at pickup is a required.</FormText>
+                   {errors.temperatureAtPickup !="" ? (
+                      <span className={classes.error}>{errors.temperatureAtPickup}</span>
+                    ) : "" }
                    </FormGroup></Col>
                     </Row>
                      <Row>
