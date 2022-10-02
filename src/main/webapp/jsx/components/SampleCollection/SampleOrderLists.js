@@ -123,6 +123,7 @@ const SampleSearch = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
+    const [manifestData, setManifestData] = useState([])
     let samples = [];
     const [ dateFilter, setDateFilter] = useState({
         startDate: null,
@@ -155,6 +156,24 @@ const SampleSearch = (props) => {
             }
         }, []);
 
+     const loadManifestData = useCallback(async () => {
+        try {
+            const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
+            let arr = [];
+            response.data.map((x) => {
+                x.sampleInformation.map((y) => {arr.push(y)})
+            })
+             setManifestData(arr);
+            setLoading(false)
+
+        } catch (e) {
+            toast.error("An error occurred while fetching lab", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
+    }, []);
+
      useEffect(() => {
      setLoading('true');
          const onSuccess = () => {
@@ -163,7 +182,7 @@ const SampleSearch = (props) => {
          const onError = () => {
              setLoading(false)
          }
-
+         loadManifestData();
          loadLabTestData();
 
      }, [loadLabTestData]);
@@ -217,6 +236,26 @@ const SampleSearch = (props) => {
         })
         console.log(samples)
      }
+
+     const sampleFilter = (collectedSamples, manifestData) => {
+
+        if (collectedSamples && manifestData) {
+            let arr = [];
+            collectedSamples.map((x) => {
+                manifestData.map((y) => {
+                    if (x.sampleID !== y.sampleID) {
+                        arr.push(x);
+                    }
+                })
+            })
+            return arr;
+        }
+
+     }
+
+     const values = sampleFilter(collectedSamples, manifestData)
+
+     console.log("got",values)
 
   return (
       <div>
