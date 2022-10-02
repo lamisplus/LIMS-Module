@@ -281,7 +281,7 @@ const CreateAManifest = (props) => {
                          <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
                          <PhoneInput
                              containerStyle={{width:'100%', border: "1px solid #014d88"}}
-                             inputStyle={{width:'100%',borderRadius:'0px', height: 39}}
+                             inputStyle={{width:'100%',borderRadius:'0px', height: 45}}
                              country={'ng'}
                              masks={{ng: '...-...-....', at: '(....) ...-....'}}
                              placeholder="(234)7099999999"
@@ -308,7 +308,7 @@ const CreateAManifest = (props) => {
                   </FormGroup></Col>
                     </Row>
                      <Row>
-                        <Col> <FormGroup>
+                        {/*<Col> <FormGroup>
                          <Label for="manifest_status" className={classes.label}>Status</Label>
                          <Input
                              type="text"
@@ -320,21 +320,8 @@ const CreateAManifest = (props) => {
                              className={classes.input}
                          />
 
-                     </FormGroup></Col>
-                        <Col><FormGroup>
-                       <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup</Label>
-                       <Input
-                           type="number"
-                           name="temperatureAtPickup"
-                           id="temperatureAtPickup"
-                           value={manifestData.temperatureAtPickup}
-                           onChange={handleChange}
-                           className={classes.input}
-                       />
-                   {errors.temperatureAtPickup !="" ? (
-                      <span className={classes.error}>{errors.temperatureAtPickup}</span>
-                    ) : "" }
-                   </FormGroup></Col>
+                     </FormGroup></Col>*/}
+
                     </Row>
                      <Row>
                         <Col><FormGroup>
@@ -363,6 +350,20 @@ const CreateAManifest = (props) => {
                         />
 
                     </FormGroup></Col>
+                      <Col><FormGroup>
+                           <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup</Label>
+                           <Input
+                               type="number"
+                               name="temperatureAtPickup"
+                               id="temperatureAtPickup"
+                               value={manifestData.temperatureAtPickup}
+                               onChange={handleChange}
+                               className={classes.input}
+                           />
+                       {errors.temperatureAtPickup !="" ? (
+                          <span className={classes.error}>{errors.temperatureAtPickup}</span>
+                        ) : "" }
+                       </FormGroup></Col>
                     </Row>
                     {
                         !saved ?

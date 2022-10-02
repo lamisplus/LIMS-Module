@@ -238,24 +238,16 @@ const SampleSearch = (props) => {
      }
 
      const sampleFilter = (collectedSamples, manifestData) => {
-
         if (collectedSamples && manifestData) {
-            let arr = [];
-            collectedSamples.map((x) => {
-                manifestData.map((y) => {
-                    if (x.sampleID !== y.sampleID) {
-                        arr.push(x);
-                    }
+            return collectedSamples.filter(x => {
+                return !manifestData.some(y => {
+                    return x.sampleID === y.sampleID
                 })
             })
-            return arr;
         }
-
      }
 
      const values = sampleFilter(collectedSamples, manifestData)
-
-     console.log("got",values)
 
   return (
       <div>
@@ -346,7 +338,7 @@ const SampleSearch = (props) => {
 
               ]}
               isLoading={loading}
-              data={ collectedSamples.filter( row => {
+              data={ values.filter( row => {
                    let filterPass = true
 
                    const date = new Date(row.sampleCollectionDate)
