@@ -37,7 +37,7 @@ public class LimsManifestService {
     private final LimsResultService resultService;
     private final LimsConfigRepository limsConfigRepository;
 
-    String FacilityDATIMCode = "FH7LMnbnVlT";
+    String FacilityDATIMCode = "meYf9FxUI4c";
     String FacilityMFLCode = "543";
     String loginUrl = "/login.php";
     String manifestUrl = "/samples/create.php";
@@ -50,7 +50,7 @@ public class LimsManifestService {
             //TODO: pick the active facility
             Long FacilityId = getCurrentUserOrganization();
             OrganisationUnit organisationUnit = organisationUnitService.getOrganizationUnit(FacilityId);
-            String FacilityName = organisationUnit.getName();
+            String FacilityName = "National Hospital - Abuja"; //organisationUnit.getName();
 
             manifest.setManifestID(GenerateManifestID(FacilityMFLCode));
             manifest.setSendingFacilityID(FacilityDATIMCode);
