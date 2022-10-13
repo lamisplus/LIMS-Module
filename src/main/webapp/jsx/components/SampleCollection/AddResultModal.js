@@ -20,6 +20,7 @@ import {token, url } from "../../../api";
 import { Spinner } from "reactstrap";
 import { toast} from "react-toastify";
 import { useHistory } from 'react-router-dom';
+import { pcr_lab } from './pcr';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -81,7 +82,12 @@ const useStyles = makeStyles(theme => ({
        fontSize:'14px',
        color:'#014d88',
        fontWeight:'bold'
-   }
+   },
+    modalStyle1:{
+       position:'absolute',
+       overflow:'scroll',
+       height:'100%',
+     }
 }))
 
 const AddResultModal = (props) => {
@@ -90,11 +96,14 @@ const AddResultModal = (props) => {
 
     const classes = useStyles()
     const { manifestObj, reload } = props
+    //console.log("main", manifestObj)
 
     const sampleIDs = []
     manifestObj.sampleInformation.map((e) => {
-        sampleIDs.push(e.sampleID)
+        sampleIDs.push(e)
     })
+
+    const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
     const [loading, setLoading] = useState(false)
     const [visible, setVisible] = useState(true);
@@ -102,6 +111,9 @@ const AddResultModal = (props) => {
     const [samples, setSamples] = useState({});
     const [optionsample, setOptionsample] = useState([]);
     const [saveButtonStatus, setSaveButtonStatus] = useState(false);
+    const [tests, setTests] = useState(false);
+    const [transferredOut, setTransferredOut] = useState(false);
+    const [reasons, setReasons] = useState(false);
 
     const [errors, setErrors] = useState({});
     const [inputFields, setInputFields] = useState({
@@ -119,14 +131,48 @@ const AddResultModal = (props) => {
             sampleID: "",
             uuid: "",
             visitDate: format(new Date(), 'yyyy-MM-dd'),
+            transferStatus: "",
+            testedBy: "",
+            approvedBy: "",
+            dateTransferredOut: "",
+            reasonNotTested: "",
+            otherRejectionReason: "",
+            sendingPCRLabID: "",
+            sendingPCRLabName: ""
     })
 
     useEffect(() => {
 
     }, []);
 
+    const checkPCRLab = (name) => {
+        pcr_lab.map(( val ) => {
+            if (val.name === name) {
+                setPcrLabCode({name: val.name, labNo: val.labNo})
+            }
+        })
+    }
+
     const handleChange = (event) => {
+           event.preventDefault();
+
            const { name, value } = event.target
+           console.log(name, value)
+
+           if (name === "sendingPCRLabName") {
+               checkPCRLab(value)
+               console.log(pcrLabCode.labNo)
+           }
+
+           if (name === 'transferStatus' && value === '2' || name === 'transferStatus' && value === '3' || name === 'transferStatus' && value === '4') {
+                setTests(true)
+                setTransferredOut(true)
+           }
+
+           if (name === 'reasonNotTested' && value === '7') {
+                setReasons(true)
+           }
+
            setInputFields({ ...inputFields, [name]: value})
      }
 
@@ -134,31 +180,31 @@ const AddResultModal = (props) => {
         e.preventDefault();
 
          try {
-             //console.log(inputFields)
+             console.log(inputFields)
 
-              await axios.post(`${url}lims/results`, [inputFields],
-                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                     console.log("results", resp)
-
-                     toast.success("PCR Sample results added successfully!!", {
-                         position: toast.POSITION.TOP_RIGHT
-                     });
-
-                      setInputFields({
-                          dateResultDispatched: "",
-                          dateSampleReceivedAtPcrLab: "",
-                          testResult: "",
-                          resultDate: "",
-                          pcrLabSampleNumber: "",
-                          approvalDate: "",
-                          assayDate: "",
-                          sampleTestable: "",
-                          sampleStatus: "",
-                          sampleID: "",
-                          uuid: "",
-                          visitDate: format(new Date(), 'yyyy-MM-dd'),
-                      })
-                 });
+//              await axios.post(`${url}lims/results`, [inputFields],
+//                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+//                     console.log("results", resp)
+//
+//                     toast.success("PCR Sample results added successfully!!", {
+//                         position: toast.POSITION.TOP_RIGHT
+//                     });
+//
+//                      setInputFields({
+//                          dateResultDispatched: "",
+//                          dateSampleReceivedAtPcrLab: "",
+//                          testResult: "",
+//                          resultDate: "",
+//                          pcrLabSampleNumber: "",
+//                          approvalDate: "",
+//                          assayDate: "",
+//                          sampleTestable: "",
+//                          sampleStatus: "",
+//                          sampleID: "",
+//                          uuid: "",
+//                          visitDate: format(new Date(), 'yyyy-MM-dd'),
+//                      })
+//                 });
              //history.push("/");
              props.togglestatus();
              reload();
@@ -175,7 +221,25 @@ const AddResultModal = (props) => {
                 <CardBody>
                     <Modal isOpen={props.modalstatus} toggle={props.togglestatus} className={props.className} size="lg">
                         <Form onSubmit={saveSample}>
-                            <ModalHeader toggle={props.togglestatus}>Add PCR Sample Results </ModalHeader>
+                            <ModalHeader toggle={props.togglestatus}>
+                            { sampleIDs.filter((key) => key.sampleID === inputFields.sampleID).map((x) => (
+                                       <Alert color="primary" style={{color:"#000" , fontWeight: 'bolder', }}>
+                                        <p style={{marginTop: '.7rem' }}>Name: <span style={{ fontWeight: 'bolder'}}>{x.firstName + " " + x.surName+ " "}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp; Patient ID::
+                                            <span style={{ fontWeight: 'bolder'}}>{" "}{x.patientID[0].idNumber}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;Sample type:
+                                            <span style={{ fontWeight: 'bolder'}}>{" "}{x.sampleType }</span>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp; Date collected :
+                                            <span style={{ fontWeight: 'bolder'}}>{" "}{x.sampleCollectionDate}</span>
+                                             &nbsp;&nbsp;&nbsp;&nbsp; Sample collected By:
+                                             <span style={{ fontWeight: 'bolder'}}>{" "}{x.sampleCollectedBy}</span>
+
+                                        </p>
+                                      </Alert>
+                             ))
+                            }
+                            </ModalHeader>
+
                             <ModalBody>
                                  <Row>
                                         <Col><FormGroup>
@@ -226,7 +290,7 @@ const AddResultModal = (props) => {
                                                  Select Sample Id
                                              </option>
                                              { sampleIDs && sampleIDs.map((sample, i) =>
-                                             <option key={i} value={sample} >{sample}</option>)}
+                                             <option key={i} value={sample.sampleID} >{sample.sampleID}</option>)}
                                             </select>
                                         </FormGroup>
                                      </Col>
@@ -257,6 +321,92 @@ const AddResultModal = (props) => {
                                          </FormGroup>
                                       </Col>
                                   </Row>
+                                <Row>
+                                   <Col><FormGroup>
+                                      <Label for="transferStatus" className={classes.label}>Transfer Status</Label>
+                                      <select
+                                         className="form-control"
+                                         name="transferStatus"
+                                         id="transferStatus"
+                                         style={{
+                                             border: "1px solid #014d88",
+                                             borderRadius:'0px',
+                                             fontSize:'14px',
+                                             color:'#000'
+                                           }}
+                                         onChange={ e => handleChange(e)}
+                                         value={inputFields.transferStatus}
+                                     >
+                                      <option hidden>
+                                          Select transfer status
+                                      </option>
+                                      <option value="1" >Not Transfered</option>
+                                      <option value="2" >Received</option>
+                                      <option value="3" >In Process</option>
+                                      <option value="4" >Tested</option>
+                                     </select>
+                                   </FormGroup></Col>
+
+                                   <Col><FormGroup>
+                                       <Label for="reasonNotTested" className={classes.label}>Reason Not Tested</Label>
+                                       <select
+                                         className="form-control"
+                                         name="reasonNotTested"
+                                         id="reasonNotTested"
+                                         style={{
+                                             border: "1px solid #014d88",
+                                             borderRadius:'0px',
+                                             fontSize:'14px',
+                                             color:'#000'
+                                           }}
+                                         onChange={ e => handleChange(e)}
+                                         value={inputFields.reasonNotTested}
+                                     >
+                                      <option hidden>
+                                          What is the reasons not tested?
+                                      </option>
+                                      <option value="1" >Testable</option>
+                                      <option value="2" >Technical Problems</option>
+                                      <option value="3" >Labeled Improperly</option>
+                                      <option value="4" >Insufficient Blood</option>
+                                      <option value="5" >Layered or clotted</option>
+                                      <option value="6" >Improper Packaging</option>
+                                      <option value="7" >Other Reasons</option>
+                                     </select>
+                                   </FormGroup></Col>
+
+                            </Row>
+
+                            <Row>
+                              { transferredOut === true ?
+                               <Col><FormGroup>
+                                    <Label for="dateTransferredOut" className={classes.label}>Date Transferred Out</Label>
+
+                                    <Input
+                                        type="date"
+                                        name="dateTransferredOut"
+                                        id="dateTransferredOut"
+                                        placeholder="Date Transferred Out"
+                                        max={new Date().toISOString().slice(0, 10)}
+                                        className={classes.input}
+                                        onChange={handleChange}
+                                        value={inputFields.dateTransferredOut}
+                                    />
+                                </FormGroup></Col> : " " }
+                                { reasons === true ?
+                               <Col><FormGroup>
+                                <Label for="otherRejectionReason" className={classes.label}>Other Rejection Reason</Label>
+                                <Input
+                                    type="text"
+                                    name="otherRejectionReason"
+                                    id="otherRejectionReason"
+                                    placeholder="Other Rejection Reason"
+                                    className={classes.input}
+                                    onChange={handleChange}
+                                    value={inputFields.otherRejectionReason}
+                                />
+                            </FormGroup></Col> : " " }
+                        </Row>
                                 <Row>
                                    <Col>
                                     <FormGroup>
@@ -328,6 +478,35 @@ const AddResultModal = (props) => {
                                  </FormGroup></Col>
                                 </Row>
                                 <Row>
+                                     <Col><FormGroup>
+                                        <Label for="approvedBy" className={classes.label}>Approved By*</Label>
+
+                                        <Input
+                                            type="text"
+                                            name="approvedBy"
+                                            id="approvedBy"
+                                            placeholder="approvedBy"
+                                            className={classes.input}
+                                            onChange={handleChange}
+                                            value={inputFields.approvedBy}
+                                        />
+                                    </FormGroup></Col>
+
+                                       <Col><FormGroup>
+                                        <Label for="testedBy" className={classes.label}>Test By *</Label>
+
+                                        <Input
+                                            type="text"
+                                            name="testedBy"
+                                            id="testedBy"
+                                            placeholder="Test By"
+                                            className={classes.input}
+                                            onChange={handleChange}
+                                            value={inputFields.testedBy}
+                                        />
+                                    </FormGroup></Col>
+                                </Row>
+                                <Row>
                                         <Col><FormGroup>
                                             <Label for="resultDate" className={classes.label}>Result Date *</Label>
 
@@ -356,6 +535,46 @@ const AddResultModal = (props) => {
                                         />
                                     </FormGroup></Col>
                                 </Row>
+                        { tests === true ?
+                          <Row>
+                                   <Col><FormGroup>
+                                        <Label for="sendingPCRLabName" className={classes.label}>Transferred PCR Lab Name</Label>
+
+                                         <select
+                                             className="form-control"
+                                             style={{
+                                              border: "1px solid #014d88",
+                                              borderRadius:'0px',
+                                              fontSize:'14px',
+                                              color:'#000'
+                                              }}
+                                             name="sendingPCRLabName"
+                                             value={pcrLabCode.name}
+                                             id="sendingPCRLabName"
+                                             onChange={ e => handleChange(e)}
+                                         >
+                                           <option>
+                                             Select PCR Lab
+                                           </option>
+                                           {pcr_lab.map((value, i) =>
+                                           <option key={i} value={value.name} >{value.name}</option>)}
+                                         </select>
+                                    </FormGroup></Col>
+                                   <Col><FormGroup>
+                                    <Label for="sendingPCRLabID" className={classes.label}>Transferred PCR Lab ID</Label>
+                                    &nbsp;&nbsp;<span>Confirm PCR Id <b>{pcrLabCode.labNo}</b></span>
+                                    <Input
+                                        type="text"
+                                        name="sendingPCRLabID"
+                                        id="sendingPCRLabID"
+                                        placeholder="Transferred PCR Lab ID"
+                                        value={inputFields.sendingPCRLabID}
+                                        className={classes.input}
+                                        onChange={ e => handleChange(e)}
+
+                                    />
+                                </FormGroup></Col>
+                            </Row> : " " }
                                 <MatButton
                                     type="submit"
                                     variant="contained"

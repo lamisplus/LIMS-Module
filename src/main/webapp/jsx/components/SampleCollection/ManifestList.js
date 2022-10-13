@@ -229,11 +229,12 @@ const DownloadManifest = (props) => {
   return (
     <>
        <div>
-           { config.length === 0 ?
+           { config.length !== 0 ?
+                " "
+                :
                 <Alert variant='danger'>
                   Kindly set the LIMS server configurations
                 </Alert>
-                : " "
            }
            {/*<Stack direction="row" spacing={2}
            m={1}

@@ -1,4 +1,5 @@
 export const pcr_lab = [
+    {name: "NRL", labNo: "LIMS150002"},
     {name: "ASOKORO Testing Lab", labNo: "LIMS150003"},
     {name: "PLASVIREC TESTING LAB", labNo: "LIMS320002"},
     {name: "ABUTH Testing Lab", labNo: "LIMS190001"},

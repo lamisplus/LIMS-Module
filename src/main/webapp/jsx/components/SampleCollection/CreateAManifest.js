@@ -281,7 +281,7 @@ const CreateAManifest = (props) => {
                          <Label for="courierContact" className={classes.label}>Courier Contact *</Label>
                          <PhoneInput
                              containerStyle={{width:'100%', border: "1px solid #014d88"}}
-                             inputStyle={{width:'100%',borderRadius:'0px', height: 45}}
+                             inputStyle={{width:'100%',borderRadius:'0px', height: 44}}
                              country={'ng'}
                              masks={{ng: '...-...-....', at: '(....) ...-....'}}
                              placeholder="(234)7099999999"
