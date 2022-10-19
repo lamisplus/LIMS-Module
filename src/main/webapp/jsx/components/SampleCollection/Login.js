@@ -63,9 +63,9 @@ const useStyles = makeStyles(theme => ({
         }
     },
     input: {
-        border:'2px solid #014d88',
+        border:'1px solid #014d88',
         borderRadius:'0px',
-        fontSize:'16px',
+        fontSize:'14px',
         color:'#000'
     },
     error: {
@@ -83,8 +83,8 @@ const useStyles = makeStyles(theme => ({
         borderRadius:'0px'
     },
     label:{
-        fontSize:'16px',
-        color:'rgb(153, 46, 98)',
+        fontSize:'14px',
+        color:'#014d88',
         fontWeight:'600'
     }
 }))
@@ -94,6 +94,8 @@ const Login = (props) => {
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
     //console.log("maniObj",manifestObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
+    const [errors, setErrors] = useState({});
+    const [demo, setDemo] = useState(false);
 
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
@@ -101,7 +103,9 @@ const Login = (props) => {
         configName: "",
         serverUrl: "",
         configEmail: "",
-        configPassword: ""
+        configPassword: "",
+        facilityId: "",
+        receivingPCRLabId: ""
     })
 
     const [logins, setLogins] = useState([])
@@ -127,12 +131,33 @@ const Login = (props) => {
 
     const handleChange = (event) => {
            const { name, value } = event.target
+           //console.log(name, value)
+           if (name === 'configName' && value === 'Demo Server') {
+               setDemo(true)
+           }else if (name === 'configName' && value === 'Live Server') {
+               setDemo(false)
+           }
            setLogin({ ...login, [name] : value})
      }
 
-     const handleSubmit = async (e) => {
+    const validateInputs = () => {
+       let temp = { ...errors }
+       temp.configName = login.configName ? "" : "Server Name is required."
+       temp.serverUrl = login.serverUrl ? "" : "Server URL is required."
+       temp.configEmail = login.configEmail ? "" : "Email is required."
+       temp.configPassword = login.configPassword ? "" : "Configuration password URL is required."
+
+        setErrors({
+             ...temp
+         })
+         return Object.values(temp).every(x => x == "")
+    }
+
+    const handleSubmit = async (e) => {
          e.preventDefault()
          try {
+
+           if (validateInputs()) {
              await axios.post(`${url}lims/configs`, login,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     console.log("login details", resp)
@@ -145,11 +170,15 @@ const Login = (props) => {
                          configName: "",
                          serverUrl: "",
                          configEmail: "",
-                         configPassword: ""
+                         configPassword: "",
+                         facilityId: "",
+                         receivingPCRLabId: ""
                      })
                 });
 
             loadResults()
+
+           }
 
         } catch (e) {
             toast.error("An error occurred while saving LIMS Credentials", {
@@ -160,7 +189,7 @@ const Login = (props) => {
         history.push("/");
      }
 
-     const deleteConfig = async (e, id) => {
+    const deleteConfig = async (e, id) => {
       e.preventDefault();
         try {
             const response = await axios.delete(`${url}lims/configs/${id}`, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -177,7 +206,6 @@ const Login = (props) => {
             setLoading(false)
         }
      }
-
 
   return (
     <div>
@@ -196,16 +224,21 @@ const Login = (props) => {
                             <Form>
                                  <FormGroup>
                                    <Label for="configName" className={classes.label}>Configuration Name</Label>
-                                   <Input
-                                       type="select"
+                                   <select
+                                       className="form-control"
+                                      style={{
+                                        border: "1px solid #014d88",
+                                        borderRadius:'0px',
+                                        fontSize:'14px',
+                                        color:'#000'
+                                        }}
                                        name="configName"
-                                       id="configName"
-                                       className={classes.input}
-                                       onChange={handleChange}
                                        value={login.configName}
+                                       id="configName"
+                                       onChange={handleChange}
                                    >
                                     <option hidden>
-                                        Select Configuration Name
+                                        Select Configuration Server
                                     </option>
                                     <option value="Demo Server">
                                         Demo Server
@@ -213,11 +246,14 @@ const Login = (props) => {
                                     <option value="Live Server">
                                         Live Server
                                     </option>
-                                   </Input>
+                                   </select>
+
+                                 {errors.configName !="" ? (
+                                      <span className={classes.error}>{errors.configName}</span>
+                                    ) : "" }
                                </FormGroup>
                                <FormGroup>
                                   <Label for="serverUrl" className={classes.label}>URL</Label>
-
                                   <Input
                                       type="text"
                                       name="serverUrl"
@@ -227,6 +263,9 @@ const Login = (props) => {
                                       onChange={handleChange}
                                       value={login.serverUrl}
                                   />
+                                  {errors.serverUrl !="" ? (
+                                    <span className={classes.error}>{errors.serverUrl}</span>
+                                  ) : "" }
                               </FormGroup>
                                 <FormGroup>
                                    <Label for="configEmail" className={classes.label}>Email</Label>
@@ -240,6 +279,9 @@ const Login = (props) => {
                                        onChange={handleChange}
                                        value={login.configEmail}
                                    />
+                                    {errors.configEmail !="" ? (
+                                       <span className={classes.error}>{errors.configEmail}</span>
+                                     ) : "" }
                                </FormGroup>
 
                                <FormGroup>
@@ -254,7 +296,42 @@ const Login = (props) => {
                                       onChange={handleChange}
                                       value={login.configPassword}
                                   />
+
+                                  {errors.configPassword !="" ? (
+                                     <span className={classes.error}>{errors.configPassword}</span>
+                                   ) : "" }
                               </FormGroup>
+                               { demo === true ?
+                               <>
+                                <FormGroup>
+                                    <Label for="facilityId" className={classes.label}>Testing Facility ID</Label>
+
+                                    <Input
+                                        type="text"
+                                        name="facilityId"
+                                        id="facilityId"
+                                        placeholder="Sending Facility ID"
+                                        className={classes.input}
+                                        onChange={handleChange}
+                                        value={login.facilityId}
+                                    />
+                                </FormGroup>
+
+                                  <FormGroup>
+                                      <Label for="receivingPCRLabId" className={classes.label}>Test PCR Lab ID</Label>
+
+                                      <Input
+                                          type="text"
+                                          name="receivingPCRLabId"
+                                          id="receivingPCRLabId"
+                                          placeholder="Receiving PCR Lab ID"
+                                          className={classes.input}
+                                          onChange={handleChange}
+                                          value={login.receivingPCRLabId}
+                                      />
+                                  </FormGroup>
+                                </>
+                                : "" }
                               <Button variant="contained" color="primary" type="submit"
                                  startIcon={<SaveIcon />} onClick={handleSubmit} >
                                Save
@@ -269,7 +346,7 @@ const Login = (props) => {
                                         <th>Configuration Name</th>
                                         <th>URL</th>
                                         <th>Email</th>
-                                        <th>Created Date</th>
+                                        {/*<th>Created Date</th>*/}
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -280,7 +357,7 @@ const Login = (props) => {
                                         <td>{data.configName}</td>
                                         <td>{data.serverUrl}</td>
                                         <td>{data.configEmail}</td>
-                                        <td>09/09/2022</td>
+                                        {/*<td>09/09/2022</td>*/}
                                         <td>
                                         <Button variant="contained" color="error"
                                              startIcon={<DeleteIcon />} onClick={ e => deleteConfig( e, data.id)}>

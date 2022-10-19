@@ -111,7 +111,6 @@ const CreateAManifest = (props) => {
     const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
 
     const [manifestData, setManifestData] = useState({
-
          manifestID: "",
          manifestStatus: "Pending",
          sendingFacilityID: "FH7LMnbnVlT",
@@ -152,7 +151,6 @@ const CreateAManifest = (props) => {
 
    const validateInputs = () => {
         let temp = { ...errors }
-
         temp.dateScheduledForPickup = manifestData.dateScheduledForPickup ? "" : "Pick-Up date is required."
         temp.temperatureAtPickup = manifestData.temperatureAtPickup ? "" : "Temperature is required."
         temp.receivingLabID = manifestData.receivingLabID ? "" : "Receiving lab Id is required."
