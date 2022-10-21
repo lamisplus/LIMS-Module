@@ -12,4 +12,6 @@ public class ConfigDTO {
     private String configEmail;
     private String configPassword;
     private String serverUrl;
+    private String testFacilityName;
+    private String testFacilityDATIMCode;
 }
