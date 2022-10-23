@@ -121,6 +121,7 @@ const ConfigModal = (props) => {
     const handleChange = (event) => {
        const { name, value } = event.target
        setConfigId(parseInt(value));
+       setSaved(true);
        //setConfig({ ...config, [name]: value})
        //console.log("config",config)
      }
@@ -133,6 +134,7 @@ const ConfigModal = (props) => {
 
     const sendManifest = async (e) => {
         e.preventDefault()
+        console.log(configId)
         //for now
         toast.success("Sample manifest sent to PCR Lab.", {
             position: toast.POSITION.TOP_RIGHT
@@ -194,7 +196,7 @@ const ConfigModal = (props) => {
                                     </Col>
                                     <Col></Col>
                                 </Row>
-
+                                {/*
                                 <MatButton
                                     type="submit"
                                     variant="contained"
@@ -206,7 +208,7 @@ const ConfigModal = (props) => {
                                     Save
                                 </MatButton>
 
-                                {" "}
+                                {" "}*/}
                                 <MatButton variant="contained" color="secondary" startIcon={<SendIcon />}
                                 type="submit" onClick={sendManifest} disabled={saved ? false : true}>
                                   Send

@@ -149,7 +149,7 @@ const CreateAManifest = (props) => {
         })
     }
 
-   const validateInputs = () => {
+    const validateInputs = () => {
         let temp = { ...errors }
         temp.dateScheduledForPickup = manifestData.dateScheduledForPickup ? "" : "Pick-Up date is required."
         temp.temperatureAtPickup = manifestData.temperatureAtPickup ? "" : "Temperature is required."
@@ -173,7 +173,7 @@ const CreateAManifest = (props) => {
                await axios.post(`${url}lims/manifests`, manifestData,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     setManifestsId(resp.data.id)
-                     console.log("response", resp)
+                     //console.log("response", resp)
                     setSaved(true);
                     toast.success("Sample manifest saved successfully!!", {
                         position: toast.POSITION.TOP_RIGHT

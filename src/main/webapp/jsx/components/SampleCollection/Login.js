@@ -104,8 +104,8 @@ const Login = (props) => {
         serverUrl: "",
         configEmail: "",
         configPassword: "",
-        facilityId: "",
-        receivingPCRLabId: ""
+        testFacilityDATIMCode: "",
+        testFacilityName: ""
     })
 
     const [logins, setLogins] = useState([])
@@ -304,30 +304,30 @@ const Login = (props) => {
                                { demo === true ?
                                <>
                                 <FormGroup>
-                                    <Label for="facilityId" className={classes.label}>Testing Facility ID</Label>
+                                    <Label for="testFacilityDATIMCode" className={classes.label}>Testing Facility Datim Code</Label>
 
                                     <Input
                                         type="text"
-                                        name="facilityId"
-                                        id="facilityId"
-                                        placeholder="Sending Facility ID"
+                                        name="testFacilityDATIMCode"
+                                        id="testFacilityDATIMCode"
+                                        placeholder="Testing Facility Datim Code"
                                         className={classes.input}
                                         onChange={handleChange}
-                                        value={login.facilityId}
+                                        value={login.testFacilityDATIMCode}
                                     />
                                 </FormGroup>
 
                                   <FormGroup>
-                                      <Label for="receivingPCRLabId" className={classes.label}>Test PCR Lab ID</Label>
+                                      <Label for="testFacilityName" className={classes.label}>Testing Facility Name</Label>
 
                                       <Input
                                           type="text"
-                                          name="receivingPCRLabId"
-                                          id="receivingPCRLabId"
-                                          placeholder="Receiving PCR Lab ID"
+                                          name="testFacilityName"
+                                          id="testFacilityName"
+                                          placeholder="Testing Facility Name"
                                           className={classes.input}
                                           onChange={handleChange}
-                                          value={login.receivingPCRLabId}
+                                          value={login.testFacilityName}
                                       />
                                   </FormGroup>
                                 </>

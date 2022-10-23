@@ -143,7 +143,7 @@ const SampleSearch = (props) => {
      const loadLabTestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("samples", response);
+                console.log("samples", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
                 localStorage.clear();
