@@ -28,17 +28,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class LimsManifestService {
     private final LimsManifestRepository limsManifestRepository;
-    private final LimsResultRepository resultRepository;
-    private final LimsSampleRepository sampleRepository;
-    private final LimsTestRepository testRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
     private final LimsResultService resultService;
     private final LimsConfigRepository limsConfigRepository;
 
-    String FacilityDATIMCode = "meYf9FxUI4c";
-    String FacilityMFLCode = "543";
     String loginUrl = "/login.php";
     String manifestUrl = "/samples/create.php";
     String resultsUrl = "/samples/result.php";
@@ -47,10 +42,24 @@ public class LimsManifestService {
         LIMSManifest manifest = limsMapper.tomManifest(manifestDTO);
 
         if(manifest.getId()==0) {
-            //TODO: pick the active facility
             Long FacilityId = getCurrentUserOrganization();
             OrganisationUnit organisationUnit = organisationUnitService.getOrganizationUnit(FacilityId);
-            String FacilityName = "National Hospital - Abuja"; //organisationUnit.getName();
+            String FacilityName = organisationUnit.getName();
+            String FacilityDATIMCode = "meYf9FxUI4c";
+            String FacilityMFLCode ="54321";
+
+            try {
+                FacilityDATIMCode = Objects.requireNonNull(organisationUnit.getOrganisationUnitIdentifiers().stream()
+                        .filter(x -> "DATIM_ID".equals(x.getName())).findFirst().orElse(null)).getCode();
+            }catch (Exception ignored){
+
+            }
+            try {
+                FacilityMFLCode = Objects.requireNonNull(organisationUnit.getOrganisationUnitIdentifiers().stream()
+                        .filter(x -> "MFL_ID".equals(x.getName())).findFirst().orElse(null)).getCode();
+            }catch (Exception ignored){
+
+            }
 
             manifest.setManifestID(GenerateManifestID(FacilityMFLCode));
             manifest.setSendingFacilityID(FacilityDATIMCode);
@@ -73,6 +82,7 @@ public class LimsManifestService {
 
     public String Delete(Integer id){
         LIMSManifest manifest = limsManifestRepository.findById(id).orElse(null);
+        assert manifest != null;
         limsManifestRepository.delete(manifest);
         return id + " deleted successfully";
     }
@@ -156,6 +166,12 @@ public class LimsManifestService {
 
     private LIMSManifestResponseDTO PostManifestRequest(RestTemplate restTemplate, HttpHeaders headers, LIMSLoginResponseDTO loginResponseDTO, int ManifestId, LIMSConfig config) {
         LIMSManifestDTO manifest = limsMapper.toLimsManifestDto(findById(ManifestId));
+
+        if (config.getTestFacilityDATIMCode().length() > 1) {
+            manifest.setSendingFacilityID(config.getTestFacilityDATIMCode());
+            manifest.setSendingFacilityName(config.getTestFacilityName());
+        }
+
         LIMSManifestRequestDTO requestDTO = new LIMSManifestRequestDTO();
         assert loginResponseDTO != null;
         requestDTO.setToken(loginResponseDTO.getJwt());
@@ -163,7 +179,7 @@ public class LimsManifestService {
         LogInfo("MANIFEST_REQUEST", requestDTO);
 
         HttpEntity<LIMSManifestRequestDTO> manifestEntity = new HttpEntity<>(requestDTO, headers);
-        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(config.getServerUrl()+manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
+        ResponseEntity<LIMSManifestResponseDTO> manifestResponse = restTemplate.exchange(config.getServerUrl() + manifestUrl, HttpMethod.POST, manifestEntity, LIMSManifestResponseDTO.class);
         LogInfo("MANIFEST_RESPONSE", manifestResponse.getBody());
 
         return manifestResponse.getBody();

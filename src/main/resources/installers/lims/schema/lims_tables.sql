@@ -65,6 +65,8 @@ CREATE TABLE public.lims_config
     config_password character varying(100),
     server_url character varying(100),
     create_date character varying(100),
+    test_facility_name character varying(100),
+    test_facility_datim_code character varying(100),
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_config_id_seq OWNED BY lims_config.id;

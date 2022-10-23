@@ -27,6 +27,10 @@ public class LIMSConfig {
     private String configPassword;
     @Column(name = "server_url")
     private String serverUrl;
+    @Column(name = "test_facility_name")
+    private String testFacilityName;
+    @Column(name = "test_facility_datim_code")
+    private String testFacilityDATIMCode;
     @Column(name = "create_date")
     private LocalDateTime createDate;
 }
