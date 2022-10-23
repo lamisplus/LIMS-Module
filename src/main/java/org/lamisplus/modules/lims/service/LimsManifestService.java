@@ -45,11 +45,21 @@ public class LimsManifestService {
             Long FacilityId = getCurrentUserOrganization();
             OrganisationUnit organisationUnit = organisationUnitService.getOrganizationUnit(FacilityId);
             String FacilityName = organisationUnit.getName();
+            String FacilityDATIMCode = "meYf9FxUI4c";
+            String FacilityMFLCode ="54321";
 
-            String FacilityDATIMCode = Objects.requireNonNull(organisationUnit.getOrganisationUnitIdentifiers().stream()
-                    .filter(x -> "DATIM_ID".equals(x.getName())).findFirst().orElse(null)).getCode();
-            String FacilityMFLCode = Objects.requireNonNull(organisationUnit.getOrganisationUnitIdentifiers().stream()
-                    .filter(x -> "MFL_ID".equals(x.getName())).findFirst().orElse(null)).getCode();
+            try {
+                FacilityDATIMCode = Objects.requireNonNull(organisationUnit.getOrganisationUnitIdentifiers().stream()
+                        .filter(x -> "DATIM_ID".equals(x.getName())).findFirst().orElse(null)).getCode();
+            }catch (Exception ignored){
+
+            }
+            try {
+                FacilityMFLCode = Objects.requireNonNull(organisationUnit.getOrganisationUnitIdentifiers().stream()
+                        .filter(x -> "MFL_ID".equals(x.getName())).findFirst().orElse(null)).getCode();
+            }catch (Exception ignored){
+
+            }
 
             manifest.setManifestID(GenerateManifestID(FacilityMFLCode));
             manifest.setSendingFacilityID(FacilityDATIMCode);
