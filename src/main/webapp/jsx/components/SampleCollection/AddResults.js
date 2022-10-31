@@ -8,6 +8,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import SaveIcon from '@material-ui/icons/Save'
 import Alert from 'react-bootstrap/Alert';
 import {format} from "date-fns";
+import { pcr_lab } from './pcr';
 
 import { CardBody,
     Form, FormFeedback, FormGroup, FormText,
@@ -99,8 +100,9 @@ const AddResult = (props) => {
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
     const sampleIDs = []
+    const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: ""});
     manifestObj.sampleInformation.map((e) => {
-        sampleIDs.push(e.sampleID)
+        sampleIDs.push(e)
     })
 
     //console.log("maniObj",manifestObj)
@@ -118,6 +120,9 @@ const AddResult = (props) => {
     })
 
     const [initialValue, SetInitialValue] = useState(0)
+    const [tests, setTests] = useState(false);
+    const [transferredOut, setTransferredOut] = useState(false);
+    const [reasons, setReasons] = useState(false);
 
     const [inputFields, setInputFields] = useState([{
         manifestRecordID: manifestObj.id,
@@ -133,17 +138,51 @@ const AddResult = (props) => {
         sampleID: sampleIDs[initialValue],
         uuid: "",
         visitDate: format(new Date(), 'yyyy-MM-dd'),
+        transferStatus: "",
+        testedBy: "",
+        approvedBy: "",
+        dateTransferredOut: "",
+        reasonNotTested: "",
+        otherRejectionReason: "",
+        sendingPCRLabID: "",
+        sendingPCRLabName: ""
     }])
 
      const handleChange = (i, event) => {
            let data = [...inputFields]
            const { name, value } = event.target
+
+           //console.log(name, value)
+
+          if (name === "sendingPCRLabName") {
+              checkPCRLab(value)
+              console.log(pcrLabCode.labNo)
+          }
+
+          if (name === 'transferStatus' && value === '2' || name === 'transferStatus' && value === '3' || name === 'transferStatus' && value === '4') {
+               setTests(true)
+               setTransferredOut(true)
+          }
+
+          if (name === 'reasonNotTested' && value === '7') {
+               setReasons(true)
+          }
+
            data[i].manifestRecordID = manifestObj.id
            data[i][name] = value
            data[i].uuid = ""
            data[i].visitDate = format(new Date(), 'yyyy-MM-dd')
 
            setInputFields(data)
+           //console.log("inputs",inputFields)
+     }
+
+     const checkPCRLab = (name) => {
+         pcr_lab.map(( val ) => {
+             if (val.name === name) {
+                 setPcrLabCode({name: val.name, labNo: val.labNo})
+             }
+         })
      }
 
      const handleSubmit = async (e) => {
@@ -173,9 +212,9 @@ const AddResult = (props) => {
         e.preventDefault()
         SetInitialValue(initialValue+1)
 
-        console.log(initialValue)
-        console.log(sampleIDs)
-        console.log(sampleIDs[initialValue])
+//        console.log(initialValue)
+//        console.log(sampleIDs)
+//        console.log(sampleIDs[initialValue])
 
         if (initialValue === 0) {
             toast.success("click the Add More button to add more fields...", {
@@ -331,6 +370,25 @@ const AddResult = (props) => {
                 <Alert style={{width:'100%',fontSize:'16px', backgroundColor: '#992E62', color: "#fff", textAlign: 'center'}}>
                   <Alert.Heading>PCR Sample Details</Alert.Heading>
                </Alert>
+                { inputFields && inputFields.map(x => (
+                      sampleIDs.filter((key) => key.sampleID === x.sampleID).map((x) => (
+                              <Alert style={{width:'100%',fontSize:'16px', backgroundColor: '#014d88', color: "#fff", textAlign: 'center'}}>
+                               <p style={{marginTop: '.7rem' }}>Name: <span style={{ fontWeight: 'bolder'}}>{x.firstName + " " + x.surName+ " "}</span>
+                                   &nbsp;&nbsp;&nbsp;&nbsp; Patient ID::
+                                   <span style={{ fontWeight: 'bolder'}}>{" "}{x.patientID[0].idNumber}</span>
+                                   &nbsp;&nbsp;&nbsp;&nbsp;Sample type:
+                                   <span style={{ fontWeight: 'bolder'}}>{" "}{x.sampleType }</span>
+                                           &nbsp;&nbsp;&nbsp;&nbsp; Date collected :
+                                   <span style={{ fontWeight: 'bolder'}}>{" "}{x.sampleCollectionDate}</span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp; Sample collected By:
+                                    <span style={{ fontWeight: 'bolder'}}>{" "}{x.sampleCollectedBy}</span>
+
+                               </p>
+                             </Alert>
+                    ))
+                 ))
+
+                }
                {
                     manifestObj.sampleInformation.length > 0 && inputFields.map((data, i) => (
                     <>
@@ -355,7 +413,7 @@ const AddResult = (props) => {
                                          Select Sample Id
                                      </option>
                                      { sampleIDs && sampleIDs.map((sample, i) =>
-                                     <option key={i} value={sample} >{sample}</option>)}
+                                     <option key={i} value={sample.sampleID} >{sample.sampleID}</option>)}
                                     </select>
                                 </FormGroup>
                              </Col>
@@ -408,6 +466,7 @@ const AddResult = (props) => {
                                      </select>
                                  </FormGroup>
                               </Col>
+
                             <Col> <FormGroup>
                                  <Label for="assayDate" className={classes.label}>Assay Date *</Label>
 
@@ -422,6 +481,117 @@ const AddResult = (props) => {
                                      onChange={e => handleChange(i, e)}
                                  />
                              </FormGroup></Col>
+                          </Row>
+                          <Row>
+                                <Col><FormGroup>
+                                  <Label for="transferStatus" className={classes.label}>Transfer Status</Label>
+                                  <select
+                                     className="form-control"
+                                     name="transferStatus"
+                                     id="transferStatus"
+                                     style={{
+                                         border: "1px solid #014d88",
+                                         borderRadius:'0px',
+                                         fontSize:'14px',
+                                         color:'#000'
+                                       }}
+                                     onChange={ e => handleChange(i, e)}
+                                     value={inputFields.transferStatus}
+                                 >
+                                  <option hidden>
+                                      Select transfer status
+                                  </option>
+                                  <option value="1" >Not Transfered</option>
+                                  <option value="2" >Received</option>
+                                  <option value="3" >In Process</option>
+                                  <option value="4" >Tested</option>
+                                 </select>
+                               </FormGroup></Col>
+
+                               <Col><FormGroup>
+                                   <Label for="reasonNotTested" className={classes.label}>Reason Not Tested</Label>
+                                   <select
+                                     className="form-control"
+                                     name="reasonNotTested"
+                                     id="reasonNotTested"
+                                     style={{
+                                         border: "1px solid #014d88",
+                                         borderRadius:'0px',
+                                         fontSize:'14px',
+                                         color:'#000'
+                                       }}
+                                     onChange={ e => handleChange(i, e)}
+                                     value={inputFields.reasonNotTested}
+                                 >
+                                  <option hidden>
+                                      What is the reasons not tested?
+                                  </option>
+                                  <option value="1" >Testable</option>
+                                  <option value="2" >Technical Problems</option>
+                                  <option value="3" >Labeled Improperly</option>
+                                  <option value="4" >Insufficient Blood</option>
+                                  <option value="5" >Layered or clotted</option>
+                                  <option value="6" >Improper Packaging</option>
+                                  <option value="7" >Other Reasons</option>
+                                 </select>
+                               </FormGroup></Col>
+
+                               <Col><FormGroup>
+                                   <Label for="approvedBy" className={classes.label}>Approved By*</Label>
+
+                                   <Input
+                                       type="text"
+                                       name="approvedBy"
+                                       id="approvedBy"
+                                       placeholder="approvedBy"
+                                       className={classes.input}
+                                       onChange={e => handleChange(i, e)}
+                                       value={inputFields.approvedBy}
+                                   />
+                               </FormGroup></Col>
+
+                                  <Col><FormGroup>
+                                   <Label for="testedBy" className={classes.label}>Test By *</Label>
+
+                                   <Input
+                                       type="text"
+                                       name="testedBy"
+                                       id="testedBy"
+                                       placeholder="Test By"
+                                       className={classes.input}
+                                       onChange={e => handleChange(i, e)}
+                                       value={inputFields.testedBy}
+                                   />
+                               </FormGroup></Col>
+
+                                    { transferredOut === true ?
+                                      <Col><FormGroup>
+                                           <Label for="dateTransferredOut" className={classes.label}>Date Transferred Out</Label>
+
+                                           <Input
+                                               type="date"
+                                               name="dateTransferredOut"
+                                               id="dateTransferredOut"
+                                               placeholder="Date Transferred Out"
+                                               max={new Date().toISOString().slice(0, 10)}
+                                               className={classes.input}
+                                               onChange={e => handleChange(i, e)}
+                                               value={inputFields.dateTransferredOut}
+                                           />
+                                       </FormGroup></Col> : " " }
+                                       { reasons === true ?
+                                      <Col><FormGroup>
+                                       <Label for="otherRejectionReason" className={classes.label}>Other Rejection Reason</Label>
+                                       <Input
+                                           type="text"
+                                           name="otherRejectionReason"
+                                           id="otherRejectionReason"
+                                           placeholder="Other Rejection Reason"
+                                           className={classes.input}
+                                           onChange={e => handleChange(i, e)}
+                                           value={inputFields.otherRejectionReason}
+                                       />
+                                   </FormGroup></Col> : " " }
                           </Row>
                             <Row>
                               <Col><FormGroup>
@@ -503,8 +673,49 @@ const AddResult = (props) => {
                                  onChange={e => handleChange(i, e)}
                              />
                          </FormGroup></Col>
-                         <Col></Col>
-                         <Col></Col>
+                          { tests === true ?
+                            <>
+                                <Col><FormGroup>
+                                     <Label for="sendingPCRLabName" className={classes.label}>Transferred PCR Lab Name</Label>
+
+                                      <select
+                                          className="form-control"
+                                          style={{
+                                           border: "1px solid #014d88",
+                                           borderRadius:'0px',
+                                           fontSize:'14px',
+                                           color:'#000'
+                                           }}
+                                          name="sendingPCRLabName"
+                                          value={pcrLabCode.name}
+                                          id="sendingPCRLabName"
+                                          onChange={ e => handleChange(i, e)}
+                                      >
+                                        <option>
+                                          Select PCR Lab
+                                        </option>
+                                        {pcr_lab.map((value, i) =>
+                                        <option key={i} value={value.name} >{value.name}</option>)}
+                                      </select>
+                                 </FormGroup></Col>
+                                <Col><FormGroup>
+                                 <Label for="sendingPCRLabID" className={classes.label}>Transferred PCR Lab ID</Label>
+                                 &nbsp;&nbsp;<span>Confirm PCR Id <b>{pcrLabCode.labNo}</b></span>
+                                 <Input
+                                     type="text"
+                                     name="sendingPCRLabID"
+                                     id="sendingPCRLabID"
+                                     placeholder="Transferred PCR Lab ID"
+                                     value={inputFields.sendingPCRLabID}
+                                     className={classes.input}
+                                     onChange={ e => handleChange(i, e)}
+
+                                 />
+                             </FormGroup></Col>
+                             </>
+                        : <><Col></Col>
+                          <Col></Col></> }
+
                         </Row>
 
                         <Row>

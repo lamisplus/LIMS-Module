@@ -111,7 +111,7 @@ class PrintResults extends React.Component {
 
                      </tbody>
                    </Table>
-                   {results.length === 0  ? <p> <Spinner color="primary" /> Please Wait, Syncing with LIMS server... </p> : " "}
+                   { results.length === 0  ? <p> <Spinner color="primary" /> Please Wait, Syncing with LIMS server... </p> : " "}
                    <span>LAMISPlus 2.0: {today}</span>
                  </Row>
                  <hr />
