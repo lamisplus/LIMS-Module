@@ -1,9 +1,9 @@
 basePackage: org.lamisplus.modules.lims
 name: LimsModule
 menus:
-  - icon:
+  - icon: fa fa-vial-virus
     disabled: false
-    name: Lims
+    name: LIMS
     state: lims
     url: /across/resources/static/lims/index.html
 umdLocation: /across/resources/static/lims/index.html
@@ -13,6 +13,21 @@ webModules:
     path: lims
     position: 99
 permissions:
-  - name: lims_dispense_drug
-    description: LIMS Module
+  - name: create_manifest
+    description: create manifest
+    moduleName: LimsModule
+  - name: view_manifest
+    description: view manifest
+    moduleName: LimsModule
+  - name: print_manifest
+    description: print manifest
+    moduleName: LimsModule
+  - name: set_configuration
+    description: set configuration
+    moduleName: LimsModule
+  - name: view_result
+    description: view result
+    moduleName: LimsModule
+  - name: add_result
+    description: add result
     moduleName: LimsModule

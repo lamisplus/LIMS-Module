@@ -63,7 +63,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: 1
+    password: smilez
     url: jdbc:postgresql://localhost:5432/lamisplus
     hibernate:
       ddl-auto: none
@@ -135,7 +135,7 @@ lamisplus:
     module:
       driver-class-name: org.postgresql.Driver
       username: postgres
-      password: 1
+      password: smilez
       url: jdbc:postgresql://localhost:5432/lamisplus
       hikari:
         auto-commit: true

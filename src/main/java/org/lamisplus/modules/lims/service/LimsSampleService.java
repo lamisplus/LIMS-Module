@@ -1,16 +1,14 @@
 package org.lamisplus.modules.lims.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lamisplus.modules.lims.domain.dto.LABSampleDTO;
 import org.lamisplus.modules.lims.domain.dto.PatientIdDTO;
-import org.lamisplus.modules.lims.domain.dto.SampleDTO;
-import org.lamisplus.modules.lims.domain.entity.Sample;
+import org.lamisplus.modules.lims.domain.entity.LIMSSample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
-import org.lamisplus.modules.lims.repository.SampleRepository;
+import org.lamisplus.modules.lims.repository.LimsSampleRepository;
 import org.lamisplus.modules.lims.util.JsonNodeTransformer;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
 import org.lamisplus.modules.patient.service.PersonService;
@@ -23,42 +21,42 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SampleService {
-    private final SampleRepository sampleRepository;
+public class LimsSampleService {
+    private final LimsSampleRepository sampleRepository;
     private final LimsMapper limsMapper;
     private final PersonService personService;
     private final JsonNodeTransformer jsonNodeTransformer;
 
-    public SampleDTO Save(SampleDTO sampleDTO){
-        Sample sample = limsMapper.toSample(sampleDTO);
+    public LABSampleDTO Save(LABSampleDTO sampleDTO){
+        LIMSSample sample = limsMapper.toSample(sampleDTO);
         sample.setUuid(UUID.randomUUID().toString());
         return limsMapper.tosSampleDto( sampleRepository.save(sample));
     }
 
-    public SampleDTO Update(SampleDTO sampleDTO){
+    public LABSampleDTO Update(LABSampleDTO sampleDTO){
         return Save(sampleDTO);
     }
 
     public String Delete(Integer id){
-        Sample sample = sampleRepository.findById(id).orElse(null);
+        LIMSSample sample = sampleRepository.findById(id).orElse(null);
         sampleRepository.delete(sample);
         return id.toString() + " deleted successfully";
     }
 
-    public SampleDTO findById(Integer id) {
+    public LABSampleDTO findById(Integer id) {
         return limsMapper.tosSampleDto(sampleRepository.findById(id).orElse(null));
     }
 
-    public List<SampleDTO> findbyManifestRecordId(int id) {
+    public List<LABSampleDTO> findbyManifestRecordId(int id) {
         return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findAllByManifestRecordID(id)));
     }
 
-    public List<SampleDTO> getAllPendingSamples() {
+    public List<LABSampleDTO> getAllPendingSamples() {
         return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findPendingVLSamples()));
     }
 
-    public List<SampleDTO> AppendPatientDetails(List<SampleDTO> sampleDTOS) {
-        for (SampleDTO sampleDTO: sampleDTOS) {
+    public List<LABSampleDTO> AppendPatientDetails(List<LABSampleDTO> sampleDTOS) {
+        for (LABSampleDTO sampleDTO: sampleDTOS) {
             PersonResponseDto personResponseDTO = personService.getPersonById((long) sampleDTO.getPid());
 
             List<PatientIdDTO> patientIdDTOS = new ArrayList<>();

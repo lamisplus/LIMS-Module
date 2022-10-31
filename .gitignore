@@ -26,6 +26,13 @@ target/
 /nbdist/
 /.nb-gradle/
 build/
+node/
+node_modules
+.mvn/
+.idea/
+gradlew/
+gradlew.bat
+src/main/resources/views/static/lims/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -56,3 +63,9 @@ build/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+node_modules/encoding/node_modules/iconv-lite/.idea/iconv-lite.iml
+node_modules/encoding/node_modules/iconv-lite/.idea/iconv-lite.iml
+node_modules/bowser/.idea/bowser.iml
+gradle/wrapper/gradle-wrapper.properties
+.mvn/wrapper/maven-wrapper.properties
+.idea/misc.xml

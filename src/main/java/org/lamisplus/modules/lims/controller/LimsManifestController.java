@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.LIMSManifestResponseDTO;
+import org.lamisplus.modules.lims.domain.dto.LIMSResultsResponseDTO;
 import org.lamisplus.modules.lims.domain.dto.ManifestDTO;
-import org.lamisplus.modules.lims.service.ManifestService;
-import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.lamisplus.modules.lims.service.LimsManifestService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,35 +16,40 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/lims")
 public class LimsManifestController {
-    private final ManifestService manifestService;
+    private final LimsManifestService limsManifestService;
 
     @PostMapping("/manifests")
     public ManifestDTO SaveManifest(@RequestBody ManifestDTO manifestDTO){
-        return manifestService.Save(manifestDTO);
+        return limsManifestService.Save(manifestDTO);
     }
 
     @PutMapping("/manifests")
     public ManifestDTO UpdateManifest(@RequestBody ManifestDTO manifestDTO){
-        return manifestService.Update(manifestDTO);
+        return limsManifestService.Update(manifestDTO);
     }
 
     @DeleteMapping("/manifests/{id}")
     public String DeleteManifest(@PathVariable int id){
-        return manifestService.Delete(id);
+        return limsManifestService.Delete(id);
     }
 
     @GetMapping("/manifests/{id}")
     public ManifestDTO GetManifestById(@PathVariable int id){
-        return manifestService.findById(id);
+        return limsManifestService.findById(id);
     }
 
     @GetMapping("/manifests")
     public List<ManifestDTO> GetAllManifests(){
-        return manifestService.findAllManifests();
+        return limsManifestService.findAllManifests();
     }
 
-    @GetMapping("/ready-manifests/{id}")
-    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id) throws JSONException, JsonProcessingException {
-        return manifestService.PostManifestToServer(id);
+    @GetMapping("/ready-manifests/{id}/{configId}")
+    public LIMSManifestResponseDTO PostManifestsToLIMSServer(@PathVariable int id, @PathVariable int configId) {
+        return limsManifestService.PostManifestToServer(id, configId);
+    }
+
+    @GetMapping("/manifest-results/{id}/{configId}")
+    public LIMSResultsResponseDTO DownloadResults(@PathVariable int id, @PathVariable int configId) {
+        return limsManifestService.DownloadResultsFromLIMS(id, configId);
     }
 }

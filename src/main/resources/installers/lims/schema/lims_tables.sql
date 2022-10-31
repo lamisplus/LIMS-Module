@@ -53,3 +53,42 @@ CREATE TABLE public.lims_sample
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_sample_id_seq OWNED BY lims_sample.id;
+
+
+CREATE SEQUENCE lims_config_id_seq;
+CREATE TABLE public.lims_config
+(
+    id bigint NOT NULL DEFAULT nextval('lims_config_id_seq'),
+    uuid character varying(100),
+    config_name character varying(100),
+    config_email character varying(100),
+    config_password character varying(100),
+    server_url character varying(100),
+    create_date character varying(100),
+    test_facility_name character varying(100),
+    test_facility_datim_code character varying(100),
+    PRIMARY KEY (id)
+);
+ALTER SEQUENCE lims_config_id_seq OWNED BY lims_config.id;
+
+
+CREATE SEQUENCE lims_result_id_seq;
+CREATE TABLE public.lims_result
+(
+    id bigint NOT NULL DEFAULT nextval('lims_result_id_seq'),
+    uuid character varying(100),
+    sample_id character varying(100),
+    pcr_lab_sample_number character varying(100),
+    visit_date character varying(100),
+    date_sample_received_at_pcr_lab character varying(100),
+    result_date character varying(100),
+	test_result character varying(100),
+    assay_date character varying(100),
+	approval_date character varying(100),
+    date_result_dispatched character varying(100),
+    sample_status character varying(100),
+    sample_testable character varying(100),
+    manifest_record_id bigint,
+    PRIMARY KEY (id)
+);
+ALTER SEQUENCE lims_result_id_seq OWNED BY lims_result.id;
