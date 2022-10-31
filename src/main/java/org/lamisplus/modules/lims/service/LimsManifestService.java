@@ -124,9 +124,11 @@ public class LimsManifestService {
         LIMSManifestResponseDTO response  = PostManifestRequest(restTemplate, headers, loginResponseDTO, id, config);
 
         //Update manifest status
-        ManifestDTO dto = findById(id);
+        LIMSManifest dto = limsManifestRepository.findById(id).orElse(null);
+        LogInfo("SUBMITTED MANIFEST", dto);
+        assert dto != null;
         dto.setManifestStatus("Submitted");
-        Save(dto);
+        limsManifestRepository.save(dto);
 
         return response;
     }
