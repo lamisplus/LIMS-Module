@@ -114,6 +114,8 @@ const AddResultModal = (props) => {
     const [tests, setTests] = useState(false);
     const [transferredOut, setTransferredOut] = useState(false);
     const [reasons, setReasons] = useState(false);
+    const [reasonsNot, setReasonsNot] = useState(false);
+    const [transferredStatus, setTransferredStatus] = useState(false);
 
     const [errors, setErrors] = useState({});
     const [inputFields, setInputFields] = useState({
@@ -157,16 +159,29 @@ const AddResultModal = (props) => {
            event.preventDefault();
 
            const { name, value } = event.target
-
+            console.log(name, value)
 
            if (name === "sendingPCRLabName") {
                checkPCRLab(value)
                console.log(pcrLabCode.labNo)
            }
 
+           if (name === "sampleStatus" && value === '2') {
+               setReasonsNot(true);
+               setTransferredStatus(false);
+           }
+
+           if (name === "sampleStatus" && value === '5') {
+               setTransferredStatus(true);
+               setReasonsNot(false);
+           }
+
            if (name === 'transferStatus' && value === '2' || name === 'transferStatus' && value === '3' || name === 'transferStatus' && value === '4') {
                 setTests(true)
                 setTransferredOut(true)
+           }else if (name === 'transferStatus' && value === '1') {
+                setTests(false)
+                setTransferredOut(false)
            }
 
            if (name === 'reasonNotTested' && value === '7') {
@@ -182,29 +197,29 @@ const AddResultModal = (props) => {
          try {
              console.log(inputFields)
 
-//              await axios.post(`${url}lims/results`, [inputFields],
-//                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-//                     console.log("results", resp)
-//
-//                     toast.success("PCR Sample results added successfully!!", {
-//                         position: toast.POSITION.TOP_RIGHT
-//                     });
-//
-//                      setInputFields({
-//                          dateResultDispatched: "",
-//                          dateSampleReceivedAtPcrLab: "",
-//                          testResult: "",
-//                          resultDate: "",
-//                          pcrLabSampleNumber: "",
-//                          approvalDate: "",
-//                          assayDate: "",
-//                          sampleTestable: "",
-//                          sampleStatus: "",
-//                          sampleID: "",
-//                          uuid: "",
-//                          visitDate: format(new Date(), 'yyyy-MM-dd'),
-//                      })
-//                 });
+              await axios.post(`${url}lims/results`, [inputFields],
+                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                     console.log("results", resp)
+
+                     toast.success("PCR Sample results added successfully!!", {
+                         position: toast.POSITION.TOP_RIGHT
+                     });
+
+                      setInputFields({
+                          dateResultDispatched: "",
+                          dateSampleReceivedAtPcrLab: "",
+                          testResult: "",
+                          resultDate: "",
+                          pcrLabSampleNumber: "",
+                          approvalDate: "",
+                          assayDate: "",
+                          sampleTestable: "",
+                          sampleStatus: "",
+                          sampleID: "",
+                          uuid: "",
+                          visitDate: format(new Date(), 'yyyy-MM-dd'),
+                      })
+                 });
              //history.push("/");
              props.togglestatus();
              reload();
@@ -294,35 +309,111 @@ const AddResultModal = (props) => {
                                             </select>
                                         </FormGroup>
                                      </Col>
-                                    <Col>
-                                       <FormGroup>
-                                             <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
-                                             <select
-                                                 className="form-control"
-                                                 name="sampleStatus"
-                                                 id="sampleStatus"
-                                                 style={{
-                                                    border: "1px solid #014d88",
-                                                    borderRadius:'0px',
-                                                    fontSize:'14px',
-                                                    color:'#000'
-                                                  }}
-                                                 onChange={ e => handleChange(e)}
-                                                 value={inputFields.sampleStatus}
-                                             >
-                                              <option hidden>
-                                                  Select Sample status
-                                              </option>
-                                              <option value="1" >Completed</option>
-                                              <option value="2" >Rejected</option>
-                                              <option value="3" >In-Progress</option>
-                                              <option value="4" >Re-run</option>
-                                             </select>
-                                         </FormGroup>
-                                      </Col>
+                                       <Col>
+                                         <FormGroup>
+                                               <Label for="surName" className={classes.label}>Sample Testable *</Label>
+                                               <select
+                                                   className="form-control"
+                                                   name="sampleTestable"
+                                                   id="sampleTestable"
+                                                   style={{
+                                                       border: "1px solid #014d88",
+                                                       borderRadius:'0px',
+                                                       fontSize:'14px',
+                                                       color:'#000'
+                                                     }}
+                                                   onChange={ e => handleChange(e)}
+                                                   value={inputFields.sampleTestable}
+                                               >
+                                                <option hidden>
+                                                    Is Sample Testable ?
+                                                </option>
+                                                <option value="true" >True</option>
+                                                <option value="false" >False</option>
+                                               </select>
+                                           </FormGroup>
+                                        </Col>
+
                                   </Row>
+
+                                  <Row>
+                                       <Col><FormGroup>
+                                           <Label for="approvedBy" className={classes.label}>Approved By*</Label>
+
+                                           <Input
+                                               type="text"
+                                               name="approvedBy"
+                                               id="approvedBy"
+                                               placeholder="approvedBy"
+                                               className={classes.input}
+                                               onChange={handleChange}
+                                               value={inputFields.approvedBy}
+                                           />
+                                       </FormGroup></Col>
+                                      <Col>
+                                         <FormGroup>
+                                             <Label for="approvalDate" className={classes.label}>Approval Date *</Label>
+
+                                             <Input
+                                                 type="date"
+                                                 name="approvalDate"
+                                                 id="approvalDate"
+                                                 placeholder="Approval Date"
+                                                 max={new Date().toISOString().slice(0, 10)}
+                                                 className={classes.input}
+                                                 onChange={handleChange}
+                                                 value={inputFields.approvalDate}
+                                             />
+                                         </FormGroup></Col>
+
+                                    </Row>
                                 <Row>
-                                   <Col><FormGroup>
+                                   <Col>
+                                      <FormGroup>
+                                            <Label for="sampleStatus" className={classes.label}>Sample Status *</Label>
+                                            <select
+                                                className="form-control"
+                                                name="sampleStatus"
+                                                id="sampleStatus"
+                                                style={{
+                                                   border: "1px solid #014d88",
+                                                   borderRadius:'0px',
+                                                   fontSize:'14px',
+                                                   color:'#000'
+                                                 }}
+                                                onChange={ e => handleChange(e)}
+                                                value={inputFields.sampleStatus}
+                                            >
+                                             <option hidden>
+                                                 Select Sample status
+                                             </option>
+                                             <option value="1" >Completed</option>
+                                             <option value="2" >Rejected</option>
+                                             <option value="3" >In-Progress</option>
+                                             <option value="4" >Re-run</option>
+                                             <option value="5" >Transferred</option>
+                                            </select>
+                                        </FormGroup>
+                                     </Col>
+
+                                      <Col><FormGroup>
+                                       <Label for="pcrLabSampleNumber" className={classes.label}>Pcr Lab Sample No *</Label>
+
+                                       <Input
+                                           type="text"
+                                           name="pcrLabSampleNumber"
+                                           id="pcrLabSampleNumber"
+                                           placeholder="Pcr Lab Sample Number"
+                                           className={classes.input}
+                                           onChange={handleChange}
+                                           value={inputFields.pcrLabSampleNumber}
+                                       />
+                                   </FormGroup></Col>
+                            </Row>
+
+                                <Row>
+                                 { transferredStatus ?
+                                    <Col><FormGroup>
                                       <Label for="transferStatus" className={classes.label}>Transfer Status</Label>
                                       <select
                                          className="form-control"
@@ -340,81 +431,38 @@ const AddResultModal = (props) => {
                                       <option hidden>
                                           Select transfer status
                                       </option>
-                                      <option value="1" >Not Transfered</option>
+                                      <option value="1" >Not Transferred</option>
                                       <option value="2" >Received</option>
                                       <option value="3" >In Process</option>
                                       <option value="4" >Tested</option>
+
                                      </select>
                                    </FormGroup></Col>
+                                   : ""}
 
-                                   <Col><FormGroup>
-                                       <Label for="reasonNotTested" className={classes.label}>Reason Not Tested</Label>
-                                       <select
-                                         className="form-control"
-                                         name="reasonNotTested"
-                                         id="reasonNotTested"
-                                         style={{
-                                             border: "1px solid #014d88",
-                                             borderRadius:'0px',
-                                             fontSize:'14px',
-                                             color:'#000'
-                                           }}
-                                         onChange={ e => handleChange(e)}
-                                         value={inputFields.reasonNotTested}
-                                     >
-                                      <option hidden>
-                                          What is the reasons not tested?
-                                      </option>
-                                      <option value="1" >Testable</option>
-                                      <option value="2" >Technical Problems</option>
-                                      <option value="3" >Labeled Improperly</option>
-                                      <option value="4" >Insufficient Blood</option>
-                                      <option value="5" >Layered or clotted</option>
-                                      <option value="6" >Improper Packaging</option>
-                                      <option value="7" >Other Reasons</option>
-                                     </select>
-                                   </FormGroup></Col>
+                                    { transferredOut === true ?
+                                     <Col><FormGroup>
+                                          <Label for="dateTransferredOut" className={classes.label}>Date Transferred Out</Label>
 
-                            </Row>
+                                          <Input
+                                              type="date"
+                                              name="dateTransferredOut"
+                                              id="dateTransferredOut"
+                                              placeholder="Date Transferred Out"
+                                              max={new Date().toISOString().slice(0, 10)}
+                                              className={classes.input}
+                                              onChange={handleChange}
+                                              value={inputFields.dateTransferredOut}
+                                          />
+                                      </FormGroup></Col> : " " }
 
-                            <Row>
-                              { transferredOut === true ?
-                               <Col><FormGroup>
-                                    <Label for="dateTransferredOut" className={classes.label}>Date Transferred Out</Label>
-
-                                    <Input
-                                        type="date"
-                                        name="dateTransferredOut"
-                                        id="dateTransferredOut"
-                                        placeholder="Date Transferred Out"
-                                        max={new Date().toISOString().slice(0, 10)}
-                                        className={classes.input}
-                                        onChange={handleChange}
-                                        value={inputFields.dateTransferredOut}
-                                    />
-                                </FormGroup></Col> : " " }
-                                { reasons === true ?
-                               <Col><FormGroup>
-                                <Label for="otherRejectionReason" className={classes.label}>Other Rejection Reason</Label>
-                                <Input
-                                    type="text"
-                                    name="otherRejectionReason"
-                                    id="otherRejectionReason"
-                                    placeholder="Other Rejection Reason"
-                                    className={classes.input}
-                                    onChange={handleChange}
-                                    value={inputFields.otherRejectionReason}
-                                />
-                            </FormGroup></Col> : " " }
-                        </Row>
-                                <Row>
-                                   <Col>
-                                    <FormGroup>
-                                          <Label for="surName" className={classes.label}>Sample Testable *</Label>
-                                          <select
+                                    { reasonsNot ?
+                                        <Col><FormGroup>
+                                            <Label for="reasonNotTested" className={classes.label}>Reason Not Tested</Label>
+                                            <select
                                               className="form-control"
-                                              name="sampleTestable"
-                                              id="sampleTestable"
+                                              name="reasonNotTested"
+                                              id="reasonNotTested"
                                               style={{
                                                   border: "1px solid #014d88",
                                                   borderRadius:'0px',
@@ -422,75 +470,96 @@ const AddResultModal = (props) => {
                                                   color:'#000'
                                                 }}
                                               onChange={ e => handleChange(e)}
-                                              value={inputFields.sampleTestable}
+                                              value={inputFields.reasonNotTested}
                                           >
                                            <option hidden>
-                                               Is Sample Testable ?
+                                               What is the reasons not tested?
                                            </option>
-                                           <option value="true" >True</option>
-                                           <option value="false" >False</option>
+                                           <option value="1" >Testable</option>
+                                           <option value="2" >Technical Problems</option>
+                                           <option value="3" >Labeled Improperly</option>
+                                           <option value="4" >Insufficient Blood</option>
+                                           <option value="5" >Layered or clotted</option>
+                                           <option value="6" >Improper Packaging</option>
+                                           <option value="7" >Other Reasons</option>
                                           </select>
-                                      </FormGroup>
-                                   </Col>
-                                    <Col> <FormGroup>
-                                         <Label for="assayDate" className={classes.label}>Assay Date *</Label>
-
-                                         <Input
-                                             type="date"
-                                             name="assayDate"
-                                             id="assayDate"
-                                             placeholder="Assay Date"
-                                             max={new Date().toISOString().slice(0, 10)}
-                                             className={classes.input}
-                                             onChange={handleChange}
-                                             value={inputFields.assayDate}
-                                         />
-                                     </FormGroup></Col>
+                                        </FormGroup></Col>
+                                     : ""}
                                 </Row>
+
+                               <Row>
+
+                                   { reasons === true ?
+                                      <Col><FormGroup>
+                                       <Label for="otherRejectionReason" className={classes.label}>Other Rejection Reason</Label>
+                                       <Input
+                                           type="text"
+                                           name="otherRejectionReason"
+                                           id="otherRejectionReason"
+                                           placeholder="Other Rejection Reason"
+                                           className={classes.input}
+                                           onChange={handleChange}
+                                           value={inputFields.otherRejectionReason}
+                                       />
+                                   </FormGroup></Col> : " " }
+                               </Row>
+
+                               { tests === true ?
+                                      <Row>
+                                               <Col><FormGroup>
+                                                    <Label for="sendingPCRLabName" className={classes.label}>Transferred PCR Lab Name</Label>
+
+                                                     <select
+                                                         className="form-control"
+                                                         style={{
+                                                          border: "1px solid #014d88",
+                                                          borderRadius:'0px',
+                                                          fontSize:'14px',
+                                                          color:'#000'
+                                                          }}
+                                                         name="sendingPCRLabName"
+                                                         value={pcrLabCode.name}
+                                                         id="sendingPCRLabName"
+                                                         onChange={ e => handleChange(e)}
+                                                     >
+                                                       <option>
+                                                         Select PCR Lab
+                                                       </option>
+                                                       {pcr_lab.map((value, i) =>
+                                                       <option key={i} value={value.name} >{value.name}</option>)}
+                                                     </select>
+                                                </FormGroup></Col>
+                                               <Col><FormGroup>
+                                                <Label for="sendingPCRLabID" className={classes.label}>Transferred PCR Lab ID</Label>
+                                                &nbsp;&nbsp;<span><b>{pcrLabCode.labNo ? "Confirm PCR Id " + pcrLabCode.labNo : ""}</b></span>
+                                                <Input
+                                                    type="text"
+                                                    name="sendingPCRLabID"
+                                                    id="sendingPCRLabID"
+                                                    placeholder="Transferred PCR Lab ID"
+                                                    value={inputFields.sendingPCRLabID}
+                                                    className={classes.input}
+                                                    onChange={ e => handleChange(e)}
+
+                                                />
+                                            </FormGroup></Col>
+                                        </Row> : " " }
+
                                 <Row>
-                                  <Col>
-                                     <FormGroup>
-                                         <Label for="approvalDate" className={classes.label}>Approval Date *</Label>
+                                      <Col> <FormGroup>
+                                          <Label for="assayDate" className={classes.label}>Assay Date *</Label>
 
-                                         <Input
-                                             type="date"
-                                             name="approvalDate"
-                                             id="approvalDate"
-                                             placeholder="Approval Date"
-                                             max={new Date().toISOString().slice(0, 10)}
-                                             className={classes.input}
-                                             onChange={handleChange}
-                                             value={inputFields.approvalDate}
-                                         />
-                                     </FormGroup></Col>
-                                  <Col><FormGroup>
-                                     <Label for="pcrLabSampleNumber" className={classes.label}>Pcr Lab Sample No *</Label>
-
-                                     <Input
-                                         type="text"
-                                         name="pcrLabSampleNumber"
-                                         id="pcrLabSampleNumber"
-                                         placeholder="Pcr Lab Sample Number"
-                                         className={classes.input}
-                                         onChange={handleChange}
-                                         value={inputFields.pcrLabSampleNumber}
-                                     />
-                                 </FormGroup></Col>
-                                </Row>
-                                <Row>
-                                     <Col><FormGroup>
-                                        <Label for="approvedBy" className={classes.label}>Approved By*</Label>
-
-                                        <Input
-                                            type="text"
-                                            name="approvedBy"
-                                            id="approvedBy"
-                                            placeholder="approvedBy"
-                                            className={classes.input}
-                                            onChange={handleChange}
-                                            value={inputFields.approvedBy}
-                                        />
-                                    </FormGroup></Col>
+                                          <Input
+                                              type="date"
+                                              name="assayDate"
+                                              id="assayDate"
+                                              placeholder="Assay Date"
+                                              max={new Date().toISOString().slice(0, 10)}
+                                              className={classes.input}
+                                              onChange={handleChange}
+                                              value={inputFields.assayDate}
+                                          />
+                                      </FormGroup></Col>
 
                                        <Col><FormGroup>
                                         <Label for="testedBy" className={classes.label}>Test By *</Label>
@@ -507,6 +576,19 @@ const AddResultModal = (props) => {
                                     </FormGroup></Col>
                                 </Row>
                                 <Row>
+                                      <Col><FormGroup>
+                                            <Label for="testResult" className={classes.label}>Test result *</Label>
+
+                                            <Input
+                                                type="text"
+                                                name="testResult"
+                                                id="testResult"
+                                                placeholder="Test result"
+                                                className={classes.input}
+                                                onChange={handleChange}
+                                                value={inputFields.testResult}
+                                            />
+                                        </FormGroup></Col>
                                         <Col><FormGroup>
                                             <Label for="resultDate" className={classes.label}>Result Date *</Label>
 
@@ -521,60 +603,9 @@ const AddResultModal = (props) => {
                                                 value={inputFields.resultDate}
                                             />
                                         </FormGroup></Col>
-                                       <Col><FormGroup>
-                                        <Label for="testResult" className={classes.label}>Test result *</Label>
 
-                                        <Input
-                                            type="text"
-                                            name="testResult"
-                                            id="testResult"
-                                            placeholder="Test result"
-                                            className={classes.input}
-                                            onChange={handleChange}
-                                            value={inputFields.testResult}
-                                        />
-                                    </FormGroup></Col>
                                 </Row>
-                        { tests === true ?
-                          <Row>
-                                   <Col><FormGroup>
-                                        <Label for="sendingPCRLabName" className={classes.label}>Transferred PCR Lab Name</Label>
 
-                                         <select
-                                             className="form-control"
-                                             style={{
-                                              border: "1px solid #014d88",
-                                              borderRadius:'0px',
-                                              fontSize:'14px',
-                                              color:'#000'
-                                              }}
-                                             name="sendingPCRLabName"
-                                             value={pcrLabCode.name}
-                                             id="sendingPCRLabName"
-                                             onChange={ e => handleChange(e)}
-                                         >
-                                           <option>
-                                             Select PCR Lab
-                                           </option>
-                                           {pcr_lab.map((value, i) =>
-                                           <option key={i} value={value.name} >{value.name}</option>)}
-                                         </select>
-                                    </FormGroup></Col>
-                                   <Col><FormGroup>
-                                    <Label for="sendingPCRLabID" className={classes.label}>Transferred PCR Lab ID</Label>
-                                    &nbsp;&nbsp;<span>Confirm PCR Id <b>{pcrLabCode.labNo}</b></span>
-                                    <Input
-                                        type="text"
-                                        name="sendingPCRLabID"
-                                        id="sendingPCRLabID"
-                                        placeholder="Transferred PCR Lab ID"
-                                        value={inputFields.sendingPCRLabID}
-                                        className={classes.input}
-                                        onChange={ e => handleChange(e)}
-
-                                    />
-                                </FormGroup></Col>
-                            </Row> : " " }
                                 <MatButton
                                     type="submit"
                                     variant="contained"

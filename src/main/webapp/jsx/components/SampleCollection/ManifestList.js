@@ -214,7 +214,7 @@ const DownloadManifest = (props) => {
                   )},
               {...(permissions.includes('add_result') || permissions.includes("all_permission") &&
                       {
-                          name:'Add Result',
+                          name:'Add RSL Result',
                           type:'link',
                           icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
                           to:{
