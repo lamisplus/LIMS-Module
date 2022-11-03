@@ -12,7 +12,7 @@ import {  Modal, ModalHeader, ModalBody,
 let today = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
 
 const sampleStatus = e =>{
-        console.log(e)
+        //console.log(e)
         if(parseInt(e)===1){
             return <p><Badge  color="success">Completed</Badge></p>
         }else if(parseInt(e)===2){
