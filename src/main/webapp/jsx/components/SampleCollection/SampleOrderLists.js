@@ -124,6 +124,7 @@ const SampleSearch = (props) => {
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
     const [manifestData, setManifestData] = useState([])
+    const [currentPage,setCurrentPage] = useState(1);
     let samples = [];
     const [ dateFilter, setDateFilter] = useState({
         startDate: null,
@@ -140,39 +141,81 @@ const SampleSearch = (props) => {
         setDateFilter({...dateFilter, [name]: value})
     }
 
-     const loadLabTestData = useCallback(async () => {
+    const loadLabTestData = useCallback(async () => {
             try {
-                const response = await axios.get(`${url}lims/collected-samples/`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("samples", response);
+                const response = await axios.get(`${url}lims/collected-samples/?searchParam=*&pageNo=${1}&pageSize=${100}`, { headers: {"Authorization" : `Bearer ${token}`} });
+                //console.log("samples", response);
                 setCollectedSamples(response.data);
                 setLoading(false)
                 localStorage.clear();
 
             } catch (e) {
-                toast.error("An error occurred while fetching lab", {
+                toast.error("An error occurred while fetching lab data", {
                     position: toast.POSITION.TOP_RIGHT
                 });
                 setLoading(false)
             }
         }, []);
 
-     const loadManifestData = useCallback(async () => {
+    const loadManifestData = useCallback(async () => {
         try {
-            const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const response = await axios.get(`${url}lims/manifests?searchParam=*&pageNo=0&pageSize=100`, { headers: {"Authorization" : `Bearer ${token}`} });
             let arr = [];
-            response.data.map((x) => {
+            response.data.records.map((x) => {
                 x.sampleInformation.map((y) => {arr.push(y)})
             })
              setManifestData(arr);
             setLoading(false)
 
         } catch (e) {
-            toast.error("An error occurred while fetching lab", {
+            toast.error("An error occurred while fetching manifest data", {
                 position: toast.POSITION.TOP_RIGHT
             });
             setLoading(false)
         }
     }, []);
+
+    const handlePulledData = query =>
+         new Promise((resolve, reject) => {
+              axios.get(`${url}lims/collected-samples/?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                 .then(resp => resp)
+                 .then(result => {
+                     resolve({
+                         data: result.data.records.
+                         filter( row => {
+                            let filterPass = true
+
+                            const date = new Date(row.sampleCollectionDate)
+
+                            if (start_date != null) {
+                              filterPass = filterPass && (new Date(start_date) <= date)
+                            }
+                            if (end_date != null) {
+                              filterPass = filterPass && (new Date(end_date) >= date)
+                            }
+                            return filterPass
+                       }).map((row) => ({
+                   typecode: row.patientID.idTypeCode,
+                   patientId: row.patientID.idNumber,
+                   firstname: row.firstName,
+                   surname: row.surName,
+                   sex: row.sex,
+                   dob: row.dateOfBirth,
+                   age: calculate_age(row.dateOfBirth),
+                   testType: "VL",
+                   sampleId: row.sampleID,
+                   sampleType: row.sampleType,
+                   orderby: row.sampleOrderedBy,
+                   orderbydate: row.sampleOrderDate,
+                   collectedby: row.sampleCollectedBy,
+                   datecollected: row.sampleCollectionDate,
+                   timecollected: row.sampleCollectionTime
+                         })),
+                         page: query.page,
+                         totalCount: result.data.totalRecords
+                     });
+                 })
+         })
 
      useEffect(() => {
      setLoading('true');
@@ -234,7 +277,7 @@ const SampleSearch = (props) => {
               }
              return null;
         })
-        console.log(samples)
+        //console.log(samples)
      }
 
      const sampleFilter = (collectedSamples, manifestData) => {
@@ -248,6 +291,15 @@ const SampleSearch = (props) => {
      }
 
      const values = sampleFilter(collectedSamples, manifestData)
+    const handleChangePage = (page) => {
+          setCurrentPage(page + 1);
+      };
+
+      const localization = {
+          pagination: {
+              labelDisplayedRows: `Page: ${currentPage}`
+          }
+      }
 
   return (
       <div>
@@ -338,37 +390,38 @@ const SampleSearch = (props) => {
 
               ]}
               isLoading={loading}
-              data={ values.filter( row => {
-                   let filterPass = true
-
-                   const date = new Date(row.sampleCollectionDate)
-
-                   if (start_date != null) {
-                     filterPass = filterPass && (new Date(start_date) <= date)
-                   }
-                   if (end_date != null) {
-                     filterPass = filterPass && (new Date(end_date) >= date)
-                   }
-                   return filterPass
-              }).map((row) => (
-                    {
-                      typecode: row.patientID.idTypeCode,
-                      patientId: row.patientID.idNumber,
-                      firstname: row.firstName,
-                      surname: row.surName,
-                      sex: row.sex,
-                      dob: row.dateOfBirth,
-                      age: calculate_age(row.dateOfBirth),
-                      testType: "VL",
-                      sampleId: row.sampleID,
-                      sampleType: row.sampleType,
-                      orderby: row.sampleOrderedBy,
-                      orderbydate: row.sampleOrderDate,
-                      collectedby: row.sampleCollectedBy,
-                      datecollected: row.sampleCollectionDate,
-                      timecollected: row.sampleCollectionTime
-                    })
-              )}
+              data={handlePulledData}
+//              data={ values.filter( row => {
+//                   let filterPass = true
+//
+//                   const date = new Date(row.sampleCollectionDate)
+//
+//                   if (start_date != null) {
+//                     filterPass = filterPass && (new Date(start_date) <= date)
+//                   }
+//                   if (end_date != null) {
+//                     filterPass = filterPass && (new Date(end_date) >= date)
+//                   }
+//                   return filterPass
+//              }).map((row) => (
+//                    {
+//                      typecode: row.patientID.idTypeCode,
+//                      patientId: row.patientID.idNumber,
+//                      firstname: row.firstName,
+//                      surname: row.surName,
+//                      sex: row.sex,
+//                      dob: row.dateOfBirth,
+//                      age: calculate_age(row.dateOfBirth),
+//                      testType: "VL",
+//                      sampleId: row.sampleID,
+//                      sampleType: row.sampleType,
+//                      orderby: row.sampleOrderedBy,
+//                      orderbydate: row.sampleOrderDate,
+//                      collectedby: row.sampleCollectedBy,
+//                      datecollected: row.sampleCollectionDate,
+//                      timecollected: row.sampleCollectionTime
+//                    })
+//              )}
 
                   options={{
                     headerStyle: {
@@ -390,6 +443,9 @@ const SampleSearch = (props) => {
                     debounceInterval: 400
                 }}
                  onSelectionChange={(rows) => handleSampleChanges(rows)}
+                 onChangePage={handleChangePage}
+                 localization={localization}
+
           />
          </Card.Body>
        </Card>

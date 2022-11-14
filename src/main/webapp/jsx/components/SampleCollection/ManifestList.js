@@ -117,114 +117,110 @@ const useStyles = makeStyles(theme => ({
 const DownloadManifest = (props) => {
     const classes = useStyles();
     const [loading, setLoading] = useState('')
-    const [collectedSamples, setCollectedSamples] = useState([])
     const [permissions, setPermissions] = useState([]);
     const [config, setConfig] = useState([]);
+    const [currentPage,setCurrentPage] = useState(1);
+
+   const userPermission =()=>{
+        axios
+            .get(`${url}account`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                //console.log("permission", response.data.permissions)
+                setPermissions(response.data.permissions);
+
+            })
+            .catch((error) => {
+            });
+    }
+
+   const loadConfig = useCallback(async () => {
+        try {
+            const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+            //console.log("configs", response);
+            setConfig(response.data)
+            setLoading(false)
+        } catch (e) {
+            toast.error("An error occurred while fetching config details", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
+    }, []);
 
      useEffect(() => {
-            loadResults();
-            userPermission();
-          }, []);
+         setLoading('true');
+         loadConfig();
+         userPermission();
+     }, []);
 
-       const userPermission =()=>{
-            axios
-                .get(`${url}account`,
-                    { headers: {"Authorization" : `Bearer ${token}`} }
-                )
-                .then((response) => {
-                    //console.log("permission", response.data.permissions)
-                    setPermissions(response.data.permissions);
-
-                })
-                .catch((error) => {
-                });
+      const actionItems = row => {
+           return  [
+               {
+                   name:'View',
+                   type:'link',
+                   icon:<FaEye  size="22"/>,
+                   to:{
+                       pathname: "/print-manifest",
+                       state: { sampleObj: row, permissions:permissions  }
+                   }
+               },
+               {
+                   name:' Results',
+                   type:'link',
+                   icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
+                   to:{
+                       pathname: "/result",
+                       state: { manifestObj: row, permissions:permissions }
+                   }
+               },
+               {
+                   name:'Add RSL Result',
+                   type:'link',
+                   icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
+                   to:{
+                       pathname: "/add-result",
+                       state: { manifestObj: row, permissions:permissions }
+                   }
+               }
+            ]
         }
 
-       const loadResults = useCallback(async () => {
-            try {
-                const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("configs", response);
-                setConfig(response.data)
-                setLoading(false)
-            } catch (e) {
-                toast.error("An error occurred while fetching config details", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-                setLoading(false)
-            }
-        }, []);
+     const handlePulledData = query =>
+         new Promise((resolve, reject) => {
+              axios.get(`${url}lims/manifests?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                     .then(resp => resp)
+                     .then(result => {
+                         resolve({
+                             data: result.data.records.map((row) => ({
+                                 manifestId: row.manifestID,
+                                 pickupDate: row.dateScheduledForPickup.replace('T', ' '),
+                                 createDate: row.createDate.replace('T', ' '),
+                                 lab: row.receivingLabName,
+                                 packaged_by: row.samplePackagedBy,
+                                 samples: row.sampleInformation.length,
+                                 status: row.manifestStatus,
+                                 actions: <>
+                                    <SplitActionButton actions={actionItems(row)} />
+                                 </>
 
-         const loadManifestData = useCallback(async () => {
-            try {
-                const response = await axios.get(`${url}lims/manifests`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("manifest", response);
-                setCollectedSamples(response.data);
-                setLoading(false)
+                             })),
+                             page: query.page,
+                             totalCount: result.data.totalRecords
+                         });
+                     })
+         })
 
-            } catch (e) {
-                toast.error("An error occurred while fetching lab", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-                setLoading(false)
-            }
-        }, []);
+      const handleChangePage = (page) => {
+          setCurrentPage(page + 1);
+      };
 
-         useEffect(() => {
-         setLoading('true');
-
-             loadManifestData();
-
-         }, [loadManifestData]);
-
-     const actionItems = row => {
-          return  [
-          {...(permissions.includes('view_manifest') || permissions.includes("all_permission") &&
-              {
-                  name:'View',
-                  type:'link',
-                  icon:<FaEye  size="22"/>,
-                  to:{
-                      pathname: "/print-manifest",
-                      state: { sampleObj: row, permissions:permissions  }
-                  }
-              }
-          )},
-//              {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
-//                      {
-//                          name:'Print Manifest',
-//                          type:'link',
-//                          icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
-//                          to:{
-//                              pathname: "/print-manifest",
-//                              state: { sampleObj: row, permissions:permissions  }
-//                          }
-//                      }
-//              )},
-
-              {...(permissions.includes('view_result') || permissions.includes("all_permission") &&
-                      {
-                          name:' Results',
-                          type:'link',
-                          icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
-                          to:{
-                              pathname: "/result",
-                              state: { manifestObj: row, permissions:permissions }
-                          }
-                      }
-                  )},
-              {...(permissions.includes('add_result') || permissions.includes("all_permission") &&
-                      {
-                          name:'Add RSL Result',
-                          type:'link',
-                          icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
-                          to:{
-                              pathname: "/add-result",
-                              state: { manifestObj: row, permissions:permissions }
-                          }
-                      }
-                  )}
-           ]
-       }
+      const localization = {
+          pagination: {
+              labelDisplayedRows: `Page: ${currentPage}`
+          }
+      }
 
   return (
     <>
@@ -236,21 +232,6 @@ const DownloadManifest = (props) => {
                   Kindly set the LIMS server configurations
                 </Alert>
            }
-           {/*<Stack direction="row" spacing={2}
-           m={1}
-           display="flex"
-           justifyContent="flex-end"
-           alignItems="flex-end">
-                <Link color="inherit"
-                    to={{pathname: "/create-manifest"}}
-                     >
-                    <Button variant="outlined" color="primary">
-                       Create Manifest
-                    </Button>
-                </Link>
-
-            </Stack>
-           <br />*/}
        </div>
        <div>
               <MaterialTable
@@ -261,57 +242,35 @@ const DownloadManifest = (props) => {
                       { title: "Pickup Date", field: "pickupDate" },
                       { title: "Created Date", field: "createDate" },
                       { title: "Receiving Lab", field: "lab" },
-                       { title: "Packaged By", field: "packaged_by" },
-                       { title: "Total Samples", field: "samples" },
-                      {
-                        title: "Status",
-                        field: "status",
-                      },
-                      {
-                        title: "Action",
-                        field: "actions",
-                        filtering: false,
-                      },
+                      { title: "Packaged By", field: "packaged_by" },
+                      { title: "Total Samples", field: "samples" },
+                      { title: "Status", field: "status" },
+                      { title: "Action", field: "actions" },
                   ]}
                   isLoading={loading}
-                  data={ collectedSamples.map((row) => (
-                        {
-                          manifestId: row.manifestID,
-                          pickupDate: row.dateScheduledForPickup.replace('T', ' '),
-                          createDate: row.createDate.replace('T', ' '),
-                          lab: row.receivingLabName,
-                          packaged_by: row.samplePackagedBy,
-                          samples: row.sampleInformation.length,
-                          status: row.manifestStatus,
+                  data={ handlePulledData }
 
-                          actions:
-                            <div>
-                                { config.length !== 0 ?
-                               <SplitActionButton actions={actionItems(row)} />
-                               : " "}
-                            </div>
-
-                        }))}
-
-                      options={{
-                        headerStyle: {
-                            backgroundColor: "#014d88",
-                            color: "#fff",
-                            fontSize:'16px',
-                            padding:'10px'
-                        },
-                        searchFieldStyle: {
-                            width : '200%',
-                            margingLeft: '250px',
-                        },
-                        selection: false,
-                        filtering: false,
-                        exportButton: false,
-                        searchFieldAlignment: 'left',
-                        pageSizeOptions:[10,20,100],
-                        pageSize:10,
-                        debounceInterval: 400
-                    }}
+                  options={{
+                    headerStyle: {
+                        backgroundColor: "#014d88",
+                        color: "#fff",
+                        fontSize:'16px',
+                        padding:'10px'
+                    },
+                    searchFieldStyle: {
+                        width : '200%',
+                        margingLeft: '250px',
+                    },
+                    selection: false,
+                    filtering: false,
+                    exportButton: false,
+                    searchFieldAlignment: 'left',
+                    pageSizeOptions:[10,20,100],
+                    pageSize:10,
+                    debounceInterval: 400
+                }}
+                onChangePage={handleChangePage}
+                localization={localization}
 
               />
        </div>

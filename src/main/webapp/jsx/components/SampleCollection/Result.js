@@ -124,7 +124,7 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    //console.log("maniObj",manifestObj)
+    console.log("maniObj",manifestObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
 
     const classes = useStyles();
@@ -169,7 +169,7 @@ const Result = (props) => {
     }
 
     const reload = e => {
-        console.log("reload results");
+        //console.log("reload results");
         loadResults();
     }
 
