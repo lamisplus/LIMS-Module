@@ -86,7 +86,7 @@ const useStyles = makeStyles(theme => ({
 const PrintManifest = (props) => {
     let history = useHistory();
     const sampleObj = history.location && history.location.state ? history.location.state.sampleObj : {}
-    console.log("props",sampleObj)
+    //console.log("props",sampleObj)
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
