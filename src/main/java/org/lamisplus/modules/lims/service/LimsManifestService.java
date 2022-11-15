@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.jar.Manifest;
 
@@ -141,7 +142,8 @@ public class LimsManifestService {
     }
 
     private String GenerateManifestID(String FacilityCode){
-        return FacilityCode +"-"+ LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HHmmss");
+        return FacilityCode +"/"+ LocalDateTime.now().format(formatter);
     }
 
     private void LogInfo(String title, Object object) {
