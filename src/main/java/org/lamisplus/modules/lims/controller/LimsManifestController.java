@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.LIMSManifestResponseDTO;
 import org.lamisplus.modules.lims.domain.dto.LIMSResultsResponseDTO;
 import org.lamisplus.modules.lims.domain.dto.ManifestDTO;
+import org.lamisplus.modules.lims.domain.dto.ManifestListMetaDataDTO;
 import org.lamisplus.modules.lims.service.LimsManifestService;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +40,10 @@ public class LimsManifestController {
     }
 
     @GetMapping("/manifests")
-    public List<ManifestDTO> GetAllManifests(){
-        return limsManifestService.findAllManifests();
+    public ManifestListMetaDataDTO GetAllManifests(@RequestParam(defaultValue = "*") String searchParam,
+                                                   @RequestParam(defaultValue = "0") Integer pageNo,
+                                                   @RequestParam(defaultValue = "10") Integer pageSize){
+        return limsManifestService.findAllManifests(searchParam, pageNo, pageSize);
     }
 
     @GetMapping("/ready-manifests/{id}/{configId}")
