@@ -79,7 +79,7 @@ public class LimsSampleService {
             return labSampleMetaDataDTO;
         }
 
-        return null;
+        return new LABSampleMetaDataDTO();
     }
 
     public PageDTO generatePagination(Page page) {

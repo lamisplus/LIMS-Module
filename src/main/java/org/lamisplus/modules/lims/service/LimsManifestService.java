@@ -126,7 +126,7 @@ public class LimsManifestService {
             return manifestListMetaDataDTO;
         }
 
-        return null;
+        return new ManifestListMetaDataDTO();
     }
 
     public PageDTO generatePagination(Page page) {
