@@ -155,7 +155,7 @@ const DownloadManifest = (props) => {
          userPermission();
      }, []);
 
-      const actionItems = row => {
+     const actionItems = row => {
            return  [
                {
                    name:'View',
@@ -212,9 +212,9 @@ const DownloadManifest = (props) => {
                      })
          })
 
-      const handleChangePage = (page) => {
-          setCurrentPage(page + 1);
-      };
+     const handleChangePage = (page) => {
+         setCurrentPage(page + 1);
+     };
 
       const localization = {
           pagination: {
@@ -271,7 +271,6 @@ const DownloadManifest = (props) => {
                 }}
                 onChangePage={handleChangePage}
                 localization={localization}
-
               />
        </div>
     </>

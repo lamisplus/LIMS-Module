@@ -5,7 +5,7 @@ import { Row, Col, Card, Table } from "react-bootstrap";
 import MaterialTable from 'material-table';
 import MatButton from '@material-ui/core/Button';
 import HomeIcon from '@mui/icons-material/Home';
-import { Badge, Spinner } from 'reactstrap';
+import { Badge, Spinner, Label, Input, FormGroup } from 'reactstrap';
 import Alert from 'react-bootstrap/Alert';
 import AddResultModal from './AddResultModal';
 
@@ -124,12 +124,14 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    console.log("maniObj",manifestObj)
+    //console.log("maniObj",manifestObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
 
     const classes = useStyles();
     const [loading, setLoading] = useState(true)
     const [results, setResults] = useState([])
+    const [logins, setLogins] = useState([])
+    const [configId, setConfigId] = useState(1);
 
     const [open, setOpen] = useState(false)
 
@@ -138,6 +140,20 @@ const Result = (props) => {
     const toggleModal = () => setOpen(!open)
 
     const componentRef = useRef();
+
+    const loadConfigs = useCallback(async () => {
+            try {
+                const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+                //console.log("configs", response);
+                setLogins(response.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error("An error occurred while fetching config details", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+                setLoading(false)
+            }
+        }, []);
 
     const loadResults = useCallback(async () => {
         try {
@@ -154,11 +170,28 @@ const Result = (props) => {
         }
     }, []);
 
+    const getPCResults = useCallback(async () => {
+          try {
+              const configId = localStorage.getItem('configId');
+              console.log(configId)
+              const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(configId)}`, { headers: {"Authorization" : `Bearer ${token}`} });
+              console.log("manifest results", response.data);
+              //setResults(response.data.results);
+              setLoading(false)
+
+          } catch (e) {
+              toast.error("An error occurred while getting manifest results", {
+                  position: toast.POSITION.TOP_RIGHT
+              });
+              setLoading(false)
+          }
+      }, []);
+
     useEffect(() => {
         loadResults()
+        loadConfigs()
+        //getPCResults()
     }, [loadResults]);
-
-
 
     const resultTestType = e => {
         if(parseInt(e)===2){
@@ -176,6 +209,28 @@ const Result = (props) => {
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
       });
+
+     const handleChange = async (event) => {
+           const { name, value } = event.target
+           setConfigId(parseInt(value));
+
+           try {
+                 const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(value)}`, { headers: {"Authorization" : `Bearer ${token}`} });
+                 console.log("manifest results", response.data);
+
+                 if (response.data.viralLoadTestReport !== null) {
+                    setResults(response.data.viralLoadTestReport);
+                 }
+
+                 setLoading(false)
+
+             } catch (e) {
+                 toast.error("An error occurred while getting manifest results", {
+                     position: toast.POSITION.TOP_RIGHT
+                 });
+                 setLoading(false)
+             }
+     }
 
   return (
     <div>
@@ -224,6 +279,31 @@ const Result = (props) => {
               </Link>
 
              </p>
+              <Row>
+               <Col>
+                  <FormGroup>
+                     <Label for="configName" className={classes.label}>Configuration Setting</Label>
+                     <Input
+                         type="select"
+                         name="config"
+                         id="config"
+                         className={classes.input}
+                         onChange={handleChange}
+                     >
+                      <option hidden>
+                          Which server are you pulling sample results from?
+                      </option>
+                      { logins && logins.map((data, i) => (
+                          <option key={i} value={data.id}>
+                              {data.configName}
+                          </option>
+                      ))}
+                     </Input>
+                 </FormGroup>
+              </Col>
+              <Col>
+              </Col>
+              </Row>
              <hr />
               {
 
