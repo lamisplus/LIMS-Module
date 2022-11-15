@@ -144,8 +144,8 @@ const SampleSearch = (props) => {
     const loadLabTestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/collected-samples/?searchParam=*&pageNo=${1}&pageSize=${100}`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("samples", response);
-                setCollectedSamples(response.data);
+                console.log("samples", response);
+                setCollectedSamples(response.data.records);
                 setLoading(false)
                 localStorage.clear();
 
@@ -160,6 +160,7 @@ const SampleSearch = (props) => {
     const loadManifestData = useCallback(async () => {
         try {
             const response = await axios.get(`${url}lims/manifests?searchParam=*&pageNo=0&pageSize=100`, { headers: {"Authorization" : `Bearer ${token}`} });
+            console.log(response);
             let arr = [];
             response.data.records.map((x) => {
                 x.sampleInformation.map((y) => {arr.push(y)})
@@ -239,7 +240,7 @@ const SampleSearch = (props) => {
            };
 
      const handleSampleChanges = (sample) => {
-        //console.log("sample clicked", sample);
+        console.log("sample clicked", sample);
         sample.filter((item) => {
             var i = samples.findIndex(x => (x.sampleId !== item.sampleId && x.sampleType === item.sampleType));
 
@@ -290,7 +291,7 @@ const SampleSearch = (props) => {
         }
      }
 
-     const values = sampleFilter(collectedSamples, manifestData)
+    const values = sampleFilter(collectedSamples, manifestData)
     const handleChangePage = (page) => {
           setCurrentPage(page + 1);
       };
