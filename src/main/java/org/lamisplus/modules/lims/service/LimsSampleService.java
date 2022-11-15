@@ -4,14 +4,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.lims.domain.dto.LABSampleDTO;
-import org.lamisplus.modules.lims.domain.dto.PatientIdDTO;
+import org.jetbrains.annotations.Nullable;
+import org.lamisplus.modules.base.domain.dto.PageDTO;
+import org.lamisplus.modules.lims.domain.dto.*;
+import org.lamisplus.modules.lims.domain.entity.LIMSManifest;
 import org.lamisplus.modules.lims.domain.entity.LIMSSample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
 import org.lamisplus.modules.lims.repository.LimsSampleRepository;
 import org.lamisplus.modules.lims.util.JsonNodeTransformer;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
 import org.lamisplus.modules.patient.service.PersonService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -51,8 +57,40 @@ public class LimsSampleService {
         return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findAllByManifestRecordID(id)));
     }
 
-    public List<LABSampleDTO> getAllPendingSamples() {
-        return AppendPatientDetails(limsMapper.toSampleDtoList(sampleRepository.findPendingVLSamples()));
+    public LABSampleMetaDataDTO getAllPendingSamples(String searchParam, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+
+        Page<LIMSSample> limsSamples = sampleRepository.findPendingVLSamples(paging);
+        return getManifestListMetaDataDto(limsSamples);
+    }
+
+    @Nullable
+    private LABSampleMetaDataDTO getManifestListMetaDataDto(Page<LIMSSample> samples) {
+        List<LABSampleDTO> sampleDTOS = limsMapper.toSampleDtoList(samples.getContent());
+
+        if (samples.hasContent()) {
+            PageDTO pageDTO = this.generatePagination(samples);
+            LABSampleMetaDataDTO labSampleMetaDataDTO = new LABSampleMetaDataDTO();
+            labSampleMetaDataDTO.setTotalRecords(pageDTO.getTotalRecords());
+            labSampleMetaDataDTO.setPageSize(pageDTO.getPageSize());
+            labSampleMetaDataDTO.setTotalPages(pageDTO.getTotalPages());
+            labSampleMetaDataDTO.setCurrentPage(pageDTO.getPageNumber());
+            labSampleMetaDataDTO.setRecords(AppendPatientDetails(sampleDTOS));
+            return labSampleMetaDataDTO;
+        }
+
+        return new LABSampleMetaDataDTO();
+    }
+
+    public PageDTO generatePagination(Page page) {
+        long totalRecords = page.getTotalElements();
+        int pageNumber = page.getNumber();
+        int pageSize = page.getSize();
+        int totalPages = page.getTotalPages();
+        return PageDTO.builder().totalRecords(totalRecords)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalPages(totalPages).build();
     }
 
     public List<LABSampleDTO> AppendPatientDetails(List<LABSampleDTO> sampleDTOS) {

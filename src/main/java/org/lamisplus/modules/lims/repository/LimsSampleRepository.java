@@ -1,6 +1,9 @@
 package org.lamisplus.modules.lims.repository;
 
+import org.lamisplus.modules.lims.domain.dto.LABSampleDTO;
 import org.lamisplus.modules.lims.domain.entity.LIMSSample;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -41,5 +44,5 @@ public interface LimsSampleRepository extends JpaRepository<LIMSSample, Integer>
             "left join base_application_codeset f on b.viral_load_indication = e.id\n" +
             "where d.lab_test_name='Viral Load'\n" +
             "and b.lab_test_order_status in (1,2,3) ", nativeQuery = true)
-    List<LIMSSample> findPendingVLSamples();
+    Page<LIMSSample> findPendingVLSamples(Pageable pageable);
 }

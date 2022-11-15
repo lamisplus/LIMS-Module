@@ -3,6 +3,7 @@ package org.lamisplus.modules.lims.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.LABSampleDTO;
+import org.lamisplus.modules.lims.domain.dto.LABSampleMetaDataDTO;
 import org.lamisplus.modules.lims.service.LimsSampleService;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +42,9 @@ public class LimsSampleController {
     }
 
     @GetMapping("/collected-samples/")
-    public List<LABSampleDTO> GetAllCollectedSamples() {
-        return limsSampleService.getAllPendingSamples();
+    public LABSampleMetaDataDTO GetAllCollectedSamples(@RequestParam(defaultValue = "*") String searchParam,
+                                                       @RequestParam(defaultValue = "0") Integer pageNo,
+                                                       @RequestParam(defaultValue = "10") Integer pageSize) {
+        return limsSampleService.getAllPendingSamples(searchParam, pageNo, pageSize);
     }
 }
