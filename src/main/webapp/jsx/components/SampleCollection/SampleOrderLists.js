@@ -160,11 +160,15 @@ const SampleSearch = (props) => {
     const loadManifestData = useCallback(async () => {
         try {
             const response = await axios.get(`${url}lims/manifests?searchParam=*&pageNo=0&pageSize=100`, { headers: {"Authorization" : `Bearer ${token}`} });
-            console.log(response);
+            console.log("manifest",response);
             let arr = [];
-            response.data.records.map((x) => {
-                x.sampleInformation.map((y) => {arr.push(y)})
-            })
+            if (response.data.records === null) {
+
+            }else {
+                response.data.records.map((x) => {
+                    x.sampleInformation.map((y) => {arr.push(y)})
+                })
+            }
              setManifestData(arr);
             setLoading(false)
 
@@ -181,41 +185,49 @@ const SampleSearch = (props) => {
               axios.get(`${url}lims/collected-samples/?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`, { headers: {"Authorization" : `Bearer ${token}`} })
                  .then(resp => resp)
                  .then(result => {
-                     resolve({
-                         data: result.data.records.
-                         filter( row => {
-                            let filterPass = true
+                 if (result.data.records === null) {
+                      resolve({
+                          data: [],
+                          page: 0,
+                          totalCount: 0
+                      })
+                  }else {
+                    resolve({
+                      data: result.data.records.
+                      filter( row => {
+                         let filterPass = true
 
-                            const date = new Date(row.sampleCollectionDate)
+                         const date = new Date(row.sampleCollectionDate)
 
-                            if (start_date != null) {
-                              filterPass = filterPass && (new Date(start_date) <= date)
-                            }
-                            if (end_date != null) {
-                              filterPass = filterPass && (new Date(end_date) >= date)
-                            }
-                            return filterPass
-                       }).map((row) => ({
-                   typecode: row.patientID.idTypeCode,
-                   patientId: row.patientID.idNumber,
-                   firstname: row.firstName,
-                   surname: row.surName,
-                   sex: row.sex,
-                   dob: row.dateOfBirth,
-                   age: calculate_age(row.dateOfBirth),
-                   testType: "VL",
-                   sampleId: row.sampleID,
-                   sampleType: row.sampleType,
-                   orderby: row.sampleOrderedBy,
-                   orderbydate: row.sampleOrderDate,
-                   collectedby: row.sampleCollectedBy,
-                   datecollected: row.sampleCollectionDate,
-                   timecollected: row.sampleCollectionTime
-                         })),
-                         page: query.page,
-                         totalCount: result.data.totalRecords
-                     });
-                 })
+                         if (start_date != null) {
+                           filterPass = filterPass && (new Date(start_date) <= date)
+                         }
+                         if (end_date != null) {
+                           filterPass = filterPass && (new Date(end_date) >= date)
+                         }
+                         return filterPass
+                    }).map((row) => ({
+                        typecode: row.patientID.idTypeCode,
+                        patientId: row.patientID.idNumber,
+                        firstname: row.firstName,
+                        surname: row.surName,
+                        sex: row.sex,
+                        dob: row.dateOfBirth,
+                        age: calculate_age(row.dateOfBirth),
+                        testType: "VL",
+                        sampleId: row.sampleID,
+                        sampleType: row.sampleType,
+                        orderby: row.sampleOrderedBy,
+                        orderbydate: row.sampleOrderDate,
+                        collectedby: row.sampleCollectedBy,
+                        datecollected: row.sampleCollectionDate,
+                        timecollected: row.sampleCollectionTime
+                      })),
+                      page: query.page,
+                      totalCount: result.data.totalRecords
+                  })
+                  }
+              })
          })
 
      useEffect(() => {

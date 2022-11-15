@@ -192,6 +192,14 @@ const DownloadManifest = (props) => {
               axios.get(`${url}lims/manifests?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`, { headers: {"Authorization" : `Bearer ${token}`} })
                      .then(resp => resp)
                      .then(result => {
+
+                     if (result.data.records === null) {
+                         resolve({
+                             data: [],
+                             page: 0,
+                             totalCount: 0
+                         })
+                     }else {
                          resolve({
                              data: result.data.records.map((row) => ({
                                  manifestId: row.manifestID,
@@ -209,7 +217,8 @@ const DownloadManifest = (props) => {
                              page: query.page,
                              totalCount: result.data.totalRecords
                          });
-                     })
+                     }
+                 })
          })
 
      const handleChangePage = (page) => {
