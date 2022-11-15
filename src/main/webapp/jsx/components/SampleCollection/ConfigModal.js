@@ -122,13 +122,11 @@ const ConfigModal = (props) => {
        const { name, value } = event.target
        setConfigId(parseInt(value));
        setSaved(true);
-       //setConfig({ ...config, [name]: value})
-       //console.log("config",config)
-     }
+    }
 
     const saveSample = async (e) => {
         e.preventDefault();
-         console.log(configId)
+         //console.log(configId)
          setSaved(true);
     };
 
@@ -136,9 +134,12 @@ const ConfigModal = (props) => {
         e.preventDefault()
         console.log(configId)
         //for now
-        toast.success("Sample manifest sent to PCR Lab.", {
+        toast.success("Sample manifest sending....", {
             position: toast.POSITION.TOP_RIGHT
         });
+
+        localStorage.setItem('configId', JSON.stringify(configId));
+
         props.togglestatus();
          await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
             .then((resp) => {
@@ -147,20 +148,6 @@ const ConfigModal = (props) => {
                 toast.success("Sample manifest sent successfully to PCR Lab.", {
                     position: toast.POSITION.TOP_RIGHT
                 });
-
-//                if (resp.data.errors.length > 0) {
-//                    toast.error(resp.data.errors[0].reasons, {
-//                        position: toast.POSITION.TOP_RIGHT
-//                     });
-//                     setSend(true)
-//                }
-//                else {
-//                     toast.success("Sample manifest sent successfully to PCR Lab.", {
-//                        position: toast.POSITION.TOP_RIGHT
-//                    });
-//                    setSend(true)
-//                    setStatus("Manifest Sent");
-//                }
             })
     }
 
