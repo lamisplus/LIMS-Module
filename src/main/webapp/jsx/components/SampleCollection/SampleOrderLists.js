@@ -132,6 +132,7 @@ const SampleSearch = (props) => {
     })
 
     const [value, setValue] = React.useState([null, null]);
+    //console.log("value",value)
 
      let start_date = value[0] != null ? value[0].$d : null;
      let end_date = value[1] != null ? value[1].$d : null;
@@ -144,7 +145,7 @@ const SampleSearch = (props) => {
     const loadLabTestData = useCallback(async () => {
             try {
                 const response = await axios.get(`${url}lims/collected-samples/?searchParam=*&pageNo=${1}&pageSize=${100}`, { headers: {"Authorization" : `Bearer ${token}`} });
-                console.log("samples", response);
+                //console.log("samples", response);
                 setCollectedSamples(response.data.records);
                 setLoading(false)
                 localStorage.clear();
@@ -180,6 +181,8 @@ const SampleSearch = (props) => {
         }
     }, []);
 
+    //console.log("outside", start_date, end_date);
+
     const handlePulledData = query =>
          new Promise((resolve, reject) => {
               axios.get(`${url}lims/collected-samples/?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`, { headers: {"Authorization" : `Bearer ${token}`} })
@@ -198,7 +201,7 @@ const SampleSearch = (props) => {
                          let filterPass = true
 
                          const date = new Date(row.sampleCollectionDate)
-
+                         //console.log("inside",start_date, end_date);
                          if (start_date != null) {
                            filterPass = filterPass && (new Date(start_date) <= date)
                          }

@@ -124,7 +124,7 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    //console.log("maniObj",manifestObj)
+    console.log("maniObjx",manifestObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
 
     const classes = useStyles();
@@ -142,18 +142,18 @@ const Result = (props) => {
     const componentRef = useRef();
 
     const loadConfigs = useCallback(async () => {
-            try {
-                const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
-                //console.log("configs", response);
-                setLogins(response.data)
-                setLoading(false)
-            } catch (e) {
-                toast.error("An error occurred while fetching config details", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-                setLoading(false)
-            }
-        }, []);
+        try {
+            const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+            //console.log("configs", response);
+            setLogins(response.data)
+            setLoading(false)
+        } catch (e) {
+            toast.error("An error occurred while fetching config details", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
+    }, []);
 
     const loadResults = useCallback(async () => {
         try {
@@ -163,17 +163,12 @@ const Result = (props) => {
             setLoading(false)
 
         } catch (e) {
-//            toast.error("An error occurred while getting manifest results", {
-//                position: toast.POSITION.TOP_RIGHT
-//            });
             setLoading(false)
         }
     }, []);
 
     const getPCResults = useCallback(async () => {
           try {
-              const configId = localStorage.getItem('configId');
-              console.log(configId)
               const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(configId)}`, { headers: {"Authorization" : `Bearer ${token}`} });
               console.log("manifest results", response.data);
               //setResults(response.data.results);
@@ -202,7 +197,6 @@ const Result = (props) => {
     }
 
     const reload = e => {
-        //console.log("reload results");
         loadResults();
     }
 
@@ -212,15 +206,19 @@ const Result = (props) => {
 
      const handleChange = async (event) => {
            const { name, value } = event.target
-           setConfigId(parseInt(value));
-
            try {
-                 const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(value)}`, { headers: {"Authorization" : `Bearer ${token}`} });
-                 console.log("manifest results", response.data);
-
-                 if (response.data.viralLoadTestReport !== null) {
-                    setResults(response.data.viralLoadTestReport);
-                 }
+                if (manifestObj.id !== 0) {
+                     const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(value)}`, { headers: {"Authorization" : `Bearer ${token}`} });
+                     console.log("manifest results", response.data);
+                     // saved to db
+                     if (response.data.viralLoadTestReport !== null) {
+                        setResults(response.data.viralLoadTestReport);
+                     }
+                }else {
+                    toast.success("Sample results are currently been processed, check back in a bit", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                }
 
                  setLoading(false)
 

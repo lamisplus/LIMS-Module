@@ -166,24 +166,28 @@ const DownloadManifest = (props) => {
                        state: { sampleObj: row, permissions:permissions  }
                    }
                },
-               {
-                   name:' Results',
-                   type:'link',
-                   icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
-                   to:{
-                       pathname: "/result",
-                       state: { manifestObj: row, permissions:permissions }
+               {...( row.manifestStatus === "Ready" ? " " :
+                   {
+                       name:' Results',
+                       type:'link',
+                       icon:<FaEye size="20" color='rgb(4, 196, 217)' />,
+                       to:{
+                           pathname: "/result",
+                           state: { manifestObj: row, permissions:permissions }
+                       }
                    }
-               },
-               {
-                   name:'Add RSL Result',
-                   type:'link',
-                   icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
-                   to:{
-                       pathname: "/add-result",
-                       state: { manifestObj: row, permissions:permissions }
+               )},
+               {...( row.manifestStatus === "Ready" ? " " :
+                   {
+                       name:'Add RSL Result',
+                       type:'link',
+                       icon:<MdModeEdit size="20" color='rgb(4, 196, 217)'  />,
+                       to:{
+                           pathname: "/add-result",
+                           state: { manifestObj: row, permissions:permissions }
+                       }
                    }
-               }
+               )}
             ]
         }
 
@@ -208,7 +212,7 @@ const DownloadManifest = (props) => {
                                  lab: row.receivingLabName,
                                  packaged_by: row.samplePackagedBy,
                                  samples: row.sampleInformation.length,
-                                 status: row.manifestStatus,
+                                 status: row.manifestStatus === "Ready" ? "Not Submitted" : row.manifestStatus,
                                  actions: <>
                                     <SplitActionButton actions={actionItems(row)} />
                                  </>

@@ -205,6 +205,7 @@ const CreateAManifest = (props) => {
                          <Label for="dateScheduledForPickup" className={classes.label}>Date & Time *</Label>
                          <Input
                              type="datetime-local"
+                             max={new Date().toISOString().substr(0, 16)}
                              name="dateScheduledForPickup"
                              id="dateScheduledForPickup"
                              placeholder="Date & Time Created"
@@ -349,7 +350,7 @@ const CreateAManifest = (props) => {
 
                     </FormGroup></Col>
                       <Col><FormGroup>
-                           <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup</Label>
+                           <Label for="temperatureAtPickup" className={classes.label}>Temperature at pickup (°C)</Label>
                            <Input
                                type="number"
                                name="temperatureAtPickup"

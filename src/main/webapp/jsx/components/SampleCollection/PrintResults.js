@@ -79,21 +79,21 @@ class PrintResults extends React.Component {
                               </tr>
                               {
                               //<p> <Spinner color="primary" /> Loading Please Wait</p>
-                              results.length  === 0 ?
+                              results.length  === 0 ? " "
 
-                               manifestObj.sampleInformation.map((result) => (
-                                        <tr>
-                                          <td scope="row">{result.sampleID}</td>
-                                          <td>-- -- --</td>
-                                          <td>-- -- --</td>
-                                          <td>-- -- --</td>
-                                          <td>{sampleStatus(result.sampleStatus)}</td>
-                                          <td>true</td>
-                                          <td>-- -- --</td>
-
-                                       </tr>
-
-                                  ))
+//                               manifestObj.sampleInformation.map((result) => (
+//                                        <tr>
+//                                          <td scope="row">{result.sampleID}</td>
+//                                          <td>-- -- --</td>
+//                                          <td>-- -- --</td>
+//                                          <td>-- -- --</td>
+//                                          <td>{sampleStatus(result.sampleStatus)}</td>
+//                                          <td>true</td>
+//                                          <td>-- -- --</td>
+//
+//                                       </tr>
+//
+//                                  ))
                                 :
                                 results.length !== 0  ? results.map((result) => (
                                     <tr>
@@ -115,7 +115,8 @@ class PrintResults extends React.Component {
 
                      </tbody>
                    </Table>
-                   { results.length === 0  ? <p> <Spinner color="primary" /> Please Wait, Syncing with LIMS server... </p> : " "}
+                   { results.length === 0  ? <p> <Spinner color="primary" /> Please Wait, Syncing with LIMS server... </p> : " " }
+                   <br />
                    <span>LAMISPlus 2.0: {today}</span>
                  </Row>
                  <hr />
