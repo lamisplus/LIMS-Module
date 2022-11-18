@@ -8,7 +8,7 @@ import { MdDashboard, MdDeleteForever, MdModeEdit, MdPerson } from "react-icons/
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import { alpha } from '@material-ui/core/styles'
 import SplitActionButton from './SplitActionButton';
-import Alert from 'react-bootstrap/Alert';
+
 
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
@@ -212,6 +212,7 @@ const DownloadManifest = (props) => {
                                  lab: row.receivingLabName,
                                  packaged_by: row.samplePackagedBy,
                                  samples: row.sampleInformation.length,
+                                 results: row.results !== null ? row.results : 0,
                                  status: row.manifestStatus === "Ready" ? "Not Submitted" : row.manifestStatus,
                                  actions: <>
                                     <SplitActionButton actions={actionItems(row)} />
@@ -238,15 +239,6 @@ const DownloadManifest = (props) => {
   return (
     <>
        <div>
-           { config.length !== 0 ?
-                " "
-                :
-                <Alert variant='danger'>
-                  Kindly set the LIMS server configurations
-                </Alert>
-           }
-       </div>
-       <div>
               <MaterialTable
                icons={tableIcons}
                   title="Previous Manifests"
@@ -257,6 +249,7 @@ const DownloadManifest = (props) => {
                       { title: "Receiving Lab", field: "lab" },
                       { title: "Packaged By", field: "packaged_by" },
                       { title: "Total Samples", field: "samples" },
+                      { title: "Total Results", field: "results" },
                       { title: "Status", field: "status" },
                       { title: "Action", field: "actions" },
                   ]}

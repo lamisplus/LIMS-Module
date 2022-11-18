@@ -100,7 +100,7 @@ const ConfigModal = (props) => {
 
     const [configId, setConfigId] = useState(0);
 
-    const loadResults = useCallback(async () => {
+    const loadConfig = useCallback(async () => {
         try {
             const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
             //console.log("configs", response);
@@ -115,8 +115,8 @@ const ConfigModal = (props) => {
     }, []);
 
     useEffect(() => {
-        loadResults()
-    }, [loadResults]);
+        loadConfig()
+    }, [loadConfig]);
 
     const handleChange = (event) => {
        const { name, value } = event.target
@@ -132,23 +132,40 @@ const ConfigModal = (props) => {
 
     const sendManifest = async (e) => {
         e.preventDefault()
-        console.log(configId)
-        //for now
-        toast.success("Sample manifest sending....", {
-            position: toast.POSITION.TOP_RIGHT
-        });
 
+        props.handleProgress(20);
         localStorage.setItem('configId', JSON.stringify(configId));
-
         props.togglestatus();
-         await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
-            .then((resp) => {
-                console.log("sending manifest", resp)
-                //setSend(true)
-                toast.success("Sample manifest sent successfully to PCR Lab.", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-            })
+         try{
+            props.handleProgress(50);
+             await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                .then((resp) => {
+                    props.handleProgress(70);
+
+                    if (resp) {
+                        console.log("sending manifest", resp)
+                        props.handleProgress(100);
+                    }
+                    console.log("sending manifest", resp)
+                    props.handleProgress(100);
+                    toast.success("Sample manifest sent successfully to PCR Lab.", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                }).catch(err => {
+                     props.handleProgress(10);
+                     toast.error("Error encountered while sending manifest", {
+                        position: toast.POSITION.TOP_RIGHT
+                     });
+                     props.handleProgress(0);
+                     props.handleFailure(true);
+                })
+         }catch(err) {
+            props.handleProgress(10);
+            toast.error("Error encountered while sending manifest", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            props.handleFailure(true);
+         }
     }
 
     return (

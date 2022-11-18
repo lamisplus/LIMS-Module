@@ -15,10 +15,22 @@ import {token, url } from "../../../api";
 function SampleCollection() {
 const [activeStep, setActiveStep] = React.useState(0)
 const [permissions, setPermissions] = useState([]);
+const [config, setConfig] = useState([]);
 
- useEffect(() => {
-            userPermission();
-          }, []);
+const loadConfig = useCallback(async () => {
+        try {
+            const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+            //console.log("configs", response);
+            setConfig(response.data)
+        } catch (e) {
+            console.log(e)
+        }
+    }, []);
+
+      useEffect(() => {
+        userPermission();
+        loadConfig();
+      }, []);
 
         const userPermission =()=>{
             axios
@@ -85,7 +97,7 @@ return(
                            >Previous Step</Button>
                            {" "}
                            <Button variant="outlined" color="primary" onClick={() => nextStep()}
-                           disabled={activeStep == 2 ? true : false}>Next Step</Button>
+                           disabled={config.length === 0 ? true : false || activeStep == 2 ? true : false}>Next Step</Button>
                     </Stack> : " " }
         </>
     </div>

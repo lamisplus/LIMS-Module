@@ -10,6 +10,7 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import {format} from "date-fns";
+import Alert from 'react-bootstrap/Alert';
 
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -41,6 +42,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import { makeStyles } from '@material-ui/core/styles'
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const tableIcons = {
 Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -125,14 +127,15 @@ const SampleSearch = (props) => {
     const [collectedSamples, setCollectedSamples] = useState([])
     const [manifestData, setManifestData] = useState([])
     const [currentPage,setCurrentPage] = useState(1);
+    const tableRef = React.createRef();
+    const [config, setConfig] = useState([]);
+    const [value, setValue] = React.useState([null, null]);
+
     let samples = [];
     const [ dateFilter, setDateFilter] = useState({
         startDate: null,
         endDate: null
     })
-
-    const [value, setValue] = React.useState([null, null]);
-    //console.log("value",value)
 
      let start_date = value[0] != null ? value[0].$d : null;
      let end_date = value[1] != null ? value[1].$d : null;
@@ -142,16 +145,36 @@ const SampleSearch = (props) => {
         setDateFilter({...dateFilter, [name]: value})
     }
 
+    const loadConfig = useCallback(async () => {
+        try {
+            const response = await axios.get(`${url}lims/configs`, { headers: {"Authorization" : `Bearer ${token}`} });
+            //console.log("configs", response);
+            setConfig(response.data)
+            setLoading(false)
+        } catch (e) {
+            toast.error("An error occurred while fetching config details", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setLoading(false)
+        }
+    }, []);
+
     const loadLabTestData = useCallback(async () => {
             try {
-                const response = await axios.get(`${url}lims/collected-samples/?searchParam=*&pageNo=${1}&pageSize=${100}`, { headers: {"Authorization" : `Bearer ${token}`} });
+                const response = await axios.get(`${url}lims/collected-samples/?searchParam=*&pageNo=0&pageSize=100`, { headers: {"Authorization" : `Bearer ${token}`} });
                 //console.log("samples", response);
-                setCollectedSamples(response.data.records);
-                setLoading(false)
-                localStorage.clear();
+                 if (response.data.records === null) {
+
+                 }else{
+                    setCollectedSamples(response.data.records);
+                    setLoading(false)
+                 }
+
+                localStorage.removeItem('samples');
+                localStorage.removeItem('manifest');
 
             } catch (e) {
-                toast.error("An error occurred while fetching lab data", {
+                toast.error("An error occurred while fetching lab samples data", {
                     position: toast.POSITION.TOP_RIGHT
                 });
                 setLoading(false)
@@ -181,57 +204,57 @@ const SampleSearch = (props) => {
         }
     }, []);
 
-    //console.log("outside", start_date, end_date);
-
-    const handlePulledData = query =>
-         new Promise((resolve, reject) => {
-              axios.get(`${url}lims/collected-samples/?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`, { headers: {"Authorization" : `Bearer ${token}`} })
-                 .then(resp => resp)
-                 .then(result => {
-                 if (result.data.records === null) {
-                      resolve({
-                          data: [],
-                          page: 0,
-                          totalCount: 0
-                      })
-                  }else {
-                    resolve({
-                      data: result.data.records.
-                      filter( row => {
-                         let filterPass = true
-
-                         const date = new Date(row.sampleCollectionDate)
-                         //console.log("inside",start_date, end_date);
-                         if (start_date != null) {
-                           filterPass = filterPass && (new Date(start_date) <= date)
-                         }
-                         if (end_date != null) {
-                           filterPass = filterPass && (new Date(end_date) >= date)
-                         }
-                         return filterPass
-                    }).map((row) => ({
-                        typecode: row.patientID.idTypeCode,
-                        patientId: row.patientID.idNumber,
-                        firstname: row.firstName,
-                        surname: row.surName,
-                        sex: row.sex,
-                        dob: row.dateOfBirth,
-                        age: calculate_age(row.dateOfBirth),
-                        testType: "VL",
-                        sampleId: row.sampleID,
-                        sampleType: row.sampleType,
-                        orderby: row.sampleOrderedBy,
-                        orderbydate: row.sampleOrderDate,
-                        collectedby: row.sampleCollectedBy,
-                        datecollected: row.sampleCollectionDate,
-                        timecollected: row.sampleCollectionTime
-                      })),
-                      page: query.page,
-                      totalCount: result.data.totalRecords
-                  })
-                  }
-              })
-         })
+//    const handlePulledData = query =>
+//         new Promise((resolve, reject) => {
+//              axios.get(`${url}lims/collected-samples/?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`,
+//              { headers: {"Authorization" : `Bearer ${token}`} })
+//                 .then(resp => resp)
+//                 .then(result => {
+//                 console.log("inside1",start_date, end_date);
+//                 if (result.data.records === null) {
+//                      resolve({
+//                          data: [],
+//                          page: 0,
+//                          totalCount: 0
+//                      })
+//                  }else {
+//                    resolve({
+//                      data: result.data.records.
+//                      filter( row => {
+//                         let filterPass = true
+//
+//                         const date = new Date(row.sampleCollectionDate)
+//                         console.log("inside2",start_date, end_date);
+//                         if (start_date != null) {
+//                           filterPass = filterPass && (new Date(start_date) <= date)
+//                         }
+//                         if (end_date != null) {
+//                           filterPass = filterPass && (new Date(end_date) >= date)
+//                         }
+//                         return filterPass
+//                    }).map((row) => ({
+//                        typecode: row.patientID.idTypeCode,
+//                        patientId: row.patientID.idNumber,
+//                        firstname: row.firstName,
+//                        surname: row.surName,
+//                        sex: row.sex,
+//                        dob: row.dateOfBirth,
+//                        age: calculate_age(row.dateOfBirth),
+//                        testType: "VL",
+//                        sampleId: row.sampleID,
+//                        sampleType: row.sampleType,
+//                        orderby: row.sampleOrderedBy,
+//                        orderbydate: row.sampleOrderDate,
+//                        collectedby: row.sampleCollectedBy,
+//                        datecollected: row.sampleCollectionDate,
+//                        timecollected: row.sampleCollectionTime
+//                      })),
+//                      page: query.page,
+//                      totalCount: result.data.totalRecords
+//                  })
+//                  }
+//              })
+//         })
 
      useEffect(() => {
      setLoading('true');
@@ -243,19 +266,19 @@ const SampleSearch = (props) => {
          }
          loadManifestData();
          loadLabTestData();
+         loadConfig();
 
      }, [loadLabTestData]);
 
      const calculate_age = dob => {
-             var today = new Date();
-             var birthDate = new Date(dob);
-             var age_now = today.getFullYear() - birthDate.getFullYear();
-             return age_now
-
-           };
+         var today = new Date();
+         var birthDate = new Date(dob);
+         var age_now = today.getFullYear() - birthDate.getFullYear();
+         return age_now
+       };
 
      const handleSampleChanges = (sample) => {
-        console.log("sample clicked", sample);
+        //console.log("sample clicked", sample);
         sample.filter((item) => {
             var i = samples.findIndex(x => (x.sampleId !== item.sampleId && x.sampleType === item.sampleType));
 
@@ -321,6 +344,13 @@ const SampleSearch = (props) => {
       <div>
       <Card>
          <Card.Body>
+         { config.length !== 0 ?
+                " "
+                :
+                <Alert variant='danger'>
+                  Och kindly set up LIMS server configurations to enable you proceed!!!
+                </Alert>
+           }
             <Grid container spacing={2}>
                  <LocalizationProvider
                   dateAdapter={AdapterDayjs}
@@ -381,6 +411,7 @@ const SampleSearch = (props) => {
           <MaterialTable
            icons={tableIcons}
               title="Sample Collection List"
+              tableRef={tableRef}
               columns={[
                   { title: "Type code", field: "typecode" },
                   { title: "Hospital ID", field: "patientId" },
@@ -406,38 +437,38 @@ const SampleSearch = (props) => {
 
               ]}
               isLoading={loading}
-              data={handlePulledData}
-//              data={ values.filter( row => {
-//                   let filterPass = true
-//
-//                   const date = new Date(row.sampleCollectionDate)
-//
-//                   if (start_date != null) {
-//                     filterPass = filterPass && (new Date(start_date) <= date)
-//                   }
-//                   if (end_date != null) {
-//                     filterPass = filterPass && (new Date(end_date) >= date)
-//                   }
-//                   return filterPass
-//              }).map((row) => (
-//                    {
-//                      typecode: row.patientID.idTypeCode,
-//                      patientId: row.patientID.idNumber,
-//                      firstname: row.firstName,
-//                      surname: row.surName,
-//                      sex: row.sex,
-//                      dob: row.dateOfBirth,
-//                      age: calculate_age(row.dateOfBirth),
-//                      testType: "VL",
-//                      sampleId: row.sampleID,
-//                      sampleType: row.sampleType,
-//                      orderby: row.sampleOrderedBy,
-//                      orderbydate: row.sampleOrderDate,
-//                      collectedby: row.sampleCollectedBy,
-//                      datecollected: row.sampleCollectionDate,
-//                      timecollected: row.sampleCollectionTime
-//                    })
-//              )}
+             // data={handlePulledData}
+              data={ values.filter( row => {
+                   let filterPass = true
+
+                   const date = new Date(row.sampleCollectionDate)
+
+                   if (start_date != null) {
+                     filterPass = filterPass && (new Date(start_date) <= date)
+                   }
+                   if (end_date != null) {
+                     filterPass = filterPass && (new Date(end_date) >= date)
+                   }
+                   return filterPass
+              }).map((row) => (
+                    {
+                      typecode: row.patientID.idTypeCode,
+                      patientId: row.patientID.idNumber,
+                      firstname: row.firstName,
+                      surname: row.surName,
+                      sex: row.sex,
+                      dob: row.dateOfBirth,
+                      age: calculate_age(row.dateOfBirth),
+                      testType: "VL",
+                      sampleId: row.sampleID,
+                      sampleType: row.sampleType,
+                      orderby: row.sampleOrderedBy,
+                      orderbydate: row.sampleOrderDate,
+                      collectedby: row.sampleCollectedBy,
+                      datecollected: row.sampleCollectionDate,
+                      timecollected: row.sampleCollectionTime
+                    })
+              )}
 
                   options={{
                     headerStyle: {

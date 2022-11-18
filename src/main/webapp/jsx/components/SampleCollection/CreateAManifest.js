@@ -2,6 +2,7 @@ import React, {useEffect, useCallback, useState} from 'react';
 import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
 import ConfigModal from './ConfigModal';
+import ProgressBar from './Progressbar';
 import Alert from 'react-bootstrap/Alert';
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
@@ -92,6 +93,8 @@ const CreateAManifest = (props) => {
     const [localStore, SetLocalStore] = useState([]);
     const [manifestsId, setManifestsId] = useState(0);
     const [status, setStatus] = useState("Pending")
+    const [progress, setProgress] = useState(0);
+    const [failed, setFailed] = useState(false);
 
     const [errors, setErrors] = useState({});
 
@@ -167,13 +170,14 @@ const CreateAManifest = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setProgress(5)
         manifestData.courierContact = contactPhone;
             if (validateInputs()) {
-               //console.log("submit", manifestData);
+
                await axios.post(`${url}lims/manifests`, manifestData,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     setManifestsId(resp.data.id)
-                     //console.log("response", resp)
+
                     setSaved(true);
                     toast.success("Sample manifest saved successfully!!", {
                         position: toast.POSITION.TOP_RIGHT
@@ -185,8 +189,19 @@ const CreateAManifest = (props) => {
                     localStorage.setItem('manifest', JSON.stringify(manifestData));
                     localStorage.removeItem("samples");
                     handleOpen()
+                    setProgress(10)
                 });
             }
+    }
+
+    const handleProgress = (progessCount) => {
+        setProgress(progessCount)
+        console.log(failed)
+    }
+
+    const handleFailure = (status) => {
+        setFailed(!failed)
+        console.log("in",status, failed)
     }
 
   return (
@@ -194,6 +209,14 @@ const CreateAManifest = (props) => {
         <Card>
             <CardBody>
              <br/>
+             { progress !== 0 ?
+                <>
+                <span>Sending manifest to PCR Lab</span>
+                <ProgressBar value={progress} />
+                </>
+                : " "
+             }
+              <br/>
              { localStore.length === 0 ?
                 <Alert variant='danger' style={{width:'100%',fontSize:'18px', textAlign: 'center'}}>
                   <b>Manifest</b> has no sample logged. pls use the previous button to add samples.
@@ -379,7 +402,9 @@ const CreateAManifest = (props) => {
              </CardBody>
         </Card>
         { open ?
-        <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={manifestsId} saved={saved} /> : " "}
+        <ConfigModal modalstatus={open} togglestatus={toggleModal}
+        manifestsId={manifestsId} saved={saved} handleProgress={handleProgress}
+        handleFailure={handleFailure}/> : " "}
       </>
   );
 }

@@ -14,7 +14,7 @@ let today = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numer
 const sampleStatus = e =>{
         //console.log(e)
         if(parseInt(e)===1){
-            return <p><Badge  color="success">Completed</Badge></p>
+            return <p><Badge  color="success">Result available</Badge></p>
         }else if(parseInt(e)===2){
             return <p><Badge  color="danger">Rejected</Badge></p>
         }else if(parseInt(e)===3){

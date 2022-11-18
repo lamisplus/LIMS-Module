@@ -124,7 +124,7 @@ ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 const Result = (props) => {
     let history = useHistory();
     const manifestObj = history.location && history.location.state ? history.location.state.manifestObj : {}
-    console.log("maniObjx",manifestObj)
+    //console.log("maniObjx",manifestObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : []
 
     const classes = useStyles();
@@ -132,6 +132,30 @@ const Result = (props) => {
     const [results, setResults] = useState([])
     const [logins, setLogins] = useState([])
     const [configId, setConfigId] = useState(1);
+    const [inputFields, setInputFields] = useState({
+        manifestRecordID: manifestObj.id,
+        dateResultDispatched: "",
+        dateSampleReceivedAtPcrLab: "",
+        testResult: "",
+        resultDate: "",
+        pcrLabSampleNumber: "",
+        approvalDate: "",
+        assayDate: "",
+        sampleTestable: "",
+        sampleStatus: "",
+        sampleID: "",
+        uuid: "",
+        visitDate: "",
+        transferStatus: "",
+        testedBy: "",
+        approvedBy: "",
+        dateTransferredOut: "",
+        reasonNotTested: "",
+        otherRejectionReason: "",
+        sendingPCRLabID: "",
+        sendingPCRLabName: ""
+    })
+
 
     const [open, setOpen] = useState(false)
 
@@ -168,24 +192,68 @@ const Result = (props) => {
     }, []);
 
     const getPCResults = useCallback(async () => {
-          try {
-              const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(configId)}`, { headers: {"Authorization" : `Bearer ${token}`} });
-              console.log("manifest results", response.data);
-              //setResults(response.data.results);
-              setLoading(false)
+      try {
+          const serverId = JSON.parse(localStorage.getItem('configId'));
 
-          } catch (e) {
-              toast.error("An error occurred while getting manifest results", {
+          if (manifestObj.id !== 0) {
+               const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(serverId)}`, { headers: {"Authorization" : `Bearer ${token}`} });
+
+               if (response.data.viralLoadTestReport !== null) {
+                  setResults(response.data.viralLoadTestReport);
+
+                  response.data.viralLoadTestReport.map(d => {
+                        if (d.approvalDate !== "" && d.testResult !== "") {
+                            let result = {
+                                 manifestRecordID: manifestObj.id,
+                                 dateResultDispatched: d.dateResultDispatched,
+                                 dateSampleReceivedAtPcrLab: d.dateSampleReceivedAtPcrLab,
+                                 testResult: d.testResult,
+                                 resultDate: d.resultDate,
+                                 pcrLabSampleNumber: d.pcrLabSampleNumber,
+                                 approvalDate: d.approvalDate,
+                                 assayDate: d.assayDate,
+                                 sampleTestable: d.sampleTestable,
+                                 sampleStatus: d.sampleStatus,
+                                 sampleID: d.sampleID,
+                                 uuid: "",
+                                 visitDate: d.visitDate,
+                                 transferStatus: d.transferStatus,
+                                 testedBy: d.transferStatus,
+                                 approvedBy: d.approvedBy,
+                                 dateTransferredOut: d.dateTransferredOut,
+                                 reasonNotTested: d.reasonNotTested,
+                                 otherRejectionReason: d.otherRejectionReason,
+                                 sendingPCRLabID: d.sendingPCRLabID,
+                                 sendingPCRLabName: d.sendingPCRLabName
+                             }
+                             //console.log("results", result)
+
+                             axios.post(`${url}lims/results`, [result],
+                                  { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                                     // console.log("results saved", resp)
+                                  });
+                        }
+                  })
+               }
+          }else {
+              toast.success("Sample results are currently been processed, check back in a bit", {
                   position: toast.POSITION.TOP_RIGHT
               });
-              setLoading(false)
           }
-      }, []);
+          setLoading(false)
+
+      } catch (e) {
+          toast.error("An error occurred while getting manifest results", {
+              position: toast.POSITION.TOP_RIGHT
+          });
+          setLoading(false)
+      }
+  }, []);
 
     useEffect(() => {
         loadResults()
         loadConfigs()
-        //getPCResults()
+        getPCResults()
     }, [loadResults]);
 
     const resultTestType = e => {
@@ -197,38 +265,38 @@ const Result = (props) => {
     }
 
     const reload = e => {
-        loadResults();
+        getPCResults();
     }
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
       });
 
-     const handleChange = async (event) => {
-           const { name, value } = event.target
-           try {
-                if (manifestObj.id !== 0) {
-                     const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(value)}`, { headers: {"Authorization" : `Bearer ${token}`} });
-                     console.log("manifest results", response.data);
-                     // saved to db
-                     if (response.data.viralLoadTestReport !== null) {
-                        setResults(response.data.viralLoadTestReport);
-                     }
-                }else {
-                    toast.success("Sample results are currently been processed, check back in a bit", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
-                }
-
-                 setLoading(false)
-
-             } catch (e) {
-                 toast.error("An error occurred while getting manifest results", {
-                     position: toast.POSITION.TOP_RIGHT
-                 });
-                 setLoading(false)
-             }
-     }
+//     const handleChange = async (event) => {
+//           const { name, value } = event.target
+//           try {
+//                if (manifestObj.id !== 0) {
+//                     const response = await axios.get(`${url}lims/manifest-results/${manifestObj.id}/${parseInt(value)}`, { headers: {"Authorization" : `Bearer ${token}`} });
+//                     console.log("manifest results", response.data);
+//                     // saved to db
+//                     if (response.data.viralLoadTestReport !== null) {
+//                        setResults(response.data.viralLoadTestReport);
+//                     }
+//                }else {
+//                    toast.success("Sample results are currently been processed, check back in a bit", {
+//                        position: toast.POSITION.TOP_RIGHT
+//                    });
+//                }
+//
+//                 setLoading(false)
+//
+//             } catch (e) {
+//                 toast.error("An error occurred while getting manifest results", {
+//                     position: toast.POSITION.TOP_RIGHT
+//                 });
+//                 setLoading(false)
+//             }
+//     }
 
   return (
     <div>
@@ -277,7 +345,7 @@ const Result = (props) => {
               </Link>
 
              </p>
-              <Row>
+              {/*<Row>
                <Col>
                   <FormGroup>
                      <Label for="configName" className={classes.label}>Configuration Setting</Label>
@@ -301,7 +369,7 @@ const Result = (props) => {
               </Col>
               <Col>
               </Col>
-              </Row>
+              </Row>*/}
              <hr />
               {
 

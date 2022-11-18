@@ -25,6 +25,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import { useReactToPrint } from 'react-to-print';
 import HomeIcon from '@mui/icons-material/Home';
 import SendIcon from '@mui/icons-material/Send';
+import ConfigModal from './ConfigModal';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -86,7 +87,7 @@ const useStyles = makeStyles(theme => ({
 const PrintManifest = (props) => {
     let history = useHistory();
     const sampleObj = history.location && history.location.state ? history.location.state.sampleObj : {}
-    console.log("props",sampleObj)
+    //console.log("props",sampleObj)
     const classes = useStyles();
     const [loading, setLoading] = useState('')
     const [collectedSamples, setCollectedSamples] = useState([])
@@ -94,6 +95,12 @@ const PrintManifest = (props) => {
     const [saved, setSaved] = useState(false);
     const [localStore, SetLocalStore] = useState([]);
     const [send, setSend] = useState(false);
+
+    const [open, setOpen] = useState(false)
+
+    const handleOpen = () => setOpen(true);
+
+    const toggleModal = () => setOpen(!open)
 
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
@@ -104,35 +111,19 @@ const PrintManifest = (props) => {
       const manifests = JSON.parse(localStorage.getItem('manifest'));
       if (manifests) {
         SetLocalStore(manifests);
-        localStorage.clear();
+        localStorage.removeItem('manifest');
       }else {
         SetLocalStore(sampleObj)
       }
     }, []);
 
-     const sendManifest = async (e) => {
+    const sendManifest = async (e) => {
         e.preventDefault()
-         await axios.get(`${url}lims/ready-manifests/${localStore.id}`, { headers: {"Authorization" : `Bearer ${token}`} })
-            .then((resp) => {
-                console.log("sending manifest", resp)
-                if (resp.data.errors.length > 0) {
-                    toast.error(resp.data.errors[0].reasons, {
-                        position: toast.POSITION.TOP_RIGHT
-                     });
-                     setSend(true)
-                }
-                else {
-                     toast.success("Sample manifest sent successfully to PCR Lab.", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
-                    setSend(true)
-                }
-
-            })
-     }
+        handleOpen()
+    }
 
   return (
-      <div>
+      <>
       <Card>
          <Card.Body>
          { Object.keys(localStore).length === 0 ?
@@ -194,7 +185,9 @@ const PrintManifest = (props) => {
             }
          </Card.Body>
        </Card>
-    </div>
+       { open ?
+          <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={sampleObj.id} saved={saved} /> : " "}
+    </>
   );
 }
 
