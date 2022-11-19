@@ -1,7 +1,7 @@
 import React, {useEffect, useCallback, useState, useRef} from 'react';
 import Container from '@mui/material/Container';
 import { Link, useHistory } from 'react-router-dom'
-import { connect } from "react-redux";
+import ProgressBar from './Progressbar';
 import { Row, Col, Card } from "react-bootstrap";
 import Alert from 'react-bootstrap/Alert';
 
@@ -95,6 +95,8 @@ const PrintManifest = (props) => {
     const [saved, setSaved] = useState(false);
     const [localStore, SetLocalStore] = useState([]);
     const [send, setSend] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [failed, setFailed] = useState(false);
 
     const [open, setOpen] = useState(false)
 
@@ -120,6 +122,15 @@ const PrintManifest = (props) => {
     const sendManifest = async (e) => {
         e.preventDefault()
         handleOpen()
+        setProgress(10)
+    }
+
+    const handleProgress = (progessCount) => {
+        setProgress(progessCount)
+    }
+
+    const handleFailure = (status) => {
+        setFailed(!failed)
     }
 
   return (
@@ -142,6 +153,7 @@ const PrintManifest = (props) => {
                      disabled={!send ? false : true}
                      onClick={sendManifest}
                  >
+
                      Send Manifest
                  </MatButton> : " "
             }
@@ -180,13 +192,22 @@ const PrintManifest = (props) => {
                      </MatButton>
                     </Link>
                </p>
+              { progress !== 0 ?
+                   <>
+                   <span>Sending manifest to PCR Lab</span>
+                   <ProgressBar value={progress} />
+                   </>
+                   : " "
+              }
             <ManifestPrint sampleObj={localStore} ref={componentRef}/>
             </>
             }
          </Card.Body>
        </Card>
        { open ?
-          <ConfigModal modalstatus={open} togglestatus={toggleModal} manifestsId={sampleObj.id} saved={saved} /> : " "}
+          <ConfigModal modalstatus={open} togglestatus={toggleModal}
+          manifestsId={sampleObj.id} saved={saved} handleProgress={handleProgress}
+          handleFailure={handleFailure}/> : " "}
     </>
   );
 }

@@ -322,7 +322,7 @@ const SampleSearch = (props) => {
      const sampleFilter = (collectedSamples, manifestData) => {
         if (collectedSamples && manifestData) {
             return collectedSamples.filter(x => {
-                return !manifestData.some(y => {
+                return manifestData.some(y => {
                     return x.sampleID === y.sampleID
                 })
             })

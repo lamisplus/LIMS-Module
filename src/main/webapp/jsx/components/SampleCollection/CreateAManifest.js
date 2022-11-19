@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { connect } from "react-redux";
 import ConfigModal from './ConfigModal';
 import ProgressBar from './Progressbar';
-import Alert from 'react-bootstrap/Alert';
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import Alert from '@mui/material/Alert';
 
 import IconButton from '@material-ui/core/IconButton';
 
@@ -170,10 +170,10 @@ const CreateAManifest = (props) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setProgress(5)
+
         manifestData.courierContact = contactPhone;
             if (validateInputs()) {
-
+                setProgress(5)
                await axios.post(`${url}lims/manifests`, manifestData,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     setManifestsId(resp.data.id)
@@ -194,6 +194,47 @@ const CreateAManifest = (props) => {
             }
     }
 
+    const resendManifest = async (e) => {
+        e.preventDefault()
+
+        setProgress(20);
+        const serverId = JSON.parse(localStorage.getItem('configId'));
+
+         try{
+            setProgress(50);
+             await axios.get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                .then((resp) => {
+                    setProgress(70);
+
+                    if (resp) {
+                        console.log("re sending manifest", resp)
+                        setProgress(100);
+                    }
+                    setProgress(100);
+                    toast.success("Sample manifest sent successfully to PCR Lab.", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                }).catch(err => {
+                     setProgress(10);
+//                     toast.error("Error encountered while sending manifest", {
+//                        position: toast.POSITION.TOP_RIGHT
+//                     });
+
+                     toast.success("Server currently down!!! Try sending manifest later", {
+                         position: toast.POSITION.TOP_CENTER
+                     });
+                     setProgress(0);
+                     setFailed(true);
+                })
+         }catch(err) {
+            setProgress(10);
+            toast.error("Error encountered while sending manifest", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+            setFailed(true);
+         }
+    }
+
     const handleProgress = (progessCount) => {
         setProgress(progessCount)
         console.log(failed)
@@ -209,6 +250,7 @@ const CreateAManifest = (props) => {
         <Card>
             <CardBody>
              <br/>
+             <Alert severity="info"><b>Guidelines: &nbsp;&nbsp;&nbsp;&nbsp; </b>Step: (1) Fill the manifest form and save. &nbsp;&nbsp;&nbsp;&nbsp;   Step: (2) Send Manifest to PCR Lab. &nbsp;&nbsp;&nbsp;&nbsp;  Step: (3) Click the Next button to Print Manifest</Alert>
              { progress !== 0 ?
                 <>
                 <span>Sending manifest to PCR Lab</span>
@@ -218,7 +260,7 @@ const CreateAManifest = (props) => {
              }
               <br/>
              { localStore.length === 0 ?
-                <Alert variant='danger' style={{width:'100%',fontSize:'18px', textAlign: 'center'}}>
+                <Alert severity="error" style={{width:'100%',fontSize:'18px', textAlign: 'center'}}>
                   <b>Manifest</b> has no sample logged. pls use the previous button to add samples.
                 </Alert>
               :
@@ -330,22 +372,6 @@ const CreateAManifest = (props) => {
                   </FormGroup></Col>
                     </Row>
                      <Row>
-                        {/*<Col> <FormGroup>
-                         <Label for="manifest_status" className={classes.label}>Status</Label>
-                         <Input
-                             type="text"
-                             name="manifestStatus"
-                             id="manifestStatus"
-                             value={status}
-                             onChange={handleChange}
-                             disabled
-                             className={classes.input}
-                         />
-
-                     </FormGroup></Col>*/}
-
-                    </Row>
-                     <Row>
                         <Col><FormGroup>
                         <Label for="total_sample" className={classes.label}>Total Sample</Label>
                         <Input
@@ -393,6 +419,17 @@ const CreateAManifest = (props) => {
                             <Button variant="contained" color="primary" type="submit"
                             startIcon={<SaveIcon />} onClick={handleSubmit}>
                               Save
+                            </Button>
+
+                        </> : ""
+                    }
+                    {" "}
+                    {
+                        failed ?
+                         <>
+                            <Button variant="contained" color="secondary" type="submit"
+                            startIcon={<SendIcon />} onClick={resendManifest}>
+                              Re-Send
                             </Button>
 
                         </> : ""

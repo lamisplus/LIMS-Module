@@ -146,7 +146,7 @@ const ConfigModal = (props) => {
                         console.log("sending manifest", resp)
                         props.handleProgress(100);
                     }
-                    console.log("sending manifest", resp)
+
                     props.handleProgress(100);
                     toast.success("Sample manifest sent successfully to PCR Lab.", {
                         position: toast.POSITION.TOP_RIGHT
@@ -174,12 +174,12 @@ const ConfigModal = (props) => {
                 <CardBody>
                     <Modal isOpen={props.modalstatus} toggle={props.togglestatus} className={props.className} size="lg">
                         <Form onSubmit={saveSample}>
-                            <ModalHeader toggle={props.togglestatus}>Select PCR Server </ModalHeader>
+                            <ModalHeader toggle={props.togglestatus}></ModalHeader>
                             <ModalBody>
                                  <Row>
                                     <Col>
                                         <FormGroup>
-                                           <Label for="configName" className={classes.label}>Configuration Setting</Label>
+                                           <Label for="configName" className={classes.label}>Which PCR Server are you sending to?</Label>
                                            <Input
                                                type="select"
                                                name="config"
@@ -188,7 +188,7 @@ const ConfigModal = (props) => {
                                                onChange={handleChange}
                                            >
                                             <option hidden>
-                                                Which server are you sending to?
+                                                Select Server
                                             </option>
                                             { logins && logins.map((data, i) => (
                                                 <option key={i} value={data.id}>

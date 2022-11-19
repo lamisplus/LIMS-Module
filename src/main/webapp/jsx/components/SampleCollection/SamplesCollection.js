@@ -75,7 +75,7 @@ return(
                 <StepLabel>Select Collected Samples</StepLabel>
             </Step>
             <Step>
-                <StepLabel>Complete Manifest Form</StepLabel>
+                <StepLabel>Complete & Send Manifest Form</StepLabel>
             </Step>
             <Step>
                 <StepLabel>Print Manifest</StepLabel>
