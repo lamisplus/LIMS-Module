@@ -14,6 +14,7 @@ import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.lims.domain.dto.*;
 import org.lamisplus.modules.lims.domain.entity.LIMSConfig;
 import org.lamisplus.modules.lims.domain.entity.LIMSManifest;
+import org.lamisplus.modules.lims.domain.entity.LIMSResult;
 import org.lamisplus.modules.lims.domain.entity.LIMSSample;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
 import org.lamisplus.modules.lims.repository.*;
@@ -37,6 +38,7 @@ import java.util.jar.Manifest;
 @RequiredArgsConstructor
 public class LimsManifestService {
     private final LimsManifestRepository limsManifestRepository;
+    private final LimsResultRepository resultRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
@@ -115,6 +117,11 @@ public class LimsManifestService {
     @Nullable
     private ManifestListMetaDataDTO getManifestListMetaDataDto(Page<LIMSManifest> manifests) {
         List<ManifestDTO> manifestDTOS = limsMapper.toManifestDtoList(manifests.getContent());
+
+        for(ManifestDTO manifestDTO:manifestDTOS){
+            List<LIMSResult> results = resultRepository.findAllByManifestRecordID(manifestDTO.getId());
+            manifestDTO.setResults(results);
+        }
 
         if (manifests.hasContent()) {
             PageDTO pageDTO = this.generatePagination(manifests);
@@ -272,10 +279,10 @@ public class LimsManifestService {
         LOG.info("RESPONSE:"+response);
 
         try {
-            //Post result in laboratory module
             for (LIMSResultDTO result : response.getViralLoadTestReport()) {
                 LOG.info("RESULT: " + result);
-                resultService.SaveResultInLabModule(limsMapper.toResult(result));
+                result.setManifestRecordID(id);
+                resultService.Save(limsMapper.toResult(result));
             }
         }catch (Exception e) {
             LOG.error("ERROR:" + e);

@@ -14,29 +14,29 @@ public class LIMSTest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private int id;
+    private Integer id;
     @Column(name = "uuid")
     private String uuid;
     @Column(name = "patient_id")
-    private int patientId;
+    private Integer patientId;
     @Column(name = "lab_test_id")
-    private int labTestId;
+    private Integer labTestId;
     @Column(name = "description")
     private String description;
     @Column(name = "lab_number")
     private String labNumber;
     @Column(name = "lab_test_group_id")
-    private int labTestGroupId;
+    private Integer labTestGroupId;
     @Column(name = "order_priority")
-    private int orderPriority;
+    private Integer orderPriority;
     @Column(name = "unit_measurement")
     private String unitMeasurement;
     @Column(name = "lab_test_order_status")
-    private int labTestOrderStatus;
+    private Integer labTestOrderStatus;
     @Column(name = "viral_load_indication")
-    private int viralLoadIndication;
+    private Integer viralLoadIndication;
     @Column(name = "lab_order_id")
-    private int labOrderId;
+    private Integer labOrderId;
     @Column(name = "patient_uuid")
     private String patientUuid;
     @Column(name = "facility_id")

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class ManifestDTO {
-    private int id;
+    private Integer id;
     private String uuid;
     private String manifestID;
     private String sendingFacilityID;

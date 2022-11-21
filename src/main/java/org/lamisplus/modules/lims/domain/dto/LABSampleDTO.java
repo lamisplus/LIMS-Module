@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 public class LABSampleDTO {
-    private int id;
+    private Integer id;
     private String uuid;
-    private int pid;
+    private Integer pid;
     private JsonNode patientID;
     private String firstName;
     private String surName;
@@ -28,5 +28,5 @@ public class LABSampleDTO {
     private String dateSampleSent;
     private String priority;
     private String priorityReason;
-    private int manifestRecordId;
+    private Integer manifestRecordId;
 }
