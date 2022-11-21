@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ConfigDTO {
-    private int id;
+    private Integer id;
     private String configName;
     private String configEmail;
     private String configPassword;

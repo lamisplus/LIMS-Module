@@ -15,7 +15,7 @@ public class LIMSResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private int id;
+    private Integer id;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
     @Column(name = "sample_id")
@@ -41,5 +41,5 @@ public class LIMSResult {
     @Column(name = "sample_testable")
     private String sampleTestable;
     @Column(name = "manifest_record_id")
-    private int manifestRecordID;
+    private Integer manifestRecordID;
 }

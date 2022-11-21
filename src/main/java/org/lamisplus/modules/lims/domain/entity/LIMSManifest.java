@@ -17,7 +17,7 @@ public class LIMSManifest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private int id;
+    private Integer id;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
     @Column(name = "manifest_id")

@@ -21,5 +21,5 @@ public class LIMSResultDTO {
     private String dateResultDispatched;
     private String sampleStatus;
     private String sampleTestable;
-    private int manifestRecordID;
+    private Integer manifestRecordID;
 }

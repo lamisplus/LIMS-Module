@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface LimsTestRepository extends JpaRepository<LIMSTest, Integer> {
     @Query(value="select * from laboratory_test where id= " +
-            "(select test_id from laboratory_sample where id=:sampleId limit 1)", nativeQuery = true)
-    List<LIMSTest> findBySampleId(@Param("sampleId") Integer sampleId);
+            "(select test_id from laboratory_sample where sample_number=:sampleId limit 1)", nativeQuery = true)
+    List<LIMSTest> findBySampleId(@Param("sampleId") String sampleId);
 }

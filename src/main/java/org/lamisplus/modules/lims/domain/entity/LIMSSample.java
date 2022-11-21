@@ -33,7 +33,7 @@ public class LIMSSample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private int id;
+    private Integer id;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
     @Column(name = "pid")
@@ -90,5 +90,5 @@ public class LIMSSample {
     private String priorityReason;
 
     @Column(name = "manifest_record_id")
-    private int manifestRecordID;
+    private Integer manifestRecordID;
 }
