@@ -212,7 +212,7 @@ const DownloadManifest = (props) => {
                                  lab: row.receivingLabName,
                                  packaged_by: row.samplePackagedBy,
                                  samples: row.sampleInformation.length,
-                                 results: row.results !== null ? row.results : 0,
+                                 results: row.results.length !== 0 ? row.results.length : 0,
                                  status: row.manifestStatus === "Ready" ? "Not Submitted" : row.manifestStatus,
                                  actions: <>
                                     <SplitActionButton actions={actionItems(row)} />
