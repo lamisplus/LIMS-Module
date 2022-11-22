@@ -16,6 +16,7 @@ function SampleCollection() {
 const [activeStep, setActiveStep] = React.useState(0)
 const [permissions, setPermissions] = useState([]);
 const [config, setConfig] = useState([]);
+const [submitted, setSubmitted] = useState(1);
 
 const loadConfig = useCallback(async () => {
         try {
@@ -32,19 +33,19 @@ const loadConfig = useCallback(async () => {
         loadConfig();
       }, []);
 
-        const userPermission =()=>{
-            axios
-                .get(`${url}account`,
-                    { headers: {"Authorization" : `Bearer ${token}`} }
-                )
-                .then((response) => {
-                    //console.log("permission", response.data.permissions)
-                    setPermissions(response.data.permissions);
+const userPermission =()=>{
+    axios
+        .get(`${url}account`,
+            { headers: {"Authorization" : `Bearer ${token}`} }
+        )
+        .then((response) => {
+            //console.log("permission", response.data.permissions)
+            setPermissions(response.data.permissions);
 
-                })
-                .catch((error) => {
-                });
-        }
+        })
+        .catch((error) => {
+        });
+}
 
 const nextStep = () => {
     if (activeStep < 2)
@@ -56,12 +57,17 @@ const previousStep = () => {
        setActiveStep((currentStep) => currentStep - 1)
 }
 
+const submitStatus = (status) => {
+
+}
+
+
 const renderContent = (step) => {
      switch (step) {
         case 0:
           return <SampleOrderLists />;
         case 1:
-          return <CreateAManifest />;
+          return <CreateAManifest setSubmitted={setSubmitted} />;
         case 2:
           return <PrintManifest />;
         default:
@@ -84,9 +90,7 @@ return(
         </Stepper>
         <br />
         <>
-            {renderContent(activeStep)}
-            <br />
-            <br />
+
                 { permissions.includes("all_permission") ?
                     <Stack direction="row" spacing={2}
                            m={1}
@@ -94,11 +98,12 @@ return(
                            justifyContent="flex-end"
                            alignItems="flex-end">
                            <Button variant="outlined" color="primary" onClick={() => previousStep()}
-                           >Previous Step</Button>
+                           disabled={config.length === 0 ? true : false || activeStep == 0 ? true : false}>Previous Page</Button>
                            {" "}
                            <Button variant="outlined" color="primary" onClick={() => nextStep()}
-                           disabled={config.length === 0 ? true : false || activeStep == 2 ? true : false}>Next Step</Button>
+                           disabled={config.length === 0 ? true : false || activeStep == submitted ? true : false}>Next Page</Button>
                     </Stack> : " " }
+              {renderContent(activeStep)}
         </>
     </div>
 );

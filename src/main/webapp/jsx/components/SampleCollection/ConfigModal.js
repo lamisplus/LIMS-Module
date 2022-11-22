@@ -133,34 +133,37 @@ const ConfigModal = (props) => {
     const sendManifest = async (e) => {
         e.preventDefault()
 
-        props.handleProgress(20);
+        const timer = setInterval(() => {
+          props.handleProgress((prevProgress) => (prevProgress >= 100 ? 100 : prevProgress + 2));
+        }, 500)
+
         localStorage.setItem('configId', JSON.stringify(configId));
         props.togglestatus();
          try{
-            props.handleProgress(50);
              await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then((resp) => {
-                    props.handleProgress(70);
 
                     if (resp) {
                         console.log("sending manifest", resp)
                         props.handleProgress(100);
+                        props.submitted(2)
+
+                        toast.success("Sample manifest sent successfully to PCR Lab.", {
+                            position: toast.POSITION.TOP_RIGHT
+                        });
                     }
 
-                    props.handleProgress(100);
-                    toast.success("Sample manifest sent successfully to PCR Lab.", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
+
                 }).catch(err => {
-                     props.handleProgress(10);
-                     toast.error("Error encountered while sending manifest", {
+                     clearInterval(timer);
+                     console.log("err", err)
+                     toast.error("Poor Internet Connection....", {
                         position: toast.POSITION.TOP_RIGHT
                      });
-                     props.handleProgress(0);
                      props.handleFailure(true);
                 })
          }catch(err) {
-            props.handleProgress(10);
+            clearInterval(timer);
             toast.error("Error encountered while sending manifest", {
                 position: toast.POSITION.TOP_RIGHT
             });

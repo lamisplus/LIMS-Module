@@ -104,6 +104,10 @@ const CreateAManifest = (props) => {
 
     const toggleModal = () => setOpen(!open)
 
+    const confirmStatusSubmitted = (status) => {
+        props.setSubmitted(status)
+    }
+
     useEffect(() => {
       const collectedSamples = JSON.parse(localStorage.getItem('samples'));
       if (collectedSamples) {
@@ -173,7 +177,6 @@ const CreateAManifest = (props) => {
 
         manifestData.courierContact = contactPhone;
             if (validateInputs()) {
-                setProgress(5)
                await axios.post(`${url}lims/manifests`, manifestData,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     setManifestsId(resp.data.id)
@@ -189,7 +192,6 @@ const CreateAManifest = (props) => {
                     localStorage.setItem('manifest', JSON.stringify(manifestData));
                     localStorage.removeItem("samples");
                     handleOpen()
-                    setProgress(10)
                 });
             }
     }
@@ -237,12 +239,10 @@ const CreateAManifest = (props) => {
 
     const handleProgress = (progessCount) => {
         setProgress(progessCount)
-        console.log(failed)
     }
 
     const handleFailure = (status) => {
         setFailed(!failed)
-        console.log("in",status, failed)
     }
 
   return (
@@ -250,7 +250,7 @@ const CreateAManifest = (props) => {
         <Card>
             <CardBody>
              <br/>
-             <Alert severity="info"><b>Guidelines: &nbsp;&nbsp;&nbsp;&nbsp; </b>Step: (1) Fill the manifest form and save. &nbsp;&nbsp;&nbsp;&nbsp;   Step: (2) Send Manifest to PCR Lab. &nbsp;&nbsp;&nbsp;&nbsp;  Step: (3) Click the Next button to Print Manifest</Alert>
+             <Alert severity="info"><b>Tip: &nbsp;&nbsp; </b>Kindly fill the manifest form correctly before going to the next page. &nbsp;&nbsp;&nbsp;&nbsp;</Alert>
              { progress !== 0 ?
                 <>
                 <span>Sending manifest to PCR Lab</span>
@@ -441,7 +441,7 @@ const CreateAManifest = (props) => {
         { open ?
         <ConfigModal modalstatus={open} togglestatus={toggleModal}
         manifestsId={manifestsId} saved={saved} handleProgress={handleProgress}
-        handleFailure={handleFailure}/> : " "}
+        handleFailure={handleFailure} submitted={confirmStatusSubmitted}/> : " "}
       </>
   );
 }
