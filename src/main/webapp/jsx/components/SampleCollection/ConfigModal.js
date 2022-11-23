@@ -88,6 +88,7 @@ const ConfigModal = (props) => {
     const [loading, setLoading] = useState(false)
     const [visible, setVisible] = useState(true);
     const onDismiss = () => setVisible(false);
+
     const [config, setConfig] = useState({
         config: ""
     });
@@ -127,44 +128,96 @@ const ConfigModal = (props) => {
     const saveSample = async (e) => {
         e.preventDefault();
          //console.log(configId)
-         setSaved(true);
+         //setSaved(true);
+        toast.success("Sample manifest saved successfully!!", {
+             position: toast.POSITION.TOP_RIGHT
+         });
+
+        props.togglestatus();
     };
 
     const sendManifest = async (e) => {
         e.preventDefault()
 
-        props.handleProgress(20);
+        const timer = setInterval(() => {
+          props.handleProgress((prevProgress) => (prevProgress >= 100 ? 100 : prevProgress + 2));
+        }, 500)
+
         localStorage.setItem('configId', JSON.stringify(configId));
         props.togglestatus();
          try{
-            props.handleProgress(50);
              await axios.get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then((resp) => {
-                    props.handleProgress(70);
 
                     if (resp) {
                         console.log("sending manifest", resp)
                         props.handleProgress(100);
+                        props.submitted(2)
+
+                        toast.success("Sample manifest sent successfully to PCR Lab.", {
+                            position: toast.POSITION.TOP_RIGHT
+                        });
                     }
 
-                    props.handleProgress(100);
+
+                }).catch(err => {
+                     props.setFailed(true);
+
+                     clearInterval(timer);
+                     console.log("err", err)
+                     toast.error("Poor Internet Connection....", {
+                        position: toast.POSITION.TOP_RIGHT
+                     });
+
+                     props.handleOpen();
+                })
+         }catch(err) {
+            props.setFailed(true);
+
+            clearInterval(timer);
+            toast.error("Error encountered while sending manifest", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+
+            props.handleOpen();
+         }
+    }
+
+    const resendManifest = async (e) => {
+        e.preventDefault()
+
+        props.handleProgress(20);
+        const serverId = JSON.parse(localStorage.getItem('configId'));
+
+         try{
+            props.handleProgress(50);
+             await axios.get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                .then((resp) => {
+                    props.handleProgress(70);
+
+                    if (resp) {
+                        console.log("re sending manifest", resp)
+                        props.handleProgress(100);
+                    }
+
                     toast.success("Sample manifest sent successfully to PCR Lab.", {
                         position: toast.POSITION.TOP_RIGHT
                     });
                 }).catch(err => {
                      props.handleProgress(10);
-                     toast.error("Error encountered while sending manifest", {
-                        position: toast.POSITION.TOP_RIGHT
+
+                     toast.success("Server currently down!!! Try sending manifest later", {
+                         position: toast.POSITION.TOP_CENTER
                      });
                      props.handleProgress(0);
-                     props.handleFailure(true);
+                     props.handleOpen();
                 })
          }catch(err) {
             props.handleProgress(10);
             toast.error("Error encountered while sending manifest", {
                 position: toast.POSITION.TOP_RIGHT
             });
-            props.handleFailure(true);
+            props.handleOpen();
          }
     }
 
@@ -176,6 +229,8 @@ const ConfigModal = (props) => {
                         <Form onSubmit={saveSample}>
                             <ModalHeader toggle={props.togglestatus}></ModalHeader>
                             <ModalBody>
+                                { props.failed ? "" :
+                               <>
                                  <Row>
                                     <Col>
                                         <FormGroup>
@@ -200,7 +255,16 @@ const ConfigModal = (props) => {
                                     </Col>
                                     <Col></Col>
                                 </Row>
-                                {/*
+
+                                    <MatButton variant="contained" color="secondary" startIcon={<SendIcon />}
+                                    type="submit" onClick={sendManifest} disabled={saved ? false : true}>
+                                      Send
+                                    </MatButton>
+                                </>
+                                }
+
+                                { !props.failed ? "" :
+                                <>
                                 <MatButton
                                     type="submit"
                                     variant="contained"
@@ -208,16 +272,29 @@ const ConfigModal = (props) => {
                                     className={classes.button}
                                     startIcon={<SaveIcon />}
                                     disabled={loading}
+                                    onClick={saveSample}
                                 >
                                     Save
                                 </MatButton>
 
-                                {" "}*/}
-                                <MatButton variant="contained" color="secondary" startIcon={<SendIcon />}
-                                type="submit" onClick={sendManifest} disabled={saved ? false : true}>
-                                  Send
-                                </MatButton>
+                                {" "}
+                                 <MatButton variant="contained" color="secondary" startIcon={<SendIcon />}
+                                    type="submit" onClick={resendManifest}>
+                                      Re-send
+                                 </MatButton>
+                                 {" "}
 
+                                 <MatButton
+                                     variant="contained"
+                                     color="default"
+                                     onClick={props.togglestatus}
+                                     className={classes.button}
+                                     startIcon={<CancelIcon />}
+                                 >
+                                     Cancel
+                                 </MatButton>
+                               </>
+                               }
                             </ModalBody>
                         </Form>
                     </Modal>

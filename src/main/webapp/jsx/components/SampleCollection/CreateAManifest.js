@@ -25,6 +25,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { pcr_lab } from './pcr';
 import SendIcon from '@mui/icons-material/Send';
 import SaveIcon from '@material-ui/icons/Save'
+import DoneIcon from '@mui/icons-material/Done';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -94,7 +95,7 @@ const CreateAManifest = (props) => {
     const [manifestsId, setManifestsId] = useState(0);
     const [status, setStatus] = useState("Pending")
     const [progress, setProgress] = useState(0);
-    const [failed, setFailed] = useState(false);
+     const [failed, setFailed] = useState(false);
 
     const [errors, setErrors] = useState({});
 
@@ -103,6 +104,10 @@ const CreateAManifest = (props) => {
     const handleOpen = () => setOpen(true);
 
     const toggleModal = () => setOpen(!open)
+
+    const confirmStatusSubmitted = (status) => {
+        props.setSubmitted(status)
+    }
 
     useEffect(() => {
       const collectedSamples = JSON.parse(localStorage.getItem('samples'));
@@ -115,9 +120,9 @@ const CreateAManifest = (props) => {
 
     const [manifestData, setManifestData] = useState({
          manifestID: "",
-         manifestStatus: "Pending",
-         sendingFacilityID: "FH7LMnbnVlT",
-         sendingFacilityName: "CHC ZUNGERU",
+         manifestStatus: "",
+         sendingFacilityID: "",
+         sendingFacilityName: "",
          receivingLabID: pcrLabCode.labNo,
          receivingLabName: pcrLabCode.name,
          dateScheduledForPickup: "",
@@ -173,15 +178,14 @@ const CreateAManifest = (props) => {
 
         manifestData.courierContact = contactPhone;
             if (validateInputs()) {
-                setProgress(5)
                await axios.post(`${url}lims/manifests`, manifestData,
                 { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
                     setManifestsId(resp.data.id)
 
                     setSaved(true);
-                    toast.success("Sample manifest saved successfully!!", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
+//                    toast.success("Sample manifest saved successfully!!", {
+//                        position: toast.POSITION.TOP_RIGHT
+//                    });
                     manifestData.manifestID = resp.data.manifestID
                     manifestData.sendingFacilityID = resp.data.sendingFacilityID
                     manifestData.sendingFacilityName = resp.data.sendingFacilityName
@@ -189,60 +193,12 @@ const CreateAManifest = (props) => {
                     localStorage.setItem('manifest', JSON.stringify(manifestData));
                     localStorage.removeItem("samples");
                     handleOpen()
-                    setProgress(10)
                 });
             }
     }
 
-    const resendManifest = async (e) => {
-        e.preventDefault()
-
-        setProgress(20);
-        const serverId = JSON.parse(localStorage.getItem('configId'));
-
-         try{
-            setProgress(50);
-             await axios.get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, { headers: {"Authorization" : `Bearer ${token}`} })
-                .then((resp) => {
-                    setProgress(70);
-
-                    if (resp) {
-                        console.log("re sending manifest", resp)
-                        setProgress(100);
-                    }
-                    setProgress(100);
-                    toast.success("Sample manifest sent successfully to PCR Lab.", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
-                }).catch(err => {
-                     setProgress(10);
-//                     toast.error("Error encountered while sending manifest", {
-//                        position: toast.POSITION.TOP_RIGHT
-//                     });
-
-                     toast.success("Server currently down!!! Try sending manifest later", {
-                         position: toast.POSITION.TOP_CENTER
-                     });
-                     setProgress(0);
-                     setFailed(true);
-                })
-         }catch(err) {
-            setProgress(10);
-            toast.error("Error encountered while sending manifest", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-            setFailed(true);
-         }
-    }
-
     const handleProgress = (progessCount) => {
         setProgress(progessCount)
-        console.log(failed)
-    }
-
-    const handleFailure = (status) => {
-        setFailed(!failed)
-        console.log("in",status, failed)
     }
 
   return (
@@ -250,13 +206,15 @@ const CreateAManifest = (props) => {
         <Card>
             <CardBody>
              <br/>
-             <Alert severity="info"><b>Guidelines: &nbsp;&nbsp;&nbsp;&nbsp; </b>Step: (1) Fill the manifest form and save. &nbsp;&nbsp;&nbsp;&nbsp;   Step: (2) Send Manifest to PCR Lab. &nbsp;&nbsp;&nbsp;&nbsp;  Step: (3) Click the Next button to Print Manifest</Alert>
+
+
+
              { progress !== 0 ?
                 <>
                 <span>Sending manifest to PCR Lab</span>
                 <ProgressBar value={progress} />
                 </>
-                : " "
+                : <Alert severity="info"><b>Tip: &nbsp;&nbsp; </b>Kindly fill the manifest form correctly before going to the next page. &nbsp;&nbsp;&nbsp;&nbsp;</Alert>
              }
               <br/>
              { localStore.length === 0 ?
@@ -417,19 +375,8 @@ const CreateAManifest = (props) => {
                         !saved ?
                          <>
                             <Button variant="contained" color="primary" type="submit"
-                            startIcon={<SaveIcon />} onClick={handleSubmit}>
-                              Save
-                            </Button>
-
-                        </> : ""
-                    }
-                    {" "}
-                    {
-                        failed ?
-                         <>
-                            <Button variant="contained" color="secondary" type="submit"
-                            startIcon={<SendIcon />} onClick={resendManifest}>
-                              Re-Send
+                            startIcon={<DoneIcon />} onClick={handleSubmit}>
+                              Manifest Form Completed
                             </Button>
 
                         </> : ""
@@ -441,7 +388,7 @@ const CreateAManifest = (props) => {
         { open ?
         <ConfigModal modalstatus={open} togglestatus={toggleModal}
         manifestsId={manifestsId} saved={saved} handleProgress={handleProgress}
-        handleFailure={handleFailure}/> : " "}
+        handleOpen={handleOpen} submitted={confirmStatusSubmitted} setFailed={setFailed} failed={failed}/> : " "}
       </>
   );
 }

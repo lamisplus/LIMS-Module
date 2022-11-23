@@ -11,6 +11,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import {format} from "date-fns";
 import Alert from 'react-bootstrap/Alert';
+import uniq from "lodash/uniq";
 
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -131,7 +132,6 @@ const SampleSearch = (props) => {
     const [config, setConfig] = useState([]);
     const [value, setValue] = React.useState([null, null]);
 
-    let samples = [];
     const [ dateFilter, setDateFilter] = useState({
         startDate: null,
         endDate: null
@@ -257,7 +257,7 @@ const SampleSearch = (props) => {
 //         })
 
      useEffect(() => {
-     setLoading('true');
+        setLoading('true');
          const onSuccess = () => {
              setLoading(false)
          }
@@ -267,7 +267,7 @@ const SampleSearch = (props) => {
          loadManifestData();
          loadLabTestData();
          loadConfig();
-
+         props.setSubmitted(1)
      }, [loadLabTestData]);
 
      const calculate_age = dob => {
@@ -278,51 +278,46 @@ const SampleSearch = (props) => {
        };
 
      const handleSampleChanges = (sample) => {
-        //console.log("sample clicked", sample);
-        sample.filter((item) => {
-            var i = samples.findIndex(x => (x.sampleId !== item.sampleId && x.sampleType === item.sampleType));
+        let samples = [];
 
-            if(i === -1){
-                  samples.push({
-                      patientID: [{
-                          idNumber: item.patientId,
-                          idTypeCode: item.typecode
-                      }],
-                      firstName: item.firstname,
-                      surName: item.surname,
-                      sex: item.sex,
-                      pregnantBreastFeedingStatus: "",
-                      age: 0,
-                      dateOfBirth: item.dob,
-                      age: item.age,
-                      sampleID: item.sampleId,
-                      sampleType: item.sampleType,
-                      indicationVLTest: 1,
-                      artCommencementDate: "",
-                      drugRegimen: "",
-                      sampleOrderedBy: item.orderby,
-                      sampleOrderDate: item.orderbydate,
-                      sampleCollectedBy: item.collectedby,
-                      sampleCollectionDate: item.datecollected,
-                      sampleCollectionTime: item.timecollected,
-                      dateSampleSent: format(new Date(), 'yyyy-MM-dd'),
-                      id: 0,
-                      manifestID: 0,
-                      pid: 0,
-                      priority: 0,
-                  });
+        let uniqueSamples = uniq(sample).map(item => {
+          samples.push({
+              patientID: [{
+                  idNumber: item.patientId,
+                  idTypeCode: item.typecode
+              }],
+              firstName: item.firstname,
+              surName: item.surname,
+              sex: item.sex,
+              pregnantBreastFeedingStatus: "",
+              age: 0,
+              dateOfBirth: item.dob,
+              age: item.age,
+              sampleID: item.sampleId,
+              sampleType: item.sampleType,
+              indicationVLTest: 1,
+              artCommencementDate: "",
+              drugRegimen: "",
+              sampleOrderedBy: item.orderby,
+              sampleOrderDate: item.orderbydate,
+              sampleCollectedBy: item.collectedby,
+              sampleCollectionDate: item.datecollected,
+              sampleCollectionTime: item.timecollected,
+              dateSampleSent: format(new Date(), 'yyyy-MM-dd'),
+              id: 0,
+              manifestID: 0,
+              pid: 0,
+              priority: 0,
+          });
+        });
 
-                  localStorage.setItem('samples', JSON.stringify(samples));
-              }
-             return null;
-        })
-        //console.log(samples)
+        localStorage.setItem('samples', JSON.stringify(samples));
      }
 
      const sampleFilter = (collectedSamples, manifestData) => {
         if (collectedSamples && manifestData) {
             return collectedSamples.filter(x => {
-                return !manifestData.some(y => {
+                return manifestData.some(y => {
                     return x.sampleID === y.sampleID
                 })
             })
@@ -334,11 +329,11 @@ const SampleSearch = (props) => {
           setCurrentPage(page + 1);
       };
 
-      const localization = {
-          pagination: {
-              labelDisplayedRows: `Page: ${currentPage}`
-          }
+  const localization = {
+      pagination: {
+          labelDisplayedRows: `Page: ${currentPage}`
       }
+  }
 
   return (
       <div>
@@ -486,7 +481,7 @@ const SampleSearch = (props) => {
                     exportButton: false,
                     searchFieldAlignment: 'left',
                     pageSizeOptions:[10,20,100],
-                    pageSize:5,
+                    pageSize:10,
                     debounceInterval: 400
                 }}
                  onSelectionChange={(rows) => handleSampleChanges(rows)}
