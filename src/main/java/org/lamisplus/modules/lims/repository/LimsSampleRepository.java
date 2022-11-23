@@ -43,6 +43,7 @@ public interface LimsSampleRepository extends JpaRepository<LIMSSample, Integer>
             "inner join laboratory_sample_type e on c.sample_type_id = e.id\n" +
             "left join base_application_codeset f on b.viral_load_indication = e.id\n" +
             "where d.lab_test_name='Viral Load'\n" +
-            "and b.lab_test_order_status in (1,2,3) ", nativeQuery = true)
+            "and b.lab_test_order_status in (1,2,3)\n" +
+            "and c.sample_number not in (select x.sample_id from lims_sample x) ", nativeQuery = true)
     Page<LIMSSample> findPendingVLSamples(Pageable pageable);
 }
