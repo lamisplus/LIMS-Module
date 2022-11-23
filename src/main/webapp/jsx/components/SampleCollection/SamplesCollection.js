@@ -16,7 +16,7 @@ function SampleCollection() {
 const [activeStep, setActiveStep] = React.useState(0)
 const [permissions, setPermissions] = useState([]);
 const [config, setConfig] = useState([]);
-const [submitted, setSubmitted] = useState(1);
+const [submitted, setSubmitted] = useState(0);
 
 const loadConfig = useCallback(async () => {
         try {
@@ -65,7 +65,7 @@ const submitStatus = (status) => {
 const renderContent = (step) => {
      switch (step) {
         case 0:
-          return <SampleOrderLists />;
+          return <SampleOrderLists setSubmitted={setSubmitted}/>;
         case 1:
           return <CreateAManifest setSubmitted={setSubmitted} />;
         case 2:

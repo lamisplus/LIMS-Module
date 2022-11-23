@@ -13,7 +13,7 @@ import SplitActionButton from './SplitActionButton';
 import {  Modal, ModalHeader, ModalBody,
     Col,Input,
     FormGroup,
-    Label,Card, CardBody, Table
+    Label,Card, CardBody, Table,Badge
 } from 'reactstrap';
 
 import "./sample.css";
@@ -212,8 +212,8 @@ const DownloadManifest = (props) => {
                                  lab: row.receivingLabName,
                                  packaged_by: row.samplePackagedBy,
                                  samples: row.sampleInformation.length,
-                                 results: row.results.length !== 0 ? row.results.length : 0,
-                                 status: row.manifestStatus === "Ready" ? "Not Submitted" : row.manifestStatus,
+                                 results: row.results.length !== 0 ? <Badge color="info">{row.results.length}</Badge> : 0,
+                                 status: row.manifestStatus === "Ready" ? <Badge color="secondary">Not Submitted</Badge> : <Badge color="success">{row.manifestStatus}</Badge>,
                                  actions: <>
                                     <SplitActionButton actions={actionItems(row)} />
                                  </>

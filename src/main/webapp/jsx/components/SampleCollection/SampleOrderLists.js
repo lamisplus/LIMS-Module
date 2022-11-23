@@ -257,7 +257,7 @@ const SampleSearch = (props) => {
 //         })
 
      useEffect(() => {
-     setLoading('true');
+        setLoading('true');
          const onSuccess = () => {
              setLoading(false)
          }
@@ -267,7 +267,7 @@ const SampleSearch = (props) => {
          loadManifestData();
          loadLabTestData();
          loadConfig();
-
+         props.setSubmitted(1)
      }, [loadLabTestData]);
 
      const calculate_age = dob => {
@@ -311,14 +311,13 @@ const SampleSearch = (props) => {
           });
         });
 
-        //console.log("sample count",samples)
         localStorage.setItem('samples', JSON.stringify(samples));
      }
 
      const sampleFilter = (collectedSamples, manifestData) => {
         if (collectedSamples && manifestData) {
             return collectedSamples.filter(x => {
-                return !manifestData.some(y => {
+                return manifestData.some(y => {
                     return x.sampleID === y.sampleID
                 })
             })
@@ -330,11 +329,11 @@ const SampleSearch = (props) => {
           setCurrentPage(page + 1);
       };
 
-      const localization = {
-          pagination: {
-              labelDisplayedRows: `Page: ${currentPage}`
-          }
+  const localization = {
+      pagination: {
+          labelDisplayedRows: `Page: ${currentPage}`
       }
+  }
 
   return (
       <div>
