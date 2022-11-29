@@ -78,6 +78,7 @@ public class LimsManifestService {
             manifest.setManifestStatus("Ready");
             manifest.setCreateDate(LocalDateTime.now());
             manifest.setUuid(UUID.randomUUID().toString());
+            manifest.setFacilityId(FacilityId);
 
             for(LIMSSample sample: manifest.getSampleInformation()){
                 sample.setUuid(UUID.randomUUID().toString());
@@ -106,10 +107,11 @@ public class LimsManifestService {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
 
         if (searchParam == null || searchParam.equals("*")) {
-            Page<LIMSManifest> manifests = limsManifestRepository.findAll(paging);
+            Page<LIMSManifest> manifests = limsManifestRepository.findAllByFacilityId(getCurrentUserOrganization(), paging);
             return getManifestListMetaDataDto(manifests);
         } else {
-            Page<LIMSManifest> manifests = limsManifestRepository.findLIMSManifestByManifestID(searchParam, paging);
+            Page<LIMSManifest> manifests = limsManifestRepository
+                    .findLIMSManifestByManifestIDAndFacilityId(searchParam, getCurrentUserOrganization(), paging);
             return getManifestListMetaDataDto(manifests);
         }
     }

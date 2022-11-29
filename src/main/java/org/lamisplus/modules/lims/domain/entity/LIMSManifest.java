@@ -44,6 +44,10 @@ public class LIMSManifest {
     private String manifestStatus;
     @Column(name = "create_date")
     private LocalDateTime createDate;
+    @Column(name = "facility_id")
+    private Long facilityId;
+    @Column(name = "facility_uuid")
+    private String facilityUuid;
 
     @JoinColumn(name = "manifest_record_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

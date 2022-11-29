@@ -6,5 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LimsManifestRepository extends JpaRepository<LIMSManifest, Integer> {
-    Page<LIMSManifest> findLIMSManifestByManifestID(String searchParam, Pageable pageable);
+    Page<LIMSManifest> findLIMSManifestByManifestIDAndFacilityId(String manifestID, Long facilityId, Pageable pageable);
+    Page<LIMSManifest> findAllByFacilityId(Long facilityId, Pageable pageable);
 }
