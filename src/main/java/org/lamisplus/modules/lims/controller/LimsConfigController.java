@@ -15,27 +15,27 @@ import java.util.List;
 public class LimsConfigController {
     private final LimsConfigService limsConfigService;
 
-    @PostMapping("/configs")
-    public ConfigDTO SaveConfig(@RequestBody ConfigDTO configDTO){
+    @PostMapping("/config")
+    public ConfigDTO SaveConfig(@RequestBody ConfigDTO configDTO) throws Exception {
         return limsConfigService.Save(configDTO);
     }
 
-    @PutMapping("/configs/{id}")
+    @PutMapping("/config/{id}")
     public ConfigDTO UpdateConfig(@PathVariable int id, @RequestBody ConfigDTO configDTO) throws Exception {
         return limsConfigService.Update(configDTO, id);
     }
 
-    @DeleteMapping("/configs/{id}")
+    @DeleteMapping("/config/{id}")
     public String DeleteConfig(@PathVariable int id) throws Exception {
         return limsConfigService.Delete(id);
     }
 
-    @GetMapping("/configs")
-    public List<ConfigDTO> GetAllConfig(){
-        return limsConfigService.FindAll();
+    @GetMapping("/config")
+    public ConfigDTO GetConfig(){
+        return limsConfigService.FindAll().get(0);
     }
 
-    @GetMapping("/configs/{id}")
+    @GetMapping("/config/{id}")
     public ConfigDTO GetConfigById(@PathVariable int id){
         return limsConfigService.FindById(id);
     }
