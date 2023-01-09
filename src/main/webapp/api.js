@@ -4,6 +4,6 @@ export const url = '/api/v1/'
 */
 
 
-export const url =  'http://localhost:8182/api/v1/';
-export const apiUrl =  'http://localhost:8182/api/';
-export const  token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJndWVzdEBsYW1pc3BsdXMub3JnIiwiYXV0aCI6IlN1cGVyIEFkbWluIiwibmFtZSI6Ikd1ZXN0IEd1ZXN0IiwiZXhwIjoxNjczMTM2NzE0fQ.LuYZRmfhTAmBqkWhF1_EPiAnywlbuDKM0kaPOeCBgRbrPmNuR9Rz1eM87OumBZ3TeDGo5bPZOcNIsi0eowlKRA';
+export const url =  'http://localhost:8282/api/v1/';
+export const apiUrl =  'http://localhost:8282/api/';
+export const  token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJndWVzdEBsYW1pc3BsdXMub3JnIiwiYXV0aCI6IlN1cGVyIEFkbWluIiwibmFtZSI6Ikd1ZXN0IEd1ZXN0IiwiZXhwIjoxNjczMzA4MjIwfQ.mgj50rD-COPKTpQ-XXI4W9-_51ZKzNG3qdTQIpkF4y_AH86aHB2oCrgoMlVwWGBLHoc-xvlvUvoaE-IVhefoyA';

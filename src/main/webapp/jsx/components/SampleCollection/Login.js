@@ -101,11 +101,11 @@ const Login = (props) => {
     testFacilityName: "",
   });
 
-  const [logins, setLogins] = useState([]);
+  const [logins, setLogins] = useState({});
 
-  const loadResults = useCallback(async () => {
+  const loadServerDetails = useCallback(async () => {
     try {
-      const response = await axios.get(`${url}lims/configs`, {
+      const response = await axios.get(`${url}lims/config`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       //console.log("configs", response);
@@ -120,13 +120,13 @@ const Login = (props) => {
   }, []);
 
   useEffect(() => {
-    loadResults();
-  }, [loadResults]);
+    loadServerDetails();
+  }, [loadServerDetails]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     //console.log(name, value)
-    if (name === "configName" && value === "Demo Server") {
+    if (name === "configName" && value === "Server") {
       setDemo(true);
     } else if (name === "configName" && value === "Live Server") {
       setDemo(false);
@@ -154,7 +154,7 @@ const Login = (props) => {
     try {
       if (validateInputs()) {
         await axios
-          .post(`${url}lims/configs`, login, {
+          .post(`${url}lims/config`, login, {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((resp) => {
@@ -174,7 +174,7 @@ const Login = (props) => {
             });
           });
 
-        loadResults();
+          loadServerDetails();
       }
     } catch (e) {
       toast.error("An error occurred while saving LIMS Credentials", {
@@ -192,7 +192,7 @@ const Login = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(" delete config", response);
-      loadResults();
+      loadServerDetails();
       toast.success("LIMS Credentials deleted successfully!!", {
         position: toast.POSITION.TOP_RIGHT,
       });
@@ -228,7 +228,7 @@ const Login = (props) => {
                   <Form>
                     <FormGroup>
                       <Label for="configName" className={classes.label}>
-                        Configuration Name
+                        Server Name
                       </Label>
                       <select
                         className="form-control"
@@ -244,8 +244,8 @@ const Login = (props) => {
                         onChange={handleChange}
                       >
                         <option hidden>Select Configuration Server</option>
-                        <option value="Demo Server">Demo Server</option>
-                        <option value="Live Server">Live Server</option>
+                        <option value="Server">LIMS Server</option>
+                        {/* <option value="Live Server">Live Server</option> */}
                       </select>
 
                       {errors.configName !== "" ? (
@@ -388,7 +388,7 @@ const Login = (props) => {
                     >
                       <tr>
                         <th>S/N</th>
-                        <th>Configuration Name</th>
+                        <th>Server Name</th>
                         <th>URL</th>
                         <th>Email</th>
                         {/*<th>Created Date</th>*/}
@@ -396,24 +396,21 @@ const Login = (props) => {
                       </tr>
                     </thead>
                     <tbody style={{ textAlign: "center" }}>
-                      {logins &&
-                        logins.map((data, i) => (
-                          <tr key={i}>
-                            <td>{++i}</td>
-                            <td>{data.configName}</td>
-                            <td>{data.serverUrl}</td>
-                            <td>{data.configEmail}</td>
+                          <tr key={logins.id}>
+                            <td>{logins.id}</td>
+                            <td>{logins.configName}</td>
+                            <td>{logins.serverUrl}</td>
+                            <td>{logins.configEmail}</td>
                             {/*<td>09/09/2022</td>*/}
                             <td>
                               <Button
                                 variant="contained"
                                 color="error"
                                 startIcon={<DeleteIcon />}
-                                onClick={(e) => deleteConfig(e, data.id)}
+                                onClick={(e) => deleteConfig(e, logins.id)}
                               ></Button>
                             </td>
                           </tr>
-                        ))}
                     </tbody>
                   </Table>
                 </Col>

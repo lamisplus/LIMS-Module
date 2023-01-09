@@ -90,17 +90,17 @@ const ConfigModal = (props) => {
   const [visible, setVisible] = useState(true);
   const onDismiss = () => setVisible(false);
 
-  const [logins, setLogins] = useState([]);
+  const [logins, setLogins] = useState({});
 
   const [configId, setConfigId] = useState(0);
 
   const loadConfig = useCallback(async () => {
     try {
-      const response = await axios.get(`${url}lims/configs`, {
+      const response = await axios.get(`${url}lims/config`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      //console.log("configs", response);
       setLogins(response.data);
+      localStorage.setItem("configId", JSON.stringify(response.data.id));
       setLoading(false);
     } catch (e) {
       toast.error("An error occurred while fetching config details", {
@@ -140,18 +140,17 @@ const ConfigModal = (props) => {
       );
     }, 500);
 
-    localStorage.setItem("configId", JSON.stringify(configId));
+    const serverId = JSON.parse(localStorage.getItem("configId"));
     props.togglestatus();
     try {
       await axios
-        .get(`${url}lims/ready-manifests/${manifestsId}/${configId}`, {
+        .get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((resp) => {
           if (resp) {
             console.log("sending manifest", resp);
             props.handleProgress(100);
-            props.submitted(2);
 
             toast.success("Sample manifest sent successfully to PCR Lab.", {
               position: toast.POSITION.TOP_RIGHT,
@@ -159,8 +158,6 @@ const ConfigModal = (props) => {
           }
         })
         .catch((err) => {
-          props.setFailed(true);
-
           clearInterval(timer);
           console.log("err", err);
           toast.error("Poor Internet Connection....", {
@@ -254,12 +251,11 @@ const ConfigModal = (props) => {
                             onChange={handleChange}
                           >
                             <option hidden>Select Server</option>
-                            {logins &&
-                              logins.map((data, i) => (
-                                <option key={i} value={data.id}>
-                                  {data.configName}
-                                </option>
-                              ))}
+                            {
+                              <option key={1} value={logins.id}>
+                                {logins.configName}
+                              </option>
+                            }
                           </Input>
                         </FormGroup>
                       </Col>
