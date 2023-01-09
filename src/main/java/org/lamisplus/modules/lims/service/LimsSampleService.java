@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.lamisplus.modules.base.domain.dto.PageDTO;
+import org.lamisplus.modules.base.domain.entities.User;
+import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.lims.domain.dto.*;
 import org.lamisplus.modules.lims.domain.entity.LIMSManifest;
 import org.lamisplus.modules.lims.domain.entity.LIMSSample;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,6 +34,7 @@ public class LimsSampleService {
     private final LimsSampleRepository sampleRepository;
     private final LimsMapper limsMapper;
     private final PersonService personService;
+    private  final UserService userService;
     private final JsonNodeTransformer jsonNodeTransformer;
 
     public LABSampleDTO Save(LABSampleDTO sampleDTO){
@@ -60,7 +64,7 @@ public class LimsSampleService {
     public LABSampleMetaDataDTO getAllPendingSamples(String searchParam, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
 
-        Page<LIMSSample> limsSamples = sampleRepository.findPendingVLSamples(paging);
+        Page<LIMSSample> limsSamples = sampleRepository.findPendingVLSamples(getCurrentUserOrganization(), paging);
         return getManifestListMetaDataDto(limsSamples);
     }
 
@@ -120,5 +124,10 @@ public class LimsSampleService {
         }
 
         return sampleDTOS;
+    }
+
+    public Long getCurrentUserOrganization() {
+        Optional<User> userWithRoles = userService.getUserWithRoles ();
+        return userWithRoles.map (User::getCurrentOrganisationUnitId).orElse (null);
     }
 }

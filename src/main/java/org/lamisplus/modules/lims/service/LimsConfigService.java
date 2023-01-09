@@ -19,11 +19,19 @@ public class LimsConfigService {
     private final LimsConfigRepository limsConfigRepository;
     private final LimsMapper limsMapper;
 
-    public ConfigDTO Save(ConfigDTO configDTO){
+    public ConfigDTO Save(ConfigDTO configDTO) throws Exception {
+        List<LIMSConfig> configs = limsConfigRepository.findAll();
         LIMSConfig config = limsMapper.toConfig(configDTO);
         config.setUuid(UUID.randomUUID().toString());
         config.setCreateDate(LocalDateTime.now());
-        return limsMapper.toConfigDto(limsConfigRepository.save(config));
+
+        if(configs.size()>0){
+            configDTO.setId(configs.get(0).getId());
+            return Update(configDTO, config.getId());
+        }
+        else{
+            return limsMapper.toConfigDto(limsConfigRepository.save(config));
+        }
     }
     public ConfigDTO Update(ConfigDTO configDTO, int id) throws Exception {
         if(FindById(id) != null) {
