@@ -25,7 +25,6 @@ const Home = (props) => {
     axios
       .get(`${url}account`, { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
-        console.log("Home_permission", response.data.permissions);
         setPermissions(response.data.permissions);
       })
       .catch((error) => {});

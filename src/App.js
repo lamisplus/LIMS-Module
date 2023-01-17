@@ -14,6 +14,7 @@ import Home from "./main/webapp/jsx/components/Home";
 import SampleCollection from "./main/webapp/jsx/components/SampleCollection/SamplesCollection";
 import PrintManifest from "./main/webapp/jsx/components/manifest/PrintManifest";
 import Result from "./main/webapp/jsx/components/results/Result";
+import PatientResultPrint from "./main/webapp/jsx/components/results/PatientResultPrint";
 import AddResult from "./main/webapp/jsx/components/results/AddResults";
 
 export default function App() {
@@ -21,6 +22,9 @@ export default function App() {
     <div>
       <ToastContainer />
       <Switch>
+        <Route path="/Patient-result">
+            <PatientResultPrint />
+        </Route>
         <Route path="/result">
           <Result />
         </Route>

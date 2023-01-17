@@ -1,7 +1,8 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 import { Badge, Spinner } from "reactstrap";
 import { Row } from "react-bootstrap";
+import PrintIcon from "@mui/icons-material/Print";
 
 import {
   Card,
@@ -60,7 +61,6 @@ const sampleStatus = (e) => {
 class PrintResults extends React.Component {
   render() {
     const { manifestObj, results } = this.props;
-    //console.log("cvx",results)
     return (
       <Card>
         <CardBody>
@@ -100,48 +100,35 @@ class PrintResults extends React.Component {
                 <tr style={{ backgroundColor: "#014d88", color: "#fff" }}>
                   <th>Sample ID</th>
                   <th>Approval Date</th>
-                  {/*<th>Assay Date</th>
-                                <th>Date Received at PCR Lab</th>*/}
                   <th>Date Result Dispatched</th>
                   <th>PCR Sample Number</th>
-                  {/*<th>Result Date</th>*/}
                   <th>Sample Status</th>
                   <th>Sample Testable</th>
                   <th>Test Result</th>
-                  {/*<th>Visit Date</th>*/}
+                  <th>Print</th>
                 </tr>
                 {
-                  //<p> <Spinner color="primary" /> Loading Please Wait</p>
                   results.length === 0 ? (
                     " "
-                  ) : //                               manifestObj.sampleInformation.map((result) => (
-                  //                                        <tr>
-                  //                                          <td scope="row">{result.sampleID}</td>
-                  //                                          <td>-- -- --</td>
-                  //                                          <td>-- -- --</td>
-                  //                                          <td>-- -- --</td>
-                  //                                          <td>{sampleStatus(result.sampleStatus)}</td>
-                  //                                          <td>true</td>
-                  //                                          <td>-- -- --</td>
-                  //
-                  //                                       </tr>
-                  //
-                  //                                  ))
+                  ) :
                   results.length !== 0 ? (
-                    results.map((result) => (
+                    manifestObj.results.map((result) => (
                       <tr>
                         <td>{result.sampleID}</td>
                         <td>{result.approvalDate}</td>
-                        {/*<td>{data.assayDate}</td>
-                                      <td>{data.dateSampleReceivedAtPCRLab}</td>*/}
                         <td>{result.dateResultDispatched}</td>
                         <td>{result.pcrLabSampleNumber}</td>
-                        {/*<td>{data.resultDate}</td>*/}
-
                         <td>{sampleStatus(result.sampleStatus)}</td>
                         <td>{result.sampleTestable}</td>
                         <td>{result.testResult}</td>
-                        {/*<td>{data.visitDate}</td>*/}
+                        <td>
+                            <Link to={{
+                                pathname: '/Patient-result',
+                                state: { data: result, sample: manifestObj}
+                            }}>
+                                <PrintIcon />
+                            </Link>
+                        </td>
                       </tr>
                     ))
                   ) : (

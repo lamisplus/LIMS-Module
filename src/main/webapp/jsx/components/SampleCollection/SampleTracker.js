@@ -131,11 +131,30 @@ const SampleTracker = () => {
               totalCount: 0,
             });
           } else {
-            resolve({
-              data: [],
-              page: query.page,
-              totalCount: result.data.totalRecords,
-            });
+             resolve({
+               data: result.data.records.map((row) => ({
+                 manifestId: row.manifestID,
+                 patientId: row.sampleInformation[0].patientID[0].idNumber,
+                 sampleId: row.sampleInformation[0].sampleID,
+                 lab: row.receivingLabName,
+                 pcr_no: row.results.length !== 0 ? row.results[0].pcrLabSampleNumber : "",
+                 status:
+                    row.manifestStatus === "Ready" ? (
+                      <Badge color="secondary">Not Submitted</Badge>
+                    ) : (
+                      <Badge color="success">Result available</Badge>
+                    ),
+                 resultDate: row.results.length !== 0 ? row.results[0].resultDate : "",
+                 approvalDate: row.results.length !== 0 ? row.results[0].approvalDate : "",
+                 assayDate: row.results.length !== 0 ? row.results[0].assayDate : "",
+                 tested_by: "",
+                 approved_by: "",
+                 receivedDate: row.results.length !== 0 ? row.results[0].dateResultDispatched : "",
+                 testResult: row.results[0] !== 0 ? row.results[0]?.testResult : "",
+               })),
+               page: query.page,
+               totalCount: result.data.totalRecords,
+             });
           }
         });
     });
@@ -153,7 +172,7 @@ const SampleTracker = () => {
     return (
         <>
           <br/>
-          <Grid container spacing={2}>
+         {/* <Grid container spacing={2}>
           <LocalizationProvider
               dateAdapter={AdapterDayjs}
               localeText={{ start: "Start-Date", end: "End-Date" }}
@@ -172,13 +191,7 @@ const SampleTracker = () => {
                 )}
               />
             </LocalizationProvider>
-            &nbsp; &nbsp; &nbsp;
-            <Button 
-              size="medium"
-              variant="contained" 
-              onClick={handleDownload}
-              startIcon={<DownloadIcon />}>Download Report</Button>
-          </Grid>
+          </Grid> */}
           <hr/>
            <MaterialTable
             icons={tableIcons}
@@ -190,13 +203,13 @@ const SampleTracker = () => {
                 { title: "PCR_Lab", field: "lab" },
                 { title: "PCR_No", field: "pcr_no" },
                 { title: "Status", field: "status" },
-                { title: "Result Date", field: "createDate" },
-                { title: "Approval Date", field: "createDate" },
-                { title: "Assay_Date", field: "pickupDate" },
-                { title: "Tested By", field: "packaged_by" },
-                { title: "Approved By", field: "packaged_by" },
-                { title: "Receive Date", field: "pickupDate" },
-                { title: "Sample Result", field: "result" },
+                { title: "Result Date", field: "resultDate" },
+                { title: "Approval Date", field: "approvalDate" },
+                { title: "Assay_Date", field: "assayDate" },
+                { title: "Tested By", field: "tested_by" },
+                { title: "Approved By", field: "approved_by" },
+                { title: "Receive Date", field: "receivedDate" },
+                { title: "Sample Result", field: "testResult" },
             ]}
             isLoading={loading}
             data={handlePulledData}
@@ -213,7 +226,7 @@ const SampleTracker = () => {
                 },
                 selection: false,
                 filtering: false,
-                exportButton: false,
+                exportButton: true,
                 searchFieldAlignment: "left",
                 pageSizeOptions: [10, 20, 100],
                 pageSize: 10,

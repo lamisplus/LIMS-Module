@@ -115,7 +115,7 @@ const SampleSearch = (props) => {
         `${url}lims/manifests?searchParam=*&pageNo=0&pageSize=100`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("manifest", response);
+
       let arr = [];
       if (response.data.records === null) {
       } else {

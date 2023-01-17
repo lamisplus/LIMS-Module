@@ -126,7 +126,6 @@ const Result = (props) => {
         `${url}lims/results/manifests/${manifestObj.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      //console.log("results", response.data);
       setResults(response.data.results);
       setLoading(false);
     } catch (e) {
@@ -143,6 +142,8 @@ const Result = (props) => {
           `${url}lims/manifest-results/${manifestObj.id}/${serverId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
+        console.log("result", response)
 
         if (response.data.viralLoadTestReport !== null) {
           setResults(response.data.viralLoadTestReport);
@@ -172,14 +173,13 @@ const Result = (props) => {
                 sendingPCRLabID: d.sendingPCRLabID,
                 sendingPCRLabName: d.sendingPCRLabName,
               };
-              //console.log("results", result)
 
               axios
                 .post(`${url}lims/results`, [result], {
                   headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((resp) => {
-                  // console.log("results saved", resp)
+                   console.log("results saved", resp)
                 });
             }
           });
@@ -194,10 +194,7 @@ const Result = (props) => {
       }
       setLoading(false);
     } catch (e) {
-      toast.error("An error occurred while getting manifest results", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      setLoading(false);
+        console.log(e.message);
     }
   }, [manifestObj.id]);
 
