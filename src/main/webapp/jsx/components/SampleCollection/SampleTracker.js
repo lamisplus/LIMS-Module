@@ -142,7 +142,7 @@ const SampleTracker = () => {
                     row.manifestStatus === "Ready" ? (
                       <Badge color="secondary">Not Submitted</Badge>
                     ) : (
-                      <Badge color="success">Result available</Badge>
+                      <Badge color="success">Submitted</Badge>
                     ),
                  resultDate: row.results.length !== 0 ? row.results[0].resultDate : "",
                  approvalDate: row.results.length !== 0 ? row.results[0].approvalDate : "",
@@ -150,7 +150,7 @@ const SampleTracker = () => {
                  tested_by: "",
                  approved_by: "",
                  receivedDate: row.results.length !== 0 ? row.results[0].dateResultDispatched : "",
-                 testResult: row.results[0] !== 0 ? row.results[0]?.testResult : "",
+                 testResult: row.results.length !== 0 ? `${row.results[0]?.testResult} cp\mL` : "",
                })),
                page: query.page,
                totalCount: result.data.totalRecords,

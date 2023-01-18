@@ -13,20 +13,22 @@ import { token, url } from "../../../api";
 function SampleCollection() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [permissions, setPermissions] = useState([]);
-  const [config, setConfig] = useState([]);
+  const [config, setConfig] = useState({});
   const [submitted, setSubmitted] = useState(0);
+  const [previous, setPrevious] = useState(0);
 
   const loadConfig = useCallback(async () => {
     try {
-      const response = await axios.get(`${url}lims/configs`, {
+      const response = await axios.get(`${url}lims/config`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      //console.log("configs", response);
       setConfig(response.data);
     } catch (e) {
       console.log(e);
     }
   }, []);
+
+  console.log("steps", previous);
 
   useEffect(() => {
     userPermission();
@@ -56,7 +58,7 @@ function SampleCollection() {
       case 0:
         return <SampleOrderLists setSubmitted={setSubmitted} />;
       case 1:
-        return <CreateAManifest setSubmitted={setSubmitted} />;
+        return <CreateAManifest setSubmitted={setSubmitted} setPrevious={setPrevious} />;
       case 2:
         return <PrintManifest />;
       default:
@@ -92,9 +94,9 @@ function SampleCollection() {
               color="primary"
               onClick={() => previousStep()}
               disabled={
-                config.length === 0
+                Object.keys(config).length === 0
                   ? true
-                  : false || activeStep === 0
+                  : false || activeStep === previous
                   ? true
                   : false
               }
@@ -106,7 +108,7 @@ function SampleCollection() {
               color="primary"
               onClick={() => nextStep()}
               disabled={
-                config.length === 0
+                Object.keys(config).length === 0
                   ? true
                   : false || activeStep === submitted
                   ? true

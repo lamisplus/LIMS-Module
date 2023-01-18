@@ -6,6 +6,7 @@ import {
   Card,
   CardBody,
   Table,
+  Badge,
 } from "reactstrap";
 
 let today = new Date().toLocaleDateString("en-us", {
@@ -15,6 +16,12 @@ let today = new Date().toLocaleDateString("en-us", {
   day: "numeric",
 });
 
+const print = {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontFamily: "Arial"
+}
+
 class ManifestPrint extends React.Component {
   render() {
     //console.log(this.props.sampleObj)
@@ -22,28 +29,27 @@ class ManifestPrint extends React.Component {
       <Card>
         <CardBody>
           <Row>
-            <span>{today}</span>
-            <Table size="sm">
+            <span style = {{ fontSize: "10px" }}>{today}</span>
+            { this.props.sampleObj.manifestStatus === "Ready" ?
+                 <span><Badge color="secondary">Not Submitted</Badge></span>
+                 : " "
+            }
+
+            <Table size="sm" style={ print }>
               <tbody>
                 <tr>
                   <th scope="row"></th>
-
                   <th scope="row"></th>
-
-                  <th scope="row" className="text-center">
-                    <img src={logo} style={{ width: "80px", height: "80px" }} alt=""/>
-                  </th>
-                </tr>
-                <tr>
                   <th scope="row"></th>
-
                   <th scope="row">
                     <h2 className="text-center">
                       NISRN TRANSPORTATION MANIFEST
                     </h2>
                   </th>
 
-                  <th scope="row"></th>
+                  <th scope="row">
+                     <img src={logo} style={{ width: "80px", height: "80px" }} alt=""/>
+                  </th>
                 </tr>
               </tbody>
             </Table>
@@ -51,7 +57,7 @@ class ManifestPrint extends React.Component {
           <br />
           <br />
           <Row>
-            <Table bordered size="sm">
+            <Table bordered size="sm" style={ print }>
               <tbody>
                 <tr>
                   <th scope="row">Pick Up Date:</th>
@@ -89,7 +95,7 @@ class ManifestPrint extends React.Component {
           </Row>
           <br />
           <Row>
-            <Table striped bordered size="sm">
+            <Table striped bordered size="sm" style={ print }>
               <thead style={{ backgroundColor: "#014d88", color: "#fff" }}>
                 <tr>
                   <th>Facility</th>
@@ -116,7 +122,7 @@ class ManifestPrint extends React.Component {
             </Table>
           </Row>
           <br />
-          <span>LAMISPlus 2.0</span>
+          <span style={{ fontSize: "10px" }}>LAMISPlus 2.0 : {today}</span>
         </CardBody>
       </Card>
     );

@@ -103,6 +103,10 @@ const CreateAManifest = (props) => {
     props.setSubmitted(status);
   };
 
+  const confirmStatusPrevious = (status) => {
+     props.setPrevious(status)
+  }
+
   useEffect(() => {
     const collectedSamples = JSON.parse(localStorage.getItem("samples"));
     if (collectedSamples) {
@@ -497,6 +501,7 @@ const CreateAManifest = (props) => {
           handleProgress={handleProgress}
           handleOpen={handleOpen}
           submitted={confirmStatusSubmitted}
+          previous = {confirmStatusPrevious}
           setFailed={setFailed}
           failed={failed}
         />

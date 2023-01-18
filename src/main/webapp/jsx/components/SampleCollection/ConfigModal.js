@@ -140,33 +140,36 @@ const ConfigModal = (props) => {
       );
     }, 500);
 
-    const serverId = JSON.parse(localStorage.getItem("configId"));
-    props.togglestatus();
-    try {
-      await axios
-        .get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((resp) => {
-          if (resp) {
-            console.log("sending manifest", resp);
-            props.handleProgress(100);
+        const serverId = JSON.parse(localStorage.getItem("configId"));
+        props.togglestatus();
+        try {
+          await axios
+            .get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((resp) => {
+              if (resp) {
+                console.log("sending manifest", resp);
+                props.handleProgress(100);
 
-            toast.success("Sample manifest sent successfully to PCR Lab.", {
-              position: toast.POSITION.TOP_RIGHT,
+                toast.success("Sample manifest sent successfully to PCR Lab.", {
+                  position: toast.POSITION.TOP_RIGHT,
+                });
+
+                props.submitted(2)
+                props.previous(0)
+              }
+            })
+            .catch((err) => {
+              clearInterval(timer);
+              console.log("err", err);
+              toast.error("Poor Internet Connection....", {
+                position: toast.POSITION.TOP_RIGHT,
+              });
+
+              props.handleOpen();
             });
-          }
-        })
-        .catch((err) => {
-          clearInterval(timer);
-          console.log("err", err);
-          toast.error("Poor Internet Connection....", {
-            position: toast.POSITION.TOP_RIGHT,
-          });
-
-          props.handleOpen();
-        });
-    } catch (err) {
+        } catch (err) {
       props.setFailed(true);
 
       clearInterval(timer);

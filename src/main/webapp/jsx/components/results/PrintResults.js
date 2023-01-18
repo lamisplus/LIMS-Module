@@ -61,6 +61,7 @@ const sampleStatus = (e) => {
 class PrintResults extends React.Component {
   render() {
     const { manifestObj, results } = this.props;
+    console.log(results)
     return (
       <Card>
         <CardBody>
@@ -112,7 +113,7 @@ class PrintResults extends React.Component {
                     " "
                   ) :
                   results.length !== 0 ? (
-                    manifestObj.results.map((result) => (
+                    results.map((result) => (
                       <tr>
                         <td>{result.sampleID}</td>
                         <td>{result.approvalDate}</td>
@@ -120,24 +121,46 @@ class PrintResults extends React.Component {
                         <td>{result.pcrLabSampleNumber}</td>
                         <td>{sampleStatus(result.sampleStatus)}</td>
                         <td>{result.sampleTestable}</td>
-                        <td>{result.testResult}</td>
-                        <td>
-                            <Link to={{
-                                pathname: '/Patient-result',
-                                state: { data: result, sample: manifestObj}
-                            }}>
-                                <PrintIcon />
-                            </Link>
-                        </td>
+                        <td>{result.testResult !== "" ? `${result.testResult} cp/mL` : "" }</td>
+                        { result.testResult !== "" ? (
+                          <td>
+                                <Link to={{
+                                    pathname: '/Patient-result',
+                                    state: { data: result, sample: manifestObj}
+                                }}>
+                                    <PrintIcon />
+                                </Link>
+                            </td>
+                        ) : " " }
                       </tr>
                     ))
                   ) : (
-                    <>
-                      <br />
-                      <p style={{ textAlign: "center" }}>
-                        No sample results available.
-                      </p>
-                    </>
+
+                     manifestObj.results.map((result) => (
+                        <tr>
+                          <td>{result.sampleID}</td>
+                          <td>{result.approvalDate}</td>
+                          <td>{result.dateResultDispatched}</td>
+                          <td>{result.pcrLabSampleNumber}</td>
+                          <td>{sampleStatus(result.sampleStatus)}</td>
+                          <td>{result.sampleTestable}</td>
+                          <td>{result.testResult}</td>
+                          <td>
+                              <Link to={{
+                                  pathname: '/Patient-result',
+                                  state: { data: result, sample: manifestObj}
+                              }}>
+                                  <PrintIcon />
+                              </Link>
+                          </td>
+                        </tr>
+                      ))
+//                    <>
+//                      <br />
+//                      <p style={{ textAlign: "center" }}>
+//                        No sample results available.
+//                      </p>
+//                    </>
                   )
                 }
               </tbody>
@@ -152,7 +175,7 @@ class PrintResults extends React.Component {
               " "
             )}
             <br />
-            <span>LAMISPlus 2.0: {today}</span>
+            <span style={{ fontSize: "10px" }} >LAMISPlus 2.0: {today}</span>
           </Row>
           <hr />
         </CardBody>

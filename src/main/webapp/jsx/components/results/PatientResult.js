@@ -5,6 +5,7 @@ import { Row } from "react-bootstrap";
 import PrintIcon from "@mui/icons-material/Print";
 import MatButton from "@material-ui/core/Button";
 import HomeIcon from "@mui/icons-material/Home";
+import "./result.css";
 
 import {
   Card,
@@ -19,6 +20,12 @@ let today = new Date().toLocaleDateString("en-us", {
   day: "numeric",
 });
 
+const print = {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontFamily: "Arial",
+}
+
 class PatientResult extends React.Component {
   render() {
     const { results, samples } = this.props;
@@ -26,10 +33,10 @@ class PatientResult extends React.Component {
     return (
       <Card>
         <CardBody>
-          <h3 style={{ textAlign: "center" }}>HIV-1 Viral Load Result</h3>
+          <h3 style={{ textAlign: "center", border: "1px solid", padding: "15px" }}>Patient Viral Load Result</h3>
           <hr />
           <Row>
-            <Table bordered size="sm" responsive>
+            <Table bordered size="sm" responsive style={ print }>
               <tbody>
                  <tr>
                   <th scope="row">Lab Report:</th>
@@ -50,7 +57,7 @@ class PatientResult extends React.Component {
                 <tr>
                   <th scope="row">Address\Location:</th>
                   <td></td>
-                  <th scope="row">Date Collected:</th>
+                  <th scope="row">Date\Time Collected:</th>
                   <td>{samples.sampleInformation[0].sampleCollectionDate}</td>
                   <th scope="row">Sample Id:</th>
                   <td>{results.sampleID}</td>
@@ -58,7 +65,7 @@ class PatientResult extends React.Component {
                 <tr>
                   <th scope="row">Sample Type:</th>
                   <td>{samples.sampleInformation[0].sampleType}</td>
-                  <th scope="row">Date Ordered:</th>
+                  <th scope="row">Date\Time Ordered:</th>
                   <td>{samples.sampleInformation[0].sampleOrderDate}</td>
                   <th scope="row">Date Received at PCR:</th>
                   <td>{results.visitDate}</td>
@@ -81,7 +88,7 @@ class PatientResult extends React.Component {
               </tbody>
             </Table>
             <br />
-            <Table striped bordered size="sm">
+            <Table striped bordered size="sm" style={ print }>
               <tbody>
                 <tr style={{ backgroundColor: "#014d88", color: "#fff" }}>
                   <th>Assay Date</th>
@@ -105,7 +112,7 @@ class PatientResult extends React.Component {
             <br />
             <br />
             <br />
-            <Table bordered size="sm" responsive>
+            <Table bordered size="sm" responsive style={ print }>
               <tbody>
                  <tr>
                   <th scope="row">Report by:<br />
@@ -119,7 +126,7 @@ class PatientResult extends React.Component {
             </Table>
 
             <br />
-            <span>LAMISPlus 2.0: {today}</span>
+            <span style={{ fontSize: "10px" }}>LAMISPlus 2.0: {today}</span>
           </Row>
           <hr />
         </CardBody>

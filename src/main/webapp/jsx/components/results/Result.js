@@ -235,7 +235,7 @@ const Result = (props) => {
             >
               Refresh
             </MatButton>
-            <MatButton
+           {/* <MatButton
               variant="contained"
               color="success"
               className={classes.button}
@@ -243,7 +243,7 @@ const Result = (props) => {
               onClick={handlePrint}
             >
               Print
-            </MatButton>
+            </MatButton> */}
 
             <Link color="inherit" to={{ pathname: "/" }}>
               <MatButton
