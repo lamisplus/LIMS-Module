@@ -165,9 +165,9 @@ const CreateAManifest = (props) => {
     temp.dateScheduledForPickup = manifestData.dateScheduledForPickup
       ? ""
       : "Pick-Up date is required.";
-    temp.temperatureAtPickup = manifestData.temperatureAtPickup
-      ? ""
-      : "Temperature is required.";
+//    temp.temperatureAtPickup = manifestData.temperatureAtPickup
+//      ? ""
+//      : "Temperature is required.";
     temp.receivingLabID = manifestData.receivingLabID
       ? ""
       : "Receiving lab Id is required.";
@@ -463,13 +463,13 @@ const CreateAManifest = (props) => {
                       onChange={handleChange}
                       className={classes.input}
                     />
-                    {errors.temperatureAtPickup !== "" ? (
+                   {/* {errors.temperatureAtPickup !== "" ? (
                       <span className={classes.error}>
                         {errors.temperatureAtPickup}
                       </span>
                     ) : (
                       ""
-                    )}
+                    )} */}
                   </FormGroup>
                 </Col>
               </Row>
