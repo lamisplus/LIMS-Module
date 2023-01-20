@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface LimsSampleRepository extends JpaRepository<LIMSSample, Integer> {
     List<LIMSSample> findAllByManifestRecordID(Integer id);
+    //List<LIMSSample> findAllByManifestRecordIDAndSendingFacilityID(Integer id, S)
     @Query(value = "select c.id, '0' as manifest_record_id\n" +
             ", c.sample_number as sample_id\n" +
             ", c.uuid\n" +

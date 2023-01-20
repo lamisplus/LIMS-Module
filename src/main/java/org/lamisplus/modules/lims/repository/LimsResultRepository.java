@@ -11,10 +11,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface LimsResultRepository extends JpaRepository<LIMSResult, Integer> {
     List<LIMSResult> findAllByManifestRecordID(Integer id);
     List<LIMSResult> findAllBySampleID(String sampleId);
+
+    Optional<LIMSResult> getLIMSResultBySampleID(String sampleId);
 
     @Transactional
     @Modifying
