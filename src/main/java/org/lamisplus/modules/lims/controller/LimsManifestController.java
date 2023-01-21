@@ -60,4 +60,9 @@ public class LimsManifestController {
                                               @RequestParam(defaultValue = "10") Integer pageSize){
         return limsManifestService.findAllManifestsV2(searchParam, pageNo, pageSize);
     }
+
+    @GetMapping("/manifest-samples-info-by-sampleid/{sampleId}")
+    public AllManifestDto getSamplesInformationBySampleId(@PathVariable String sampleId) {
+        return limsManifestService.getSingleSampleInformationBySampleId(sampleId);
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LimsSampleRepository extends JpaRepository<LIMSSample, Integer> {
     List<LIMSSample> findAllByManifestRecordID(Integer id);
@@ -47,4 +48,6 @@ public interface LimsSampleRepository extends JpaRepository<LIMSSample, Integer>
             "and b.lab_test_order_status in (1,2,3)\n" +
             "and c.sample_number not in (select x.sample_id from lims_sample x) ", nativeQuery = true)
     Page<LIMSSample> findPendingVLSamples(Long facilityId, Pageable pageable);
+
+    Optional<LIMSSample> findLIMSSampleBySampleID(String sampleId);
 }

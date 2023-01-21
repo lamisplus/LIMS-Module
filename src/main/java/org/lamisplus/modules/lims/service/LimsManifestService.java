@@ -337,6 +337,7 @@ public class LimsManifestService {
                 allManifestDto.setLocalSampleId(limsSample.getId());
                 allManifestDto.setPatientID(limsSample.getPatientID());
                 allManifestDto.setPid(limsSample.getPid());
+                allManifestDto.setSampleID(limsSample.getSampleID());
                 allManifestDto.setSampleType(limsSample.getSampleType());
                 allManifestDto.setSampleOrderedBy(limsSample.getSampleOrderedBy());
                 allManifestDto.setSampleOrderDate(limsSample.getSampleOrderDate());
@@ -360,7 +361,6 @@ public class LimsManifestService {
                     allManifestDto.setResultIsBack(Boolean.TRUE);
                     LIMSResult limsResult = limsResults.get();
                     allManifestDto.setLocalResultId(limsResult.getId());
-                    allManifestDto.setSampleID(limsResult.getSampleID());
                     allManifestDto.setPcrLabSampleNumber(limsResult.getPcrLabSampleNumber());
                     allManifestDto.setVisitDate(limsResult.getVisitDate());
                     allManifestDto.setDateSampleReceivedAtPcrLab(limsResult.getDateSampleReceivedAtPcrLab());
@@ -394,4 +394,75 @@ public class LimsManifestService {
      {
          return (int)Math.ceil(totalRec/pageSize);
      }
+
+    public  AllManifestDto getSingleSampleInformationBySampleId(String sampleId){
+        AllManifestDto allManifestDto = new AllManifestDto();
+        Optional<LIMSSample>  limsSamples = sampleRepository.findLIMSSampleBySampleID(sampleId);
+        if(limsSamples.isPresent())
+        {
+            LIMSSample limsSample = limsSamples.get();
+            Optional<LIMSManifest> limsManifests = limsManifestRepository.findById(limsSample.getManifestRecordID());
+            if (limsManifests.isPresent()){
+                LIMSManifest limsManifest = limsManifests.get();
+                allManifestDto.setLocalManifestId(limsManifest.getId());
+                allManifestDto.setManifestID(limsManifest.getManifestID());
+                allManifestDto.setSendingFacilityID(limsManifest.getSendingFacilityID());
+                allManifestDto.setSendingFacilityName(limsManifest.getSendingFacilityName());
+                allManifestDto.setReceivingLabID(limsManifest.getReceivingLabID());
+                allManifestDto.setReceivingLabName(limsManifest.getReceivingLabName());
+                allManifestDto.setDateScheduledForPickup(limsManifest.getDateScheduledForPickup());
+                allManifestDto.setTemperatureAtPickup(limsManifest.getTemperatureAtPickup());
+                allManifestDto.setSamplePackagedBy(limsManifest.getSamplePackagedBy());
+                allManifestDto.setCourierRiderName(limsManifest.getCourierRiderName());
+                allManifestDto.setCourierContact(limsManifest.getCourierContact());
+                allManifestDto.setManifestStatus(limsManifest.getManifestStatus());
+                allManifestDto.setCreateDate(limsManifest.getCreateDate());
+                allManifestDto.setFacilityId(limsManifest.getFacilityId());
+            }
+
+            allManifestDto.setLocalSampleId(limsSample.getId());
+            allManifestDto.setPatientID(limsSample.getPatientID());
+            allManifestDto.setPid(limsSample.getPid());
+            allManifestDto.setSampleID(limsSample.getSampleID());
+            allManifestDto.setSampleType(limsSample.getSampleType());
+            allManifestDto.setSampleOrderedBy(limsSample.getSampleOrderedBy());
+            allManifestDto.setSampleOrderDate(limsSample.getSampleOrderDate());
+            allManifestDto.setSampleCollectedBy(limsSample.getSampleCollectedBy());
+            allManifestDto.setSampleCollectionDate(limsSample.getSampleCollectionDate());
+            allManifestDto.setSampleCollectionTime(limsSample.getSampleCollectionTime());
+            allManifestDto.setDateSampleSent(limsSample.getDateSampleSent());
+            allManifestDto.setIndicationVLTest(limsSample.getIndicationVLTest());
+            allManifestDto.setFirstName(limsSample.getFirstName());
+            allManifestDto.setSurName(limsSample.getSurName());
+            allManifestDto.setSex(limsSample.getSex());
+            allManifestDto.setAge(limsSample.getAge());
+            allManifestDto.setDateOfBirth(limsSample.getDateOfBirth());
+            allManifestDto.setPregnantBreastFeedingStatus(limsSample.getPregnantBreastFeedingStatus());
+            allManifestDto.setArtCommencementDate(limsSample.getArtCommencementDate());
+            allManifestDto.setPriority(limsSample.getPriority());
+            allManifestDto.setPriorityReason(limsSample.getPriorityReason());
+
+            Optional<LIMSResult> limsResults = this.resultRepository.getLIMSResultBySampleID(limsSample.getSampleID());
+            if (limsResults.isPresent()) {
+                allManifestDto.setResultIsBack(Boolean.TRUE);
+                LIMSResult limsResult = limsResults.get();
+                allManifestDto.setLocalResultId(limsResult.getId());
+                allManifestDto.setPcrLabSampleNumber(limsResult.getPcrLabSampleNumber());
+                allManifestDto.setVisitDate(limsResult.getVisitDate());
+                allManifestDto.setDateSampleReceivedAtPcrLab(limsResult.getDateSampleReceivedAtPcrLab());
+                allManifestDto.setResultDate(limsResult.getResultDate());
+                allManifestDto.setTestResult(limsResult.getTestResult());
+                allManifestDto.setAssayDate(limsResult.getAssayDate());
+                allManifestDto.setApprovalDate(limsResult.getApprovalDate());
+                allManifestDto.setDateResultDispatched(limsResult.getDateResultDispatched());
+                allManifestDto.setSampleStatus(limsResult.getSampleStatus());
+                allManifestDto.setSampleTestable(limsResult.getSampleTestable());
+
+
+            }else allManifestDto.setResultIsBack(Boolean.FALSE);
+
+        }
+
+        return allManifestDto;
+    }
 }
