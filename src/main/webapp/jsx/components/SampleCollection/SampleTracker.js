@@ -119,7 +119,7 @@ const SampleTracker = () => {
     new Promise((resolve, reject) => {
       axios
         .get(
-          `${url}lims/manifests?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`,
+          `${url}lims/manifests-all-in-one-drkarim?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`,
           { headers: { Authorization: `Bearer ${token}` } }
         )
         .then((resp) => resp)
@@ -134,23 +134,29 @@ const SampleTracker = () => {
              resolve({
                data: result.data.records.map((row) => ({
                  manifestId: row.manifestID,
-                 patientId: row.sampleInformation[0].patientID[0].idNumber,
-                 sampleId: row.sampleInformation[0].sampleID,
+                 patientId: row.patientID[0].idNumber,
+                 sampleId: row.sampleID,
+                 sampleType: row.sampleType,
+                 orderBy: row.sampleOrderedBy,
+                 sampleOrderDate: row.sampleOrderDate,
+                 sampleCollectedBy: row.sampleCollectedBy,
+                 sampleCollectionDate: row.sampleCollectionDate,
+                 dateSampleSent: row.dateSampleSent,
                  lab: row.receivingLabName,
-                 pcr_no: row.results.length !== 0 ? row.results[0].pcrLabSampleNumber : "",
+                 pcr_no: row.pcrLabSampleNumber,
                  status:
                     row.manifestStatus === "Ready" ? (
                       <Badge color="secondary">Not Submitted</Badge>
                     ) : (
                       <Badge color="success">Submitted</Badge>
                     ),
-                 resultDate: row.results.length !== 0 ? row.results[0].resultDate : "",
-                 approvalDate: row.results.length !== 0 ? row.results[0].approvalDate : "",
-                 assayDate: row.results.length !== 0 ? row.results[0].assayDate : "",
+                 resultDate: row.resultDate,
+                 approvalDate: row.approvalDate,
+                 assayDate: row.assayDate,
                  tested_by: "",
                  approved_by: "",
-                 receivedDate: row.results.length !== 0 ? row.results[0].dateResultDispatched : "",
-                 testResult: row.results.length !== 0 ? `${row.results[0]?.testResult} cp\mL` : "",
+                 receivedDate: row.dateResultDispatched,
+                 testResult: row.testResult !== null ? `${row.testResult} cp\mL` : "",
                })),
                page: query.page,
                totalCount: result.data.totalRecords,
@@ -197,12 +203,19 @@ const SampleTracker = () => {
             icons={tableIcons}
             title="PCR Sample Tracker"
             columns={[
+                { title: "Status", field: "status" },
                 { title: "Manifest Id", field: "manifestId" },
                 { title: "Patient Id", field: "patientId" },
                 { title: "Sample Id", field: "sampleId" },
+                { title: "Sample Type", field: "sampleType" },
+                { title: "Order by", field: "orderBy" },
+                { title: "Order Date", field: "sampleOrderDate" },
+                { title: "Collected By", field: "sampleCollectedBy" },
+                { title: "Collection Date", field: "sampleCollectionDate" },
+                { title: "Date Sent", field: "dateSampleSent" },
                 { title: "PCR_Lab", field: "lab" },
                 { title: "PCR_No", field: "pcr_no" },
-                { title: "Status", field: "status" },
+
                 { title: "Result Date", field: "resultDate" },
                 { title: "Approval Date", field: "approvalDate" },
                 { title: "Assay_Date", field: "assayDate" },
