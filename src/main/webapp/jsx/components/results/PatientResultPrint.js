@@ -88,13 +88,31 @@ const PatientResultPrint = (props) => {
   const location = useLocation()
 
   const patientResults = location && location.state ? location.state.data : {};
-  const sampleData = location && location.state ? location.state.sample : {};
+
+  const [patientInfo, setPatientInfo] = useState({});
 
   const componentRef = useRef();
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
+   const loadInfo = useCallback(async () => {
+      try {
+        const response = await axios.get(
+          `${url}lims/manifest-samples-info-by-sampleid/${patientResults.sampleID}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log(response)
+        setPatientInfo(response.data);
+      } catch (e) {
+          console.err(e)
+      }
+   }, [patientResults.sampleID]);
+
+     useEffect(() => {
+       loadInfo();
+     }, [loadInfo]);
 
   return (
     <div>
@@ -125,8 +143,7 @@ const PatientResultPrint = (props) => {
             <>
               <br />
               <PatientResult
-                results = {patientResults}
-                samples = {sampleData}
+                samples = {patientInfo}
                 ref={componentRef}
               />
             </>

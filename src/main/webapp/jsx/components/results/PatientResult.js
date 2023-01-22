@@ -28,7 +28,8 @@ const print = {
 
 class PatientResult extends React.Component {
   render() {
-    const { results, samples } = this.props;
+    const { samples } = this.props;
+    console.log(samples);
 
     return (
       <Card>
@@ -39,36 +40,36 @@ class PatientResult extends React.Component {
             <Table bordered size="sm" responsive style={ print }>
               <tbody>
                  <tr>
-                  <th scope="row">Lab Report:</th>
-                  <td></td>
+                  <th scope="row">Manifest Id:</th>
+                  <td>{samples.manifestID}</td>
                   <th scope="row">Patient Name:</th>
-                  <td>{samples.sampleInformation[0].firstName + " " + samples.sampleInformation[0].surName}</td>
+                  <td>{samples.firstName + " " + samples.surName}</td>
                   <th scope="row">Gender:</th>
-                  <td>{samples.sampleInformation[0].sex}</td>
+                  <td>{samples.sex === "M" ? "Male" : "Female"}</td>
                 </tr>
                  <tr>
                   <th scope="row">Age:</th>
-                  <td>{samples.sampleInformation[0].age}</td>
+                  <td>{samples.age}</td>
                   <th scope="row">Client Unique No:</th>
-                  <td>{samples.sampleInformation[0].patientID[0].idNumber}</td>
+                  <td>{Object.keys(samples).length !== 0 ? samples.patientID[0].idNumber : ""}</td>
                   <th scope="row">Facility Name:</th>
                   <td>{samples.sendingFacilityName}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Address\Location:</th>
-                  <td></td>
+                  <th scope="row">Sample Collected by:</th>
+                  <td>{samples.sampleCollectedBy}</td>
                   <th scope="row">Date\Time Collected:</th>
-                  <td>{samples.sampleInformation[0].sampleCollectionDate}</td>
+                  <td>{samples.sampleCollectionDate}</td>
                   <th scope="row">Sample Id:</th>
-                  <td>{results.sampleID}</td>
+                  <td>{samples.sampleID}</td>
                 </tr>
                 <tr>
                   <th scope="row">Sample Type:</th>
-                  <td>{samples.sampleInformation[0].sampleType}</td>
+                  <td>{samples.sampleType}</td>
                   <th scope="row">Date\Time Ordered:</th>
-                  <td>{samples.sampleInformation[0].sampleOrderDate}</td>
+                  <td>{samples.sampleOrderDate}</td>
                   <th scope="row">Date Received at PCR:</th>
-                  <td>{results.visitDate}</td>
+                  <td>{samples.visitDate}</td>
                 </tr>
 
                 <tr>
@@ -99,11 +100,11 @@ class PatientResult extends React.Component {
                 </tr>
                 {
                   <tr>
-                    <td>{results.approvalDate}</td>
-                    <td>{results.assayDate}</td>
-                    <td>{results.dateResultDispatched}</td>
-                    <td>{results.pcrLabSampleNumber}</td>
-                    <td>{results.testResult} Copies/mL</td>
+                    <td>{samples.approvalDate}</td>
+                    <td>{samples.assayDate}</td>
+                    <td>{samples.dateResultDispatched}</td>
+                    <td>{samples.pcrLabSampleNumber}</td>
+                    <td>{samples.testResult} Copies/mL</td>
                   </tr>
                 }
               </tbody>

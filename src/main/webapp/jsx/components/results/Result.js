@@ -23,7 +23,7 @@ import { token, url } from "../../../api";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import PrintIcon from "@mui/icons-material/Print";
+//import PrintIcon from "@mui/icons-material/Print";
 import { useReactToPrint } from "react-to-print";
 import AddIcon from "@mui/icons-material/Add";
 import PrintResults from "./PrintResults";
@@ -143,8 +143,6 @@ const Result = (props) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log("result", response)
-
         if (response.data.viralLoadTestReport !== null) {
           setResults(response.data.viralLoadTestReport);
 
@@ -179,7 +177,7 @@ const Result = (props) => {
                   headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((resp) => {
-                   console.log("results saved", resp)
+                   //console.log("results saved", resp)
                 });
             }
           });
