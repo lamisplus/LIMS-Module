@@ -3,11 +3,9 @@ package org.lamisplus.modules.lims.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.lims.domain.dto.LIMSManifestResponseDTO;
-import org.lamisplus.modules.lims.domain.dto.LIMSResultsResponseDTO;
-import org.lamisplus.modules.lims.domain.dto.ManifestDTO;
-import org.lamisplus.modules.lims.domain.dto.ManifestListMetaDataDTO;
+import org.lamisplus.modules.lims.domain.dto.*;
 import org.lamisplus.modules.lims.service.LimsManifestService;
+import org.lamisplus.modules.patient.domain.dto.PersonMetaDataDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,5 +52,17 @@ public class LimsManifestController {
     @GetMapping("/manifest-results/{id}/{configId}")
     public LIMSResultsResponseDTO DownloadResults(@PathVariable int id, @PathVariable int configId) {
         return limsManifestService.DownloadResultsFromLIMS(id, configId);
+    }
+
+    @GetMapping("/manifests-all-in-one-drkarim")
+    public PersonMetaDataDto getAllManifests2(@RequestParam(defaultValue = "*") String searchParam,
+                                              @RequestParam(defaultValue = "0") Integer pageNo,
+                                              @RequestParam(defaultValue = "10") Integer pageSize){
+        return limsManifestService.findAllManifestsV2(searchParam, pageNo, pageSize);
+    }
+
+    @GetMapping("/manifest-samples-info-by-sampleid/{sampleId}")
+    public AllManifestDto getSamplesInformationBySampleId(@PathVariable String sampleId) {
+        return limsManifestService.getSingleSampleInformationBySampleId(sampleId);
     }
 }

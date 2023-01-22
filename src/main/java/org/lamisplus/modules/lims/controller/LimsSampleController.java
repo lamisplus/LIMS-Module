@@ -47,4 +47,5 @@ public class LimsSampleController {
                                                        @RequestParam(defaultValue = "10") Integer pageSize) {
         return limsSampleService.getAllPendingSamples(searchParam, pageNo, pageSize);
     }
+
 }
