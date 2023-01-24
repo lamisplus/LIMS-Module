@@ -372,6 +372,15 @@ public class LimsManifestService {
                     allManifestDto.setSampleStatus(limsResult.getSampleStatus());
                     allManifestDto.setSampleTestable(limsResult.getSampleTestable());
 
+                    allManifestDto.setTransferStatus(limsResult.getTransferStatus());
+                    allManifestDto.setTestedBy(limsResult.getTestedBy());
+                    allManifestDto.setApprovedBy(limsResult.getApprovedBy());
+                    allManifestDto.setDateTransferredOut(limsResult.getDateTransferredOut());
+                    allManifestDto.setReasonNotTested(limsResult.getReasonNotTested());
+                    allManifestDto.setOtherRejectionReason(limsResult.getOtherRejectionReason());
+                    allManifestDto.setSendingPcrLabID(limsResult.getSendingPcrLabID());
+                    allManifestDto.setSendingPcrLabName(limsResult.getSendingPcrLabName());
+
 
                 }else allManifestDto.setResultIsBack(Boolean.FALSE);
 
@@ -458,6 +467,14 @@ public class LimsManifestService {
                 allManifestDto.setSampleStatus(limsResult.getSampleStatus());
                 allManifestDto.setSampleTestable(limsResult.getSampleTestable());
 
+                allManifestDto.setTransferStatus(limsResult.getTransferStatus());
+                allManifestDto.setTestedBy(limsResult.getTestedBy());
+                allManifestDto.setApprovedBy(limsResult.getApprovedBy());
+                allManifestDto.setDateTransferredOut(limsResult.getDateTransferredOut());
+                allManifestDto.setReasonNotTested(limsResult.getReasonNotTested());
+                allManifestDto.setOtherRejectionReason(limsResult.getOtherRejectionReason());
+                allManifestDto.setSendingPcrLabID(limsResult.getSendingPcrLabID());
+                allManifestDto.setSendingPcrLabName(limsResult.getSendingPcrLabName());
 
             }else allManifestDto.setResultIsBack(Boolean.FALSE);
 
