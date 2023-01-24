@@ -28,7 +28,7 @@ function SampleCollection() {
     }
   }, []);
 
-  console.log("steps", previous);
+  //console.log("steps", previous);
 
   useEffect(() => {
     userPermission();

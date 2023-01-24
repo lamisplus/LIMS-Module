@@ -24,6 +24,7 @@ const print = {
     width: "100%",
     borderCollapse: "collapse",
     fontFamily: "Arial",
+    textAlign: "left",
 }
 
 class PatientResult extends React.Component {
@@ -113,14 +114,18 @@ class PatientResult extends React.Component {
             <br />
             <br />
             <br />
+            <br />
+            <br />
+            <br />
+            <br />
             <Table bordered size="sm" responsive style={ print }>
               <tbody>
                  <tr>
                   <th scope="row">Report by:<br />
-                  Date: </th>
-                  <th scope="row">Signature</th>
+                  Date: {samples.dateResultDispatched}</th>
+                  <td scope="row"></td>
                   <th scope="row">Reviewed by:<br />
-                    Date: </th>
+                    Date: {today}</th>
                   <th scope="row">Signature</th>
                 </tr>
               </tbody>
