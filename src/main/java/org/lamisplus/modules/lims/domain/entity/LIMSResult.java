@@ -42,4 +42,21 @@ public class LIMSResult {
     private String sampleTestable;
     @Column(name = "manifest_record_id")
     private Integer manifestRecordID;
+
+    @Column(name = "transfer_status")
+    private String transferStatus;
+    @Column(name = "tested_by")
+    private String  testedBy;
+    @Column(name = "approved_by")
+    private String approvedBy;
+    @Column(name = "date_transferred_out")
+    private String dateTransferredOut;
+    @Column(name = "reason_not_tested")
+    private String reasonNotTested;
+    @Column(name = "other_rejection_reason")
+    private String otherRejectionReason;
+    @Column(name = "sending_pcr_lab_id")
+    private String sendingPcrLabID;
+    @Column(name = "sending_pcr_lab_name")
+    private String sendingPcrLabName;
 }

@@ -89,6 +89,14 @@ CREATE TABLE public.lims_result
     sample_status character varying(100),
     sample_testable character varying(100),
     manifest_record_id bigint,
+    transfer_status character varying(100),
+    tested_by character varying(100),
+    approved_by character varying(100),
+    date_transferred_out character varying(100),
+    reason_not_tested character varying(100),
+    other_rejection_reason character varying(100),
+    sending_pcr_lab_id character varying(100),
+    sending_pcr_lab_name character varying(100),
     PRIMARY KEY (id)
 );
 ALTER SEQUENCE lims_result_id_seq OWNED BY lims_result.id;
