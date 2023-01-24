@@ -45,12 +45,10 @@ public class LimsConfigService {
     public ConfigDTO FindById(Integer id){
         return limsMapper.toConfigDto(limsConfigRepository.findById(id).orElse(null));
     }
-
     public String Delete(Integer id){
         limsConfigRepository.deleteById(id);
         return id+" deleted successfully";
     }
-
     public List<ConfigDTO> FindAll(){
         return limsMapper.toConfigDtoList(limsConfigRepository.findAll());
     }
