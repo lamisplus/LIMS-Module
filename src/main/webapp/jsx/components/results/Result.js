@@ -142,7 +142,7 @@ const Result = (props) => {
           `${url}lims/manifest-results/${manifestObj.id}/${serverId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
+        console.log("lims", response.data.viralLoadTestReport)
         if (response.data.viralLoadTestReport !== null) {
           setResults(response.data.viralLoadTestReport);
 
@@ -171,7 +171,7 @@ const Result = (props) => {
                 sendingPCRLabID: d.sendingPCRLabID,
                 sendingPCRLabName: d.sendingPCRLabName,
               };
-
+               console.log("payload", result);
               axios
                 .post(`${url}lims/results`, [result], {
                   headers: { Authorization: `Bearer ${token}` },

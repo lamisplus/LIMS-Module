@@ -6,6 +6,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import MatButton from "@material-ui/core/Button";
 import HomeIcon from "@mui/icons-material/Home";
 import "./result.css";
+import { logo } from "../SampleCollection/pcr";
 
 import {
   Card,
@@ -35,8 +36,26 @@ class PatientResult extends React.Component {
     return (
       <Card>
         <CardBody>
-          <h3 style={{ textAlign: "center", border: "1px solid", padding: "15px" }}>Patient Viral Load Result</h3>
-          <hr />
+          <Row>
+            <Table size="sm" style={ print }>
+              <tbody>
+                <tr>
+                  <th scope="row"></th>
+                  <th scope="row"></th>
+                  <th scope="row"></th>
+                  <th scope="row">
+                    <h2 className="text-center">
+                      NISRN VIRAL LOAD RESULT
+                    </h2>
+                  </th>
+
+                  <th scope="row">
+                     <img src={logo} style={{ width: "80px", height: "80px" }} alt=""/>
+                  </th>
+                </tr>
+              </tbody>
+            </Table>
+          </Row>
           <Row>
             <Table bordered size="sm" responsive style={ print }>
               <tbody>
