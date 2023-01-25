@@ -33,6 +33,41 @@ class PatientResult extends React.Component {
     const { samples } = this.props;
     console.log(samples);
 
+  const transferStatus = (e) => {
+    //console.log(e)
+    if (parseInt(e) === 1) {
+      return (
+        <p>
+          <Badge color="info">Not Transafered</Badge>
+        </p>
+      );
+    } else if (parseInt(e) === 2) {
+      return (
+        <p>
+          <Badge color="info">Received</Badge>
+        </p>
+      );
+    } else if (parseInt(e) === 3) {
+      return (
+        <p>
+          <Badge color="info">In-Progress</Badge>
+        </p>
+      );
+    } else if (parseInt(e) === 4) {
+      return (
+        <p>
+          <Badge color="warning">Tested</Badge>
+        </p>
+      );
+    } else {
+      return (
+        <p>
+          <Badge color="dark">None</Badge>
+        </p>
+      );
+    }
+  };
+
     return (
       <Card>
         <CardBody>
@@ -112,16 +147,16 @@ class PatientResult extends React.Component {
             <Table striped bordered size="sm" style={ print }>
               <tbody>
                 <tr style={{ backgroundColor: "#014d88", color: "#fff" }}>
-                  <th>Assay Date</th>
-                  <th>Approval Date</th>
+                  <th>Transferred Out Date</th>
+                  <th>Transfer Status</th>
                   <th>Date Result Dispatched</th>
                   <th>PCR Sample Number</th>
                   <th>Test Result</th>
                 </tr>
                 {
                   <tr>
-                    <td>{samples.approvalDate}</td>
-                    <td>{samples.assayDate}</td>
+                    <td>{samples.dateTransferredOut !== null ? samples.dateTransferredOut : "None"}</td>
+                    <td>{transferStatus(samples.transferStatus)}</td>
                     <td>{samples.dateResultDispatched}</td>
                     <td>{samples.pcrLabSampleNumber}</td>
                     <td>{samples.testResult} Copies/mL</td>
@@ -140,8 +175,11 @@ class PatientResult extends React.Component {
             <Table bordered size="sm" responsive style={ print }>
               <tbody>
                  <tr>
-                  <th scope="row">Report by:<br />
+                  <th scope="row">Tested by: {samples.testedBy}<br />
                   Date: {samples.dateResultDispatched}</th>
+                   <td scope="row"></td>
+                  <th scope="row">Approved by: {samples.approvedBy}<br />
+                    Date: {samples.approvalDate}</th>
                   <td scope="row"></td>
                   <th scope="row">Reviewed by:<br />
                     Date: {today}</th>
