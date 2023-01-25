@@ -57,6 +57,14 @@ public class AllManifestDto implements Serializable
     private String dateResultDispatched;
     private String sampleStatus;
     private String sampleTestable;
+    private String transferStatus;
+    private String  testedBy;
+    private String approvedBy;
+    private String dateTransferredOut;
+    private String reasonNotTested;
+    private String otherRejectionReason;
+    private String sendingPcrLabID;
+    private String sendingPcrLabName;
 
 
 
