@@ -52,7 +52,7 @@ const sampleStatus = (e) => {
   } else {
     return (
       <p>
-        <Badge color="dark">Result Pending</Badge>
+        <Badge color="dark">Pending</Badge>
       </p>
     );
   }

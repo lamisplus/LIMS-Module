@@ -32,7 +32,11 @@ public class LimsConfigController {
 
     @GetMapping("/config")
     public ConfigDTO GetConfig(){
-        return limsConfigService.FindAll().get(0);
+        boolean config = limsConfigService.FindAll().isEmpty();
+        if (config != true) {
+            return limsConfigService.FindAll().get(0);
+        }
+        return null;
     }
 
     @GetMapping("/config/{id}")

@@ -188,7 +188,7 @@ const Login = (props) => {
   const deleteConfig = async (e, id) => {
     e.preventDefault();
     try {
-      const response = await axios.delete(`${url}lims/configs/${id}`, {
+      const response = await axios.delete(`${url}lims/config/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(" delete config", response);
@@ -258,7 +258,7 @@ const Login = (props) => {
                     </FormGroup>
                     <FormGroup>
                       <Label for="serverUrl" className={classes.label}>
-                        URL
+                        LIMS URL
                       </Label>
                       <Input
                         type="text"
@@ -279,14 +279,14 @@ const Login = (props) => {
                     </FormGroup>
                     <FormGroup>
                       <Label for="configEmail" className={classes.label}>
-                        Email
+                        LIMS Username
                       </Label>
 
                       <Input
                         type="text"
                         name="configEmail"
                         id="configEmail"
-                        placeholder="E-Mail"
+                        placeholder="LIMS Username"
                         className={classes.input}
                         onChange={handleChange}
                         value={login.configEmail}
@@ -302,7 +302,7 @@ const Login = (props) => {
 
                     <FormGroup>
                       <Label for="configPassword" className={classes.label}>
-                        Password
+                        LIMS Password
                       </Label>
 
                       <Input
