@@ -3,6 +3,7 @@ package org.lamisplus.modules.lims.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -12,10 +13,7 @@ import org.lamisplus.modules.base.domain.entities.User;
 import org.lamisplus.modules.base.service.OrganisationUnitService;
 import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.lims.domain.dto.*;
-import org.lamisplus.modules.lims.domain.entity.LIMSConfig;
-import org.lamisplus.modules.lims.domain.entity.LIMSManifest;
-import org.lamisplus.modules.lims.domain.entity.LIMSResult;
-import org.lamisplus.modules.lims.domain.entity.LIMSSample;
+import org.lamisplus.modules.lims.domain.entity.*;
 import org.lamisplus.modules.lims.domain.mapper.LimsMapper;
 import org.lamisplus.modules.lims.repository.*;
 import org.lamisplus.modules.patient.domain.dto.PersonMetaDataDto;
@@ -44,6 +42,8 @@ public class LimsManifestService {
     private final LimsResultRepository resultRepository;
 
     private final LimsSampleRepository sampleRepository;
+
+    private final LIMSPCRLabRepository limspcrLabRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
@@ -481,5 +481,15 @@ public class LimsManifestService {
         }
 
         return allManifestDto;
+    }
+
+    public List<LIMSPCRLab> getAllPCRLabs(){
+        return this.limspcrLabRepository.allpcrlabs();
+    }
+
+    @SneakyThrows
+    public LIMSPCRLab getSingleLab(Long id) {
+        return this.limspcrLabRepository.findById(id)
+                .orElseThrow(() -> new Exception("LIMSPCRLab NOT FOUND"));
     }
 }

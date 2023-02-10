@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.lims.domain.dto.*;
+import org.lamisplus.modules.lims.domain.entity.LIMSPCRLab;
 import org.lamisplus.modules.lims.service.LimsManifestService;
 import org.lamisplus.modules.patient.domain.dto.PersonMetaDataDto;
+import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,5 +67,15 @@ public class LimsManifestController {
     @GetMapping("/manifest-samples-info-by-sampleid/{sampleId}")
     public AllManifestDto getSamplesInformationBySampleId(@PathVariable String sampleId) {
         return limsManifestService.getSingleSampleInformationBySampleId(sampleId);
+    }
+
+    @GetMapping("/get-prclabs/")
+    public List<LIMSPCRLab> getPCRLabs() {
+        return limsManifestService.getAllPCRLabs();
+    }
+
+    @GetMapping("get-single-pcrlab/{id}")
+    public ResponseEntity<LIMSPCRLab> getPCRLabById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok (limsManifestService.getSingleLab(id));
     }
 }
