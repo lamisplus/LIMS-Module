@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ConfigModal from "../SampleCollection/ConfigModal";
 import ProgressBar from "../SampleCollection/Progressbar";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Alert from "@mui/material/Alert";
+import { toast } from "react-toastify";
+import MatButton from "@material-ui/core/Button";
+import SendIcon from "@mui/icons-material/Send";
 
 import {
   Row,
@@ -20,7 +23,7 @@ import axios from "axios";
 import { token, url } from "../../../api";
 import Button from "@mui/material/Button";
 import { makeStyles } from "@material-ui/core/styles";
-import { pcr_lab } from "../SampleCollection/pcr";
+//import { pcr_lab } from "../SampleCollection/pcr";
 import DoneIcon from "@mui/icons-material/Done";
 
 const useStyles = makeStyles((theme) => ({
@@ -87,9 +90,10 @@ const CreateAManifest = (props) => {
 
   const [localStore, SetLocalStore] = useState([]);
   const [manifestsId, setManifestsId] = useState(0);
+  const [pcr_lab, setPcr_lab] = useState([]);
 
   const [progress, setProgress] = useState(0);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState(true);
 
   const [errors, setErrors] = useState({});
 
@@ -104,15 +108,51 @@ const CreateAManifest = (props) => {
   };
 
   const confirmStatusPrevious = (status) => {
-     props.setPrevious(status)
-  }
+    props.setPrevious(status);
+  };
+
+  const loadConfig = useCallback(async () => {
+    try {
+      const response = await axios.get(`${url}lims/config`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    
+      localStorage.setItem("configId", JSON.stringify(response.data.id));
+      
+    } catch (e) {
+      toast.error("An error occurred while fetching config details", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      
+    }
+  }, []);
+
+  const pcrLab = useCallback(async () => {
+      try {
+        const response = await axios.get(`${url}lims/get-prclabs/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        //console.log("pcrlab", response)
+        if (response.data !== "") {
+            setPcr_lab(response.data)
+        }
+
+      } catch (e) {
+        toast.error("An error occurred while fetching config details", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+
+      }
+    }, []);
 
   useEffect(() => {
+    loadConfig()
+    pcrLab()
     const collectedSamples = JSON.parse(localStorage.getItem("samples"));
     if (collectedSamples) {
       SetLocalStore(collectedSamples);
     }
-  }, []);
+  }, [loadConfig, pcrLab]);
 
   const [pcrLabCode, setPcrLabCode] = useState({ name: "", labNo: "" });
 
@@ -160,14 +200,18 @@ const CreateAManifest = (props) => {
     });
   };
 
+  const handleProgress = (progessCount) => {
+    setProgress(progessCount);
+  };
+
   const validateInputs = () => {
     let temp = { ...errors };
     temp.dateScheduledForPickup = manifestData.dateScheduledForPickup
       ? ""
       : "Pick-Up date is required.";
-//    temp.temperatureAtPickup = manifestData.temperatureAtPickup
-//      ? ""
-//      : "Temperature is required.";
+    //    temp.temperatureAtPickup = manifestData.temperatureAtPickup
+    //      ? ""
+    //      : "Temperature is required.";
     temp.receivingLabID = manifestData.receivingLabID
       ? ""
       : "Receiving lab Id is required.";
@@ -203,22 +247,107 @@ const CreateAManifest = (props) => {
           setManifestsId(resp.data.id);
 
           setSaved(true);
-          //                    toast.success("Sample manifest saved successfully!!", {
-          //                        position: toast.POSITION.TOP_RIGHT
-          //                    });
+
           manifestData.manifestID = resp.data.manifestID;
           manifestData.sendingFacilityID = resp.data.sendingFacilityID;
           manifestData.sendingFacilityName = resp.data.sendingFacilityName;
 
           localStorage.setItem("manifest", JSON.stringify(manifestData));
           localStorage.removeItem("samples");
-          handleOpen();
+          //handleOpen();
+          //sending manifest
+          const timer = setInterval(() => {
+            handleProgress((prevProgress) =>
+              prevProgress >= 100 ? 100 : prevProgress + 2
+            );
+          }, 500);
+
+          const serverId = JSON.parse(localStorage.getItem("configId"));
+
+          try {
+            axios
+              .get(`${url}lims/ready-manifests/${resp.data.id}/${serverId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .then((resp) => {
+                if (resp) {
+                  console.log("sending manifest", resp);
+                  handleProgress(100);
+  
+                  toast.success("Sample manifest sent successfully to PCR Lab.", {
+                    position: toast.POSITION.TOP_RIGHT,
+                  });
+  
+                  confirmStatusSubmitted(2)
+                  confirmStatusPrevious(0)
+                }
+              })
+              .catch((err) => {
+                clearInterval(timer);
+                console.log("err", err);
+                toast.error("Poor Internet Connection....", {
+                  position: toast.POSITION.TOP_RIGHT,
+                });
+                failed(false);
+                //props.handleOpen();
+              });
+          } catch (err) {
+            failed(false);
+  
+            clearInterval(timer);
+            toast.error("Error encountered while sending manifest", {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+          }
+
         });
     }
   };
 
-  const handleProgress = (progessCount) => {
-    setProgress(progessCount);
+  const resendManifest = async (e) => {
+    e.preventDefault();
+
+    handleProgress(20);
+    const serverId = JSON.parse(localStorage.getItem("configId"));
+
+    try {
+      handleProgress(50);
+      await axios
+        .get(`${url}lims/ready-manifests/${manifestsId}/${serverId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((resp) => {
+          handleProgress(70);
+
+          if (resp) {
+            console.log("re sending manifest", resp);
+            handleProgress(100);
+          }
+
+          confirmStatusSubmitted(2)
+          confirmStatusPrevious(0)
+
+          toast.success("Sample manifest sent successfully to PCR Lab.", {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        })
+        .catch((err) => {
+          handleProgress(10);
+          failed(false);
+          toast.success("Server currently down!!! Try sending manifest later", {
+            position: toast.POSITION.TOP_CENTER,
+          });
+          handleProgress(0);
+          // props.handleOpen();
+        });
+    } catch (err) {
+      handleProgress(10);
+      failed(false);
+      toast.error("Error encountered while sending manifest", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      //props.handleOpen();
+    }
   };
 
   return (
@@ -257,7 +386,7 @@ const CreateAManifest = (props) => {
                       for="dateScheduledForPickup"
                       className={classes.label}
                     >
-                      Date & Time *
+                      Date & Time <span style={{ color: "red" }}> *</span>
                     </Label>
                     <Input
                       type="datetime-local"
@@ -282,7 +411,7 @@ const CreateAManifest = (props) => {
                 <Col>
                   <FormGroup>
                     <Label for="receivingLabName" className={classes.label}>
-                      Receiving Lab *
+                      Receiving Lab <span style={{ color: "red" }}> *</span>
                     </Label>
                     <select
                       className="form-control"
@@ -318,7 +447,8 @@ const CreateAManifest = (props) => {
                   {" "}
                   <FormGroup>
                     <Label for="receivingLabID" className={classes.label}>
-                      Receiving Lab number *
+                      Receiving Lab number{" "}
+                      <span style={{ color: "red" }}> *</span>
                     </Label>
                     <Input
                       type="text"
@@ -343,7 +473,7 @@ const CreateAManifest = (props) => {
                 <Col>
                   <FormGroup>
                     <Label for="courierRiderName" className={classes.label}>
-                      Courier Name *
+                      Courier Name <span style={{ color: "red" }}> *</span>
                     </Label>
                     <Input
                       type="text"
@@ -366,7 +496,7 @@ const CreateAManifest = (props) => {
                   {" "}
                   <FormGroup>
                     <Label for="courierContact" className={classes.label}>
-                      Courier Contact *
+                      Courier Contact <span style={{ color: "red" }}> *</span>
                     </Label>
                     <PhoneInput
                       containerStyle={{
@@ -396,7 +526,8 @@ const CreateAManifest = (props) => {
                 <Col>
                   <FormGroup>
                     <Label for="samplePackagedBy" className={classes.label}>
-                      Sample Packaged By *
+                      Sample Packaged By{" "}
+                      <span style={{ color: "red" }}> *</span>
                     </Label>
                     <Input
                       type="text"
@@ -463,7 +594,7 @@ const CreateAManifest = (props) => {
                       onChange={handleChange}
                       className={classes.input}
                     />
-                   {/* {errors.temperatureAtPickup !== "" ? (
+                    {/* {errors.temperatureAtPickup !== "" ? (
                       <span className={classes.error}>
                         {errors.temperatureAtPickup}
                       </span>
@@ -486,7 +617,18 @@ const CreateAManifest = (props) => {
                   </Button>
                 </>
               ) : (
-                ""
+                <>
+                   <MatButton
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<SendIcon />}
+                      type="submit"
+                      onClick={resendManifest}
+                      disabled={failed}
+                    >
+                      Re-send
+                    </MatButton>
+                </>
               )}
             </Form>
           )}
@@ -501,7 +643,7 @@ const CreateAManifest = (props) => {
           handleProgress={handleProgress}
           handleOpen={handleOpen}
           submitted={confirmStatusSubmitted}
-          previous = {confirmStatusPrevious}
+          previous={confirmStatusPrevious}
           setFailed={setFailed}
           failed={failed}
         />

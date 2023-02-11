@@ -459,7 +459,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="sampleID" className={classes.label}>
-                          Sample ID *
+                          Sample ID <span style={{ color: "red" }}> *</span>
                         </Label>
                         <select
                           className="form-control"
@@ -486,7 +486,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="sampleTestable" className={classes.label}>
-                          Sample Testable *
+                          Sample Testable <span style={{ color: "red" }}> *</span>
                         </Label>
                         <select
                           className="form-control"
@@ -510,7 +510,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="sampleStatus" className={classes.label}>
-                          Sample Status *
+                          Sample Status <span style={{ color: "red" }}> *</span>
                         </Label>
                         <select
                           className="form-control"
@@ -537,13 +537,14 @@ const AddResult = (props) => {
                       {" "}
                       <FormGroup>
                         <Label for="assayDate" className={classes.label}>
-                          Assay Date *
+                          Assay Date <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
                           type="date"
                           name="assayDate"
                           id="assayDate"
+                          min={manifestObj.createDate.slice(0, 10)}
                           max={new Date().toISOString().slice(0, 10)}
                           //min={new Date(datasample.dateSampleVerified)}
                           placeholder="Assay Date"
@@ -616,7 +617,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="approvedBy" className={classes.label}>
-                          Approved By*
+                          Approved By <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -634,7 +635,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="testedBy" className={classes.label}>
-                          Test By *
+                          Test By <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -705,7 +706,7 @@ const AddResult = (props) => {
                           for="dateSampleReceivedAtPcrLab"
                           className={classes.label}
                         >
-                          Date sample at PCR Lab *
+                          Date sample at PCR Lab <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -713,6 +714,7 @@ const AddResult = (props) => {
                           name="dateSampleReceivedAtPcrLab"
                           id="dateSampleReceivedAtPcrLab"
                           placeholder="result Date"
+                          min={manifestObj.createDate.slice(0, 10)}
                           max={new Date().toISOString().slice(0, 10)}
                           className={classes.input}
                           onChange={(e) => handleChange(i, e)}
@@ -725,7 +727,7 @@ const AddResult = (props) => {
                           for="dateResultDispatched"
                           className={classes.label}
                         >
-                          Date Result Dispatched *
+                          Date Result Dispatched <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -733,6 +735,7 @@ const AddResult = (props) => {
                           name="dateResultDispatched"
                           id="dateResultDispatched"
                           placeholder="result Date"
+                          min={manifestObj.createDate.slice(0, 10)}
                           max={new Date().toISOString().slice(0, 10)}
                           className={classes.input}
                           onChange={(e) => handleChange(i, e)}
@@ -742,7 +745,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="approvalDate" className={classes.label}>
-                          Approval Date *
+                          Approval Date <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -750,6 +753,7 @@ const AddResult = (props) => {
                           name="approvalDate"
                           id="approvalDate"
                           placeholder="Approval Date"
+                          min={manifestObj.createDate.slice(0, 10)}
                           max={new Date().toISOString().slice(0, 10)}
                           className={classes.input}
                           onChange={(e) => handleChange(i, e)}
@@ -762,7 +766,7 @@ const AddResult = (props) => {
                           for="pcrLabSampleNumber"
                           className={classes.label}
                         >
-                          Pcr Lab Sample No *
+                          Pcr Lab Sample No <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -780,7 +784,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="resultDate" className={classes.label}>
-                          Result Date *
+                          Result Date <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
@@ -788,6 +792,7 @@ const AddResult = (props) => {
                           name="resultDate"
                           id="resultDate"
                           placeholder="result Date"
+                          min={manifestObj.createDate.slice(0, 10)}
                           max={new Date().toISOString().slice(0, 10)}
                           className={classes.input}
                           onChange={(e) => handleChange(i, e)}
@@ -797,7 +802,7 @@ const AddResult = (props) => {
                     <Col>
                       <FormGroup>
                         <Label for="testResult" className={classes.label}>
-                          Test result *
+                          Test result <span style={{ color: "red" }}> *</span>
                         </Label>
 
                         <Input
