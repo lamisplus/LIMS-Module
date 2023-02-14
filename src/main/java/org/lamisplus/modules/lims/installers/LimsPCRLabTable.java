@@ -8,7 +8,7 @@ import org.springframework.core.annotation.Order;
         description = "Installs the required lims pcr labs tables",
         version = 1)
 public class LimsPCRLabTable extends AcrossLiquibaseInstaller {
-    public LimsPCRLabTable() {
-        super("classpath:installers/lims/schema/schema3.xml");
-    }
+//    public LimsPCRLabTable() {
+//        super("classpath:installers/lims/schema/schema3.xml");
+//    }
 }
