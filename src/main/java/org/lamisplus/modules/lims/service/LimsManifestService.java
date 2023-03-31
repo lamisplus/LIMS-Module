@@ -40,10 +40,7 @@ import java.util.jar.Manifest;
 public class LimsManifestService {
     private final LimsManifestRepository limsManifestRepository;
     private final LimsResultRepository resultRepository;
-
     private final LimsSampleRepository sampleRepository;
-
-    private final LIMSPCRLabRepository limspcrLabRepository;
     private final LimsMapper limsMapper;
     private final OrganisationUnitService organisationUnitService;
     private  final UserService userService;
@@ -481,15 +478,5 @@ public class LimsManifestService {
         }
 
         return allManifestDto;
-    }
-
-    public List<LIMSPCRLab> getAllPCRLabs(){
-        return this.limspcrLabRepository.allpcrlabs();
-    }
-
-    @SneakyThrows
-    public LIMSPCRLab getSingleLab(Long id) {
-        return this.limspcrLabRepository.findById(id)
-                .orElseThrow(() -> new Exception("LIMSPCRLab NOT FOUND"));
     }
 }

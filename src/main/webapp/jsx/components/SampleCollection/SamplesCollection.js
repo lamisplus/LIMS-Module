@@ -58,7 +58,12 @@ function SampleCollection() {
       case 0:
         return <SampleOrderLists setSubmitted={setSubmitted} />;
       case 1:
-        return <CreateAManifest setSubmitted={setSubmitted} setPrevious={setPrevious} />;
+        return (
+          <CreateAManifest
+            setSubmitted={setSubmitted}
+            setPrevious={setPrevious}
+          />
+        );
       case 2:
         return <PrintManifest />;
       default:
@@ -67,6 +72,7 @@ function SampleCollection() {
   };
   return (
     <div>
+      <br />
       <Stepper activeStep={activeStep}>
         <Step>
           <StepLabel>Select Collected Samples</StepLabel>
@@ -96,7 +102,7 @@ function SampleCollection() {
               disabled={
                 Object.keys(config).length === 0
                   ? true
-                  : false || activeStep === previous
+                  : false || activeStep === previous || activeStep === submitted
                   ? true
                   : false
               }

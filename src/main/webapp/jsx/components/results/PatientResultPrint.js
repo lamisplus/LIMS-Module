@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useCallback,
-  useState,
-  useRef,
-} from "react";
+import React, { useEffect, useCallback, useState, useRef } from "react";
 
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { Card } from "react-bootstrap";
@@ -23,6 +18,7 @@ import { token, url } from "../../../api";
 
 import { makeStyles } from "@material-ui/core/styles";
 
+import ReplyIcon from "@mui/icons-material/Reply";
 import PrintIcon from "@mui/icons-material/Print";
 import { useReactToPrint } from "react-to-print";
 import PatientResult from "./PatientResult";
@@ -85,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const PatientResultPrint = (props) => {
-  const location = useLocation()
+  const location = useLocation();
 
   const patientResults = location && location.state ? location.state.data : {};
 
@@ -97,22 +93,22 @@ const PatientResultPrint = (props) => {
     content: () => componentRef.current,
   });
 
-   const loadInfo = useCallback(async () => {
-      try {
-        const response = await axios.get(
-          `${url}lims/manifest-samples-info-by-sampleid/${patientResults.sampleID}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        console.log(response)
-        setPatientInfo(response.data);
-      } catch (e) {
-          console.err(e)
-      }
-   }, [patientResults.sampleID]);
+  const loadInfo = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${url}lims/manifest-samples-info-by-sampleid/${patientResults.sampleID}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log(response);
+      setPatientInfo(response.data);
+    } catch (e) {
+      console.err(e);
+    }
+  }, [patientResults.sampleID]);
 
-     useEffect(() => {
-       loadInfo();
-     }, [loadInfo]);
+  useEffect(() => {
+    loadInfo();
+  }, [loadInfo]);
 
   return (
     <div>
@@ -126,15 +122,18 @@ const PatientResultPrint = (props) => {
               onClick={handlePrint}
             >
               Print
-            </MatButton>
-            {" "}
+            </MatButton>{" "}
             <Link color="inherit" to={{ pathname: "/" }}>
               <MatButton
                 variant="contained"
                 color="primary"
-                startIcon={<HomeIcon />}
+                style={{
+                  backgroundColor: "rgb(153, 46, 98)",
+                  color: "#fff",
+                }}
+                startIcon={<ReplyIcon />}
               >
-                back Home
+                back
               </MatButton>
             </Link>
           </p>
@@ -142,10 +141,7 @@ const PatientResultPrint = (props) => {
           {
             <>
               <br />
-              <PatientResult
-                samples = {patientInfo}
-                ref={componentRef}
-              />
+              <PatientResult samples={patientInfo} ref={componentRef} />
             </>
           }
         </Card.Body>

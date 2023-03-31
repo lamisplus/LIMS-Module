@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useCallback,
-  useState,
-  useRef,
-} from "react";
-
+import React, { useEffect, useCallback, useState, useRef } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { Card } from "react-bootstrap";
 
@@ -14,7 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import AddResultModal from "./AddResultModal";
 
 import "../SampleCollection/sample.css";
-
+import CircularProgress from "@mui/material/CircularProgress";
 import CachedIcon from "@mui/icons-material/Cached";
 
 import axios from "axios";
@@ -23,7 +17,7 @@ import { token, url } from "../../../api";
 
 import { makeStyles } from "@material-ui/core/styles";
 
-//import PrintIcon from "@mui/icons-material/Print";
+import ReplyIcon from "@mui/icons-material/Reply";
 import { useReactToPrint } from "react-to-print";
 import AddIcon from "@mui/icons-material/Add";
 import PrintResults from "./PrintResults";
@@ -107,7 +101,7 @@ const Result = (props) => {
       const response = await axios.get(`${url}lims/config`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-    
+
       localStorage.setItem("configId", JSON.stringify(response.data.id));
       setLoading(false);
     } catch (e) {
@@ -136,13 +130,14 @@ const Result = (props) => {
   const getPCResults = useCallback(async () => {
     try {
       const serverId = JSON.parse(localStorage.getItem("configId"));
-
+      setResults([]);
       if (manifestObj.id !== 0) {
         const response = await axios.get(
           `${url}lims/manifest-results/${manifestObj.id}/${serverId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log("lims", response.data.viralLoadTestReport)
+
+        console.log("lims", response.data.viralLoadTestReport);
         if (response.data.viralLoadTestReport !== null) {
           setResults(response.data.viralLoadTestReport);
 
@@ -171,13 +166,13 @@ const Result = (props) => {
                 sendingPCRLabID: d.sendingPCRLabID,
                 sendingPCRLabName: d.sendingPCRLabName,
               };
-               console.log("payload", result);
+              console.log("payload", result);
               axios
                 .post(`${url}lims/results`, [result], {
                   headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((resp) => {
-                   //console.log("results saved", resp)
+                  //console.log("results saved", resp)
                 });
             }
           });
@@ -192,7 +187,7 @@ const Result = (props) => {
       }
       setLoading(false);
     } catch (e) {
-        console.log(e.message);
+      console.log(e.message);
     }
   }, [manifestObj.id]);
 
@@ -206,14 +201,21 @@ const Result = (props) => {
     getPCResults();
   };
 
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
+  // const handlePrint = useReactToPrint({
+  //   content: () => componentRef.current,
+  // });
 
   return (
     <div>
       <Card>
         <Card.Body>
+          {results.length === 0 ? (
+            <p>
+              <CircularProgress color="primary" /> connecting to LIMS server...
+            </p>
+          ) : (
+            " "
+          )}
           <p style={{ textAlign: "right" }}>
             <MatButton
               variant="contained"
@@ -233,7 +235,7 @@ const Result = (props) => {
             >
               Refresh
             </MatButton>
-           {/* <MatButton
+            {/* <MatButton
               variant="contained"
               color="success"
               className={classes.button}
@@ -247,10 +249,13 @@ const Result = (props) => {
               <MatButton
                 variant="contained"
                 color="primary"
-                className={classes.button}
-                startIcon={<HomeIcon />}
+                style={{
+                  backgroundColor: "rgb(153, 46, 98)",
+                  color: "#fff",
+                }}
+                startIcon={<ReplyIcon />}
               >
-                back Home
+                back
               </MatButton>
             </Link>
           </p>

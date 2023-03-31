@@ -4,11 +4,7 @@ import { Badge, Spinner } from "reactstrap";
 import { Row } from "react-bootstrap";
 import PrintIcon from "@mui/icons-material/Print";
 
-import {
-  Card,
-  CardBody,
-  Table,
-} from "reactstrap";
+import { Card, CardBody, Table } from "reactstrap";
 
 let today = new Date().toLocaleDateString("en-us", {
   weekday: "long",
@@ -22,7 +18,12 @@ const sampleStatus = (e) => {
   if (parseInt(e) === 1) {
     return (
       <p>
-        <Badge color="success">Result available</Badge>
+        <Badge
+          color="#013220"
+          style={{ backgroundColor: "#006400", color: "#fff" }}
+        >
+          Result available
+        </Badge>
       </p>
     );
   } else if (parseInt(e) === 2) {
@@ -84,7 +85,12 @@ class PrintResults extends React.Component {
                   <td>
                     {
                       <p>
-                        <Badge color="primary">Viral Load</Badge>
+                        <Badge
+                          color="#014d88"
+                          style={{ backgroundColor: "#014d88", color: "#fff" }}
+                        >
+                          Viral Load
+                        </Badge>
                       </p>
                     }
                   </td>
@@ -109,34 +115,39 @@ class PrintResults extends React.Component {
                   <th>Print</th>
                 </tr>
                 {
-                  results.length === 0 ? (
-                    " "
-                  ) :
-                  results.length !== 0 ? (
-                    results.map((result) => (
-                      <tr>
-                        <td>{result.sampleID}</td>
-                        <td>{result.approvalDate}</td>
-                        <td>{result.dateResultDispatched}</td>
-                        <td>{result.pcrLabSampleNumber}</td>
-                        <td>{sampleStatus(result.sampleStatus)}</td>
-                        <td>{result.sampleTestable}</td>
-                        <td>{result.testResult !== "" ? `${result.testResult} cp/mL` : "" }</td>
-                        { result.testResult !== "" ? (
+                  results.length === 0
+                    ? " "
+                    : results.length !== 0
+                    ? results.map((result) => (
+                        <tr>
+                          <td>{result.sampleID}</td>
+                          <td>{result.approvalDate}</td>
+                          <td>{result.dateResultDispatched}</td>
+                          <td>{result.pcrLabSampleNumber}</td>
+                          <td>{sampleStatus(result.sampleStatus)}</td>
+                          <td>{result.sampleTestable}</td>
                           <td>
-                                <Link to={{
-                                    pathname: '/Patient-result',
-                                    state: { data: result, sample: manifestObj}
-                                }}>
-                                    <PrintIcon />
-                                </Link>
+                            {result.testResult !== ""
+                              ? `${result.testResult} cp/mL`
+                              : ""}
+                          </td>
+                          {result.testResult !== "" ? (
+                            <td>
+                              <Link
+                                to={{
+                                  pathname: "/Patient-result",
+                                  state: { data: result, sample: manifestObj },
+                                }}
+                              >
+                                <PrintIcon />
+                              </Link>
                             </td>
-                        ) : " " }
-                      </tr>
-                    ))
-                  ) : (
-
-                     manifestObj.results.map((result) => (
+                          ) : (
+                            " "
+                          )}
+                        </tr>
+                      ))
+                    : manifestObj.results.map((result) => (
                         <tr>
                           <td>{result.sampleID}</td>
                           <td>{result.approvalDate}</td>
@@ -146,26 +157,27 @@ class PrintResults extends React.Component {
                           <td>{result.sampleTestable}</td>
                           <td>{result.testResult}</td>
                           <td>
-                              <Link to={{
-                                  pathname: '/Patient-result',
-                                  state: { data: result, sample: manifestObj}
-                              }}>
-                                  <PrintIcon />
-                              </Link>
+                            <Link
+                              to={{
+                                pathname: "/Patient-result",
+                                state: { data: result, sample: manifestObj },
+                              }}
+                            >
+                              <PrintIcon />
+                            </Link>
                           </td>
                         </tr>
                       ))
-//                    <>
-//                      <br />
-//                      <p style={{ textAlign: "center" }}>
-//                        No sample results available.
-//                      </p>
-//                    </>
-                  )
+                  //                    <>
+                  //                      <br />
+                  //                      <p style={{ textAlign: "center" }}>
+                  //                        No sample results available.
+                  //                      </p>
+                  //                    </>
                 }
               </tbody>
             </Table>
-            {results.length === 0 ? (
+            {/* {results.length === 0 ? (
               <p>
                 {" "}
                 <Spinner color="primary" /> Please Wait, Syncing with LIMS
@@ -173,9 +185,9 @@ class PrintResults extends React.Component {
               </p>
             ) : (
               " "
-            )}
+            )} */}
             <br />
-            <span style={{ fontSize: "10px" }} >LAMISPlus 2.0: {today}</span>
+            <span style={{ fontSize: "10px" }}>LAMISPlus 2.0: {today}</span>
           </Row>
           <hr />
         </CardBody>

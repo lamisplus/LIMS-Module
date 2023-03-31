@@ -1,13 +1,7 @@
 import React from "react";
 import { logo } from "../SampleCollection/pcr";
 
-import {
-  Row,
-  Card,
-  CardBody,
-  Table,
-  Badge,
-} from "reactstrap";
+import { Row, Card, CardBody, Table, Badge } from "reactstrap";
 
 let today = new Date().toLocaleDateString("en-us", {
   weekday: "long",
@@ -17,10 +11,10 @@ let today = new Date().toLocaleDateString("en-us", {
 });
 
 const print = {
-    width: "100%",
-    borderCollapse: "collapse",
-    fontFamily: "Arial"
-}
+  width: "100%",
+  borderCollapse: "collapse",
+  fontFamily: "Arial",
+};
 
 class ManifestPrint extends React.Component {
   render() {
@@ -29,13 +23,16 @@ class ManifestPrint extends React.Component {
       <Card>
         <CardBody>
           <Row>
-            <span style = {{ fontSize: "10px" }}>{today}</span>
-            { this.props.sampleObj.manifestStatus === "Ready" ?
-                 <span><Badge color="secondary">Not Submitted</Badge></span>
-                 : " "
-            }
+            <span style={{ fontSize: "10px" }}>{today}</span>
+            {this.props.sampleObj.manifestStatus === "Ready" ? (
+              <span>
+                <Badge color="secondary">Not Submitted</Badge>
+              </span>
+            ) : (
+              " "
+            )}
 
-            <Table size="sm" style={ print }>
+            <Table size="sm" style={print}>
               <tbody>
                 <tr>
                   <th scope="row"></th>
@@ -48,7 +45,11 @@ class ManifestPrint extends React.Component {
                   </th>
 
                   <th scope="row">
-                     <img src={logo} style={{ width: "80px", height: "80px" }} alt=""/>
+                    <img
+                      src={logo}
+                      style={{ width: "80px", height: "80px" }}
+                      alt=""
+                    />
                   </th>
                 </tr>
               </tbody>
@@ -57,7 +58,7 @@ class ManifestPrint extends React.Component {
           <br />
           <br />
           <Row>
-            <Table bordered size="sm" style={ print }>
+            <Table bordered size="sm" style={print}>
               <tbody>
                 <tr>
                   <th scope="row">Pick Up Date:</th>
@@ -80,7 +81,11 @@ class ManifestPrint extends React.Component {
                   <th scope="row">Manifest Id:</th>
                   <td>{this.props.sampleObj.manifestID}</td>
                   <th scope="row">Sample Temperature:</th>
-                  <td>{this.props.sampleObj.temperatureAtPickup}</td>
+                  <td>
+                    {this.props.sampleObj.temperatureAtPickup === ""
+                      ? "Not Provided"
+                      : this.props.sampleObj.temperatureAtPickup}
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Courier Name:</th>
@@ -95,7 +100,7 @@ class ManifestPrint extends React.Component {
           </Row>
           <br />
           <Row>
-            <Table striped bordered size="sm" style={ print }>
+            <Table striped bordered size="sm" style={print}>
               <thead style={{ backgroundColor: "#014d88", color: "#fff" }}>
                 <tr>
                   <th>Facility</th>
@@ -109,9 +114,7 @@ class ManifestPrint extends React.Component {
                 {this.props.sampleObj.sampleInformation &&
                   this.props.sampleObj.sampleInformation.map((data, i) => (
                     <tr key={i}>
-                      <td>
-                        {this.props.sampleObj.sendingFacilityName}
-                      </td>
+                      <td>{this.props.sampleObj.sendingFacilityName}</td>
                       <td>{data.patientID[0].idNumber}</td>
                       <td>{data.sampleID}</td>
                       <td>{data.sampleType}</td>

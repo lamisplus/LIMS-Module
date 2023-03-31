@@ -135,58 +135,6 @@ const SampleSearch = (props) => {
     }
   }, []);
 
-  //    const handlePulledData = query =>
-  //         new Promise((resolve, reject) => {
-  //              axios.get(`${url}lims/collected-samples/?searchParam=${query.search}&pageNo=${query.page}&pageSize=${query.pageSize}`,
-  //              { headers: {"Authorization" : `Bearer ${token}`} })
-  //                 .then(resp => resp)
-  //                 .then(result => {
-  //                 console.log("inside1",start_date, end_date);
-  //                 if (result.data.records === null) {
-  //                      resolve({
-  //                          data: [],
-  //                          page: 0,
-  //                          totalCount: 0
-  //                      })
-  //                  }else {
-  //                    resolve({
-  //                      data: result.data.records.
-  //                      filter( row => {
-  //                         let filterPass = true
-  //
-  //                         const date = new Date(row.sampleCollectionDate)
-  //                         console.log("inside2",start_date, end_date);
-  //                         if (start_date != null) {
-  //                           filterPass = filterPass && (new Date(start_date) <= date)
-  //                         }
-  //                         if (end_date != null) {
-  //                           filterPass = filterPass && (new Date(end_date) >= date)
-  //                         }
-  //                         return filterPass
-  //                    }).map((row) => ({
-  //                        typecode: row.patientID.idTypeCode,
-  //                        patientId: row.patientID.idNumber,
-  //                        firstname: row.firstName,
-  //                        surname: row.surName,
-  //                        sex: row.sex,
-  //                        dob: row.dateOfBirth,
-  //                        age: calculate_age(row.dateOfBirth),
-  //                        testType: "VL",
-  //                        sampleId: row.sampleID,
-  //                        sampleType: row.sampleType,
-  //                        orderby: row.sampleOrderedBy,
-  //                        orderbydate: row.sampleOrderDate,
-  //                        collectedby: row.sampleCollectedBy,
-  //                        datecollected: row.sampleCollectionDate,
-  //                        timecollected: row.sampleCollectionTime
-  //                      })),
-  //                      page: query.page,
-  //                      totalCount: result.data.totalRecords
-  //                  })
-  //                  }
-  //              })
-  //         })
-
   useEffect(() => {
     setLoading("true");
     loadManifestData();
@@ -266,14 +214,6 @@ const SampleSearch = (props) => {
     <div>
       <Card>
         <Card.Body>
-          {config.length !== 0 ? (
-            " "
-          ) : (
-            <Alert variant="danger">
-              Och kindly set up LIMS server configurations to enable you
-              proceed!!!
-            </Alert>
-          )}
           <Grid container spacing={2}>
             <LocalizationProvider
               dateAdapter={AdapterDayjs}
@@ -293,42 +233,6 @@ const SampleSearch = (props) => {
                 )}
               />
             </LocalizationProvider>
-
-            {/*   <Grid item xs={2}>
-                   <FormGroup>
-                       <Label for="startDate" className={classes.label}>Start date</Label>
-
-                       <Input
-                           type="date"
-                           name="startDate"
-
-                           id="startDate"
-                           placeholder="Start Date"
-                           onChange={handleChange}
-                           className={classes.input}
-                       />
-                   </FormGroup>
-              </Grid>
-              <Grid item xs={2}>
-                    <FormGroup>
-                      <Label for="endDate" className={classes.label}>End date</Label>
-
-                      <Input
-                          type="date"
-                          name="endDate"
-
-                          id="endDate"
-                          placeholder="End Date"
-                          onChange={handleChange}
-                          className={classes.input}
-                      />
-                  </FormGroup>
-              </Grid>
-
-              <Grid item xs={2}>
-
-              </Grid>
-              */}
           </Grid>
           <br />
           <MaterialTable
@@ -373,7 +277,7 @@ const SampleSearch = (props) => {
                 filtering: false,
               },
             ]}
-            isLoading={loading}
+            //isLoading={loading}
             // data={handlePulledData}
             data={values
               .filter((row) => {

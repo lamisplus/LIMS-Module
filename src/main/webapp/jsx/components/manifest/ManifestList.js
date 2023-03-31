@@ -1,15 +1,14 @@
 import React, { useEffect, useCallback, useState } from "react";
+import { Link } from "react-router-dom";
 import MaterialTable from "material-table";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  MdModeEdit,
-} from "react-icons/md";
+import { MdModeEdit } from "react-icons/md";
+import MatButton from "@material-ui/core/Button";
+import AddCardIcon from "@mui/icons-material/AddCard";
 
 import SplitActionButton from "../SampleCollection/SplitActionButton";
 
-import {
-  Badge,
-} from "reactstrap";
+import { Badge } from "reactstrap";
 
 import "../SampleCollection/sample.css";
 
@@ -108,7 +107,7 @@ const DownloadManifest = (props) => {
   const classes = useStyles();
   const [loading, setLoading] = useState("");
   const [permissions, setPermissions] = useState([]);
-  const [config, setConfig] = useState([]);
+  const [config, setConfig] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
 
   const userPermission = () => {
@@ -123,10 +122,10 @@ const DownloadManifest = (props) => {
 
   const loadConfig = useCallback(async () => {
     try {
-      const response = await axios.get(`${url}lims/configs`, {
+      const response = await axios.get(`${url}lims/config`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      //console.log("configs", response);
+      console.log("configs", response);
       setConfig(response.data);
       setLoading(false);
     } catch (e) {
@@ -217,7 +216,12 @@ const DownloadManifest = (props) => {
                   row.manifestStatus === "Ready" ? (
                     <Badge color="secondary">Not Submitted</Badge>
                   ) : (
-                    <Badge color="success">{row.manifestStatus}</Badge>
+                    <Badge
+                      color="#013220"
+                      style={{ backgroundColor: "#006400", color: "#fff" }}
+                    >
+                      {row.manifestStatus}
+                    </Badge>
                   ),
                 actions: (
                   <>
@@ -245,6 +249,22 @@ const DownloadManifest = (props) => {
   return (
     <>
       <div>
+        {Object.keys(config).length !== 0 ? (
+          <p style={{ textAlign: "right" }}>
+            <Link color="inherit" to={{ pathname: "/create-manifest" }}>
+              <MatButton
+                variant="contained"
+                color="primary"
+                startIcon={<AddCardIcon />}
+                style={{ backgroundColor: "#014d88", color: "#fff" }}
+              >
+                Create Manifest
+              </MatButton>
+            </Link>
+          </p>
+        ) : (
+          ""
+        )}
         <MaterialTable
           icons={tableIcons}
           title="Previous Manifests"

@@ -1,8 +1,4 @@
-import React, {
-  useEffect,
-  useCallback,
-  useState,
-} from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Row, Col, Card, Table } from "react-bootstrap";
 
@@ -11,12 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import Alert from "react-bootstrap/Alert";
 
-import {
-  Form,
-  FormGroup,
-  Input,
-  Label
-} from "reactstrap";
+import { Form, FormGroup, Input, Label } from "reactstrap";
 
 import "./sample.css";
 import axios from "axios";
@@ -102,6 +93,21 @@ const Login = (props) => {
   });
 
   const [logins, setLogins] = useState({});
+  const [facilities, setFacilities] = useState([]);
+
+  const Facilities = () => {
+    axios
+      .get(`${url}account`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        //console.log(response.data);
+        setFacilities(response.data.applicationUserOrganisationUnits);
+      })
+      .catch((error) => {
+        //console.log(error);
+      });
+  };
 
   const loadServerDetails = useCallback(async () => {
     try {
@@ -120,12 +126,21 @@ const Login = (props) => {
   }, []);
 
   useEffect(() => {
+    Facilities();
     loadServerDetails();
   }, [loadServerDetails]);
+
+  const getFacilityDatim = (facilityId) => {
+    console.log(facilityId);
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     //console.log(name, value)
+    if (name === "testFacilityName") {
+      getFacilityDatim(value);
+    }
+
     if (name === "configName" && value === "Server") {
       setDemo(true);
     } else if (name === "configName" && value === "Live Server") {
@@ -174,7 +189,7 @@ const Login = (props) => {
             });
           });
 
-          loadServerDetails();
+        loadServerDetails();
       }
     } catch (e) {
       toast.error("An error occurred while saving LIMS Credentials", {
@@ -327,6 +342,46 @@ const Login = (props) => {
                       <>
                         <FormGroup>
                           <Label
+                            for="testFacilityName"
+                            className={classes.label}
+                          >
+                            Facility Name
+                          </Label>
+                          <select
+                            className="form-control"
+                            name="testFacilityName"
+                            id="testFacilityName"
+                            onChange={handleChange}
+                            style={{
+                              border: "1px solid #014d88",
+                              borderRadius: "0px",
+                              fontSize: "14px",
+                              color: "#000",
+                            }}
+                          >
+                            <option value={""}></option>
+                            {facilities.map((value) => (
+                              <option
+                                key={value.id}
+                                value={value.organisationUnitName}
+                              >
+                                {value.organisationUnitName}
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* <Input
+                            type="text"
+                            name="testFacilityName"
+                            id="testFacilityName"
+                            placeholder="Testing Facility Name"
+                            className={classes.input}
+                            onChange={handleChange}
+                            value={login.testFacilityName}
+                          /> */}
+                        </FormGroup>
+                        <FormGroup>
+                          <Label
                             for="testFacilityDATIMCode"
                             className={classes.label}
                           >
@@ -341,25 +396,6 @@ const Login = (props) => {
                             className={classes.input}
                             onChange={handleChange}
                             value={login.testFacilityDATIMCode}
-                          />
-                        </FormGroup>
-
-                        <FormGroup>
-                          <Label
-                            for="testFacilityName"
-                            className={classes.label}
-                          >
-                            Testing Facility Name
-                          </Label>
-
-                          <Input
-                            type="text"
-                            name="testFacilityName"
-                            id="testFacilityName"
-                            placeholder="Testing Facility Name"
-                            className={classes.input}
-                            onChange={handleChange}
-                            value={login.testFacilityName}
                           />
                         </FormGroup>
                       </>
@@ -396,21 +432,21 @@ const Login = (props) => {
                       </tr>
                     </thead>
                     <tbody style={{ textAlign: "center" }}>
-                          <tr key={logins.id}>
-                            <td>{logins.id}</td>
-                            <td>{logins.configName}</td>
-                            <td>{logins.serverUrl}</td>
-                            <td>{logins.configEmail}</td>
-                            {/*<td>09/09/2022</td>*/}
-                            <td>
-                              <Button
-                                variant="contained"
-                                color="error"
-                                startIcon={<DeleteIcon />}
-                                onClick={(e) => deleteConfig(e, logins.id)}
-                              ></Button>
-                            </td>
-                          </tr>
+                      <tr key={logins.id}>
+                        <td>{logins.id}</td>
+                        <td>{logins.configName}</td>
+                        <td>{logins.serverUrl}</td>
+                        <td>{logins.configEmail}</td>
+                        {/*<td>09/09/2022</td>*/}
+                        <td>
+                          <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            onClick={(e) => deleteConfig(e, logins.id)}
+                          ></Button>
+                        </td>
+                      </tr>
                     </tbody>
                   </Table>
                 </Col>

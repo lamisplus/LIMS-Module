@@ -11,7 +11,8 @@ import ManifestPrint from "./ManifestPrint";
 import MatButton from "@material-ui/core/Button";
 import PrintIcon from "@mui/icons-material/Print";
 import { useReactToPrint } from "react-to-print";
-import HomeIcon from "@mui/icons-material/Home";
+import ReplyIcon from "@mui/icons-material/Reply";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import SendIcon from "@mui/icons-material/Send";
 import ConfigModal from "../SampleCollection/ConfigModal";
 
@@ -167,10 +168,13 @@ const PrintManifest = (props) => {
                   <MatButton
                     variant="contained"
                     color="primary"
-                    className={classes.button}
-                    startIcon={<HomeIcon />}
+                    style={{
+                      backgroundColor: "rgb(153, 46, 98)",
+                      color: "#fff",
+                    }}
+                    startIcon={<ReplyIcon />}
                   >
-                    back Home
+                    back
                   </MatButton>
                 </Link>
                 <Link
@@ -184,7 +188,8 @@ const PrintManifest = (props) => {
                     variant="contained"
                     color="secondary"
                     className={classes.button}
-                    startIcon={<HomeIcon />}
+                    style={{ backgroundColor: "#014d88", color: "#fff" }}
+                    startIcon={<ListAltIcon />}
                   >
                     Results
                   </MatButton>

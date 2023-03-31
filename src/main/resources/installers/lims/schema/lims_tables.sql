@@ -101,11 +101,3 @@ CREATE TABLE public.lims_result
 );
 ALTER SEQUENCE lims_result_id_seq OWNED BY lims_result.id;
 
-CREATE SEQUENCE lims_pcr_lab_id_seq;
-CREATE TABLE public.lims_pcr_lab
-(
-    id bigint NOT NULL DEFAULT nextval('lims_config_id_seq'),
-    name character varying(100),
-    lab_no character varying(100),
-    PRIMARY KEY (id)
-);

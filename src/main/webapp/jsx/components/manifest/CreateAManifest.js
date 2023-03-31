@@ -129,7 +129,7 @@ const CreateAManifest = (props) => {
 
   const pcrLab = useCallback(async () => {
       try {
-        const response = await axios.get(`${url}lims/get-prclabs/`, {
+        const response = await axios.get(`${url}laboratory/get-prclabs/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         //console.log("pcrlab", response)

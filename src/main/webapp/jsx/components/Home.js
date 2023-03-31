@@ -64,18 +64,18 @@ const Home = (props) => {
                   <Tab eventKey="manifest-list" title="Manifest List">
                     <ManifestList />
                   </Tab>
-                  {permissions.includes("create_manifest") ||
+                  {/* {permissions.includes("create_manifest") ||
                     (permissions.includes("all_permission") && (
                       <Tab eventKey="collection" title="Create Manifest">
                         <SampleCollection />
                       </Tab>
-                    ))}
+                    ))} */}
                   {permissions.includes("create_manifest") ||
-                  (permissions.includes("all_permission") && (
-                    <Tab eventKey="tracker" title="Samples Tracker">
-                      <SamplesTracker />
-                    </Tab>
-                  ))}
+                    (permissions.includes("all_permission") && (
+                      <Tab eventKey="tracker" title="Samples Tracker">
+                        <SamplesTracker />
+                      </Tab>
+                    ))}
                   {permissions.includes("set_configuration") ||
                     (permissions.includes("all_permission") && (
                       <Tab eventKey="config" title="Configuration">
