@@ -1,6 +1,6 @@
 basePackage: org.lamisplus.modules.lims
 name: LimsModule
-dependencies: {PatientModule: 1.0.0, LaboratoryModule: 1.0.0 }
+dependencies: {PatientModule: 2.0.2.2023.4, LaboratoryModule: 2.0.2.2023.4 }
 menus:
   - icon: fa fa-vial-virus
     disabled: false
