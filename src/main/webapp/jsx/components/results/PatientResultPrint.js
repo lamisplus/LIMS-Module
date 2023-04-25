@@ -85,6 +85,8 @@ const PatientResultPrint = (props) => {
 
   const patientResults = location && location.state ? location.state.data : {};
 
+  console.log(patientResults)
+
   const [patientInfo, setPatientInfo] = useState({});
 
   const componentRef = useRef();
