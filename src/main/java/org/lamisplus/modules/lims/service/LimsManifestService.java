@@ -153,8 +153,8 @@ public class LimsManifestService {
     }
 
     private String GenerateManifestID(String FacilityCode){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HHmmss");
-        return FacilityCode +"/"+ LocalDateTime.now().format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+        return FacilityCode +"-"+ LocalDateTime.now().format(formatter);
     }
 
     private void LogInfo(String title, Object object) {
