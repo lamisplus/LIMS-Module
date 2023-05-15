@@ -28,7 +28,7 @@ public class LIMSResultDTO {
     private String transferStatus;
     private String testedBy;
     private String approvedBy;
-    private String dateTransferredOut;
+    //private String dateTransferredOut;
     private String reasonNotTested;
     private String otherRejectionReason;
     private String sendingPcrLabID;
