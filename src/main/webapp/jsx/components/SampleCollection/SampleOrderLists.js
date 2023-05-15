@@ -240,13 +240,13 @@ const SampleSearch = (props) => {
             title="Sample Collection List"
             tableRef={tableRef}
             columns={[
-              { title: "Type code", field: "typecode" },
+              { title: "Type code", field: "typecode", hidden: true },
               { title: "Hospital ID", field: "patientId" },
-              { title: "First Name", field: "firstname" },
-              { title: "Surname", field: "surname" },
-              { title: "Sex", field: "sex" },
-              { title: "DOB", field: "dob" },
-              { title: "Age", field: "age" },
+              { title: "First Name", field: "firstname", hidden: true },
+              { title: "Surname", field: "surname", hidden: true },
+              { title: "Sex", field: "sex", hidden: true },
+              { title: "DOB", field: "dob", hidden: true },
+              { title: "Age", field: "age", hidden: true },
               {
                 title: "Test Type",
                 field: "testType",
@@ -258,23 +258,23 @@ const SampleSearch = (props) => {
               },
               { title: "Sample Orderby", field: "orderby" },
               {
-                title: "Orderby Date",
+                title: "Order Date",
                 field: "orderbydate",
                 type: "date",
-                filtering: false,
+                //hidden: true,
               },
               { title: "Collected By", field: "collectedby" },
               {
                 title: "Date Collected",
                 field: "datecollected",
                 type: "date",
-                filtering: false,
+                hidden: true,
               },
               {
                 title: "Time Collected",
                 field: "timecollected",
                 type: "time",
-                filtering: false,
+                hidden: true,
               },
             ]}
             //isLoading={loading}
