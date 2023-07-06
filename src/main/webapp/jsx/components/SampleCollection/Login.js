@@ -174,7 +174,7 @@ const Login = (props) => {
           })
           .then((resp) => {
             console.log("login details", resp);
-
+            props.setConfig(resp.data);
             toast.success("LIMS Credentials saved successfully!!", {
               position: toast.POSITION.TOP_RIGHT,
             });
@@ -190,6 +190,7 @@ const Login = (props) => {
           });
 
         loadServerDetails();
+        props.setKey("manifest-list");
       }
     } catch (e) {
       toast.error("An error occurred while saving LIMS Credentials", {
@@ -208,6 +209,7 @@ const Login = (props) => {
       });
       console.log(" delete config", response);
       loadServerDetails();
+      props.setConfig({});
       toast.success("LIMS Credentials deleted successfully!!", {
         position: toast.POSITION.TOP_RIGHT,
       });
@@ -385,7 +387,7 @@ const Login = (props) => {
                             for="testFacilityDATIMCode"
                             className={classes.label}
                           >
-                            Testing Facility Datim Code
+                            Facility Datim Code
                           </Label>
 
                           <Input

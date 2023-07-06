@@ -5,6 +5,7 @@ import "./sample.css";
 import { format } from "date-fns";
 import Alert from "react-bootstrap/Alert";
 import uniq from "lodash/uniq";
+import { Spinner } from "reactstrap";
 
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -212,6 +213,14 @@ const SampleSearch = (props) => {
 
   return (
     <div>
+      {values.length <= 0 ? (
+        <p>
+          {" "}
+          <Spinner color="primary" /> loading Patient Samples...
+        </p>
+      ) : (
+        " "
+      )}
       <Card>
         <Card.Body>
           <Grid container spacing={2}>
@@ -277,7 +286,7 @@ const SampleSearch = (props) => {
                 hidden: true,
               },
             ]}
-            //isLoading={loading}
+            isLoading={loading}
             // data={handlePulledData}
             data={values
               .filter((row) => {

@@ -16,6 +16,7 @@ const divStyle = {
 
 const Home = (props) => {
   const [key, setKey] = useState("manifest-list");
+  const [config, setConfig] = useState({});
 
   const urlTabs =
     props.location && props.location.state ? props.location.state : null;
@@ -62,7 +63,7 @@ const Home = (props) => {
                   className="mb-3"
                 >
                   <Tab eventKey="manifest-list" title="Manifest List">
-                    <ManifestList />
+                    <ManifestList config={config} setConfig={setConfig} />
                   </Tab>
                   {/* {permissions.includes("create_manifest") ||
                     (permissions.includes("all_permission") && (
@@ -79,7 +80,11 @@ const Home = (props) => {
                   {permissions.includes("set_configuration") ||
                     (permissions.includes("all_permission") && (
                       <Tab eventKey="config" title="Configuration">
-                        <Login />
+                        <Login
+                          setKey={setKey}
+                          config={config}
+                          setConfig={setConfig}
+                        />
                       </Tab>
                     ))}
                 </Tabs>

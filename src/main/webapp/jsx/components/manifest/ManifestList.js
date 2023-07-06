@@ -107,7 +107,7 @@ const DownloadManifest = (props) => {
   const classes = useStyles();
   const [loading, setLoading] = useState("");
   const [permissions, setPermissions] = useState([]);
-  const [config, setConfig] = useState({});
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const userPermission = () => {
@@ -126,7 +126,7 @@ const DownloadManifest = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("configs", response);
-      setConfig(response.data);
+      props.setConfig(response.data);
       setLoading(false);
     } catch (e) {
       toast.error("An error occurred while fetching config details", {
@@ -249,7 +249,7 @@ const DownloadManifest = (props) => {
   return (
     <>
       <div>
-        {Object.keys(config).length !== 0 ? (
+        {Object.keys(props.config).length !== 0 ? (
           <p style={{ textAlign: "right" }}>
             <Link color="inherit" to={{ pathname: "/create-manifest" }}>
               <MatButton
