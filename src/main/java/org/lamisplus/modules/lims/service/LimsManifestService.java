@@ -153,8 +153,8 @@ public class LimsManifestService {
     }
 
     private String GenerateManifestID(String FacilityCode){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd/HHmmss");
-        return FacilityCode +"/"+ LocalDateTime.now().format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+        return FacilityCode +"-"+ LocalDateTime.now().format(formatter);
     }
 
     private void LogInfo(String title, Object object) {
@@ -372,7 +372,7 @@ public class LimsManifestService {
                     allManifestDto.setTransferStatus(limsResult.getTransferStatus());
                     allManifestDto.setTestedBy(limsResult.getTestedBy());
                     allManifestDto.setApprovedBy(limsResult.getApprovedBy());
-                    allManifestDto.setDateTransferredOut(limsResult.getDateTransferredOut());
+                    allManifestDto.setDateTransferredOut(limsResult.getDate_Transferred_Out());
                     allManifestDto.setReasonNotTested(limsResult.getReasonNotTested());
                     allManifestDto.setOtherRejectionReason(limsResult.getOtherRejectionReason());
                     allManifestDto.setSendingPcrLabID(limsResult.getSendingPcrLabID());
@@ -467,7 +467,7 @@ public class LimsManifestService {
                 allManifestDto.setTransferStatus(limsResult.getTransferStatus());
                 allManifestDto.setTestedBy(limsResult.getTestedBy());
                 allManifestDto.setApprovedBy(limsResult.getApprovedBy());
-                allManifestDto.setDateTransferredOut(limsResult.getDateTransferredOut());
+                allManifestDto.setDateTransferredOut(limsResult.getDate_Transferred_Out());
                 allManifestDto.setReasonNotTested(limsResult.getReasonNotTested());
                 allManifestDto.setOtherRejectionReason(limsResult.getOtherRejectionReason());
                 allManifestDto.setSendingPcrLabID(limsResult.getSendingPcrLabID());

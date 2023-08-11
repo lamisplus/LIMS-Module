@@ -26,12 +26,17 @@ public class LIMSResultDTO {
     private Integer manifestRecordID;
 
     private String transferStatus;
-    private String  testedBy;
+    private String testedBy;
     private String approvedBy;
-    private String dateTransferredOut;
+    //private String dateTransferredOut;
     private String reasonNotTested;
     private String otherRejectionReason;
     private String sendingPcrLabID;
     private String sendingPcrLabName;
 
+    private String Secondary_PCR_Lab_ID;
+    private String Secondary_PCR_Lab_Name;
+    private String Date_Transferred_Out;
+    private String rejectionReason;
 }
+

@@ -49,8 +49,8 @@ public class LIMSResult {
     private String  testedBy;
     @Column(name = "approved_by")
     private String approvedBy;
-    @Column(name = "date_transferred_out")
-    private String dateTransferredOut;
+    //@Column(name = "date_transferred_out")
+    //private String dateTransferredOut;
     @Column(name = "reason_not_tested")
     private String reasonNotTested;
     @Column(name = "other_rejection_reason")
@@ -59,4 +59,13 @@ public class LIMSResult {
     private String sendingPcrLabID;
     @Column(name = "sending_pcr_lab_name")
     private String sendingPcrLabName;
+
+    @Column(name = "secondary_pcr_lab_id")
+    private String Secondary_PCR_Lab_ID;
+    @Column(name = "secondary_pcr_lab_name")
+    private String Secondary_PCR_Lab_Name;
+    @Column(name = "date_transferred_out")
+    private String Date_Transferred_Out;
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
 }

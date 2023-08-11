@@ -86,7 +86,9 @@ function SampleCollection() {
       </Stepper>
       <br />
       <>
-        {permissions.includes("all_permission") ? (
+        {permissions.includes("all_permission") ||
+        permissions.includes("create_manifest") ||
+        permissions.includes("view_manifest") ? (
           <Stack
             direction="row"
             spacing={2}
