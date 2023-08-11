@@ -85,7 +85,7 @@ const PatientResultPrint = (props) => {
 
   const patientResults = location && location.state ? location.state.data : {};
 
-  console.log(patientResults)
+  //console.log(patientResults)
 
   const [patientInfo, setPatientInfo] = useState({});
 

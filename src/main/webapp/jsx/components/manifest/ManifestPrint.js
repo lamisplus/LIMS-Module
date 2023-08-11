@@ -18,7 +18,7 @@ const print = {
 
 class ManifestPrint extends React.Component {
   render() {
-    //console.log(this.props.sampleObj)
+    // console.log(this.props.sampleObj);
     return (
       <Card>
         <CardBody>
@@ -105,6 +105,9 @@ class ManifestPrint extends React.Component {
                 <tr>
                   <th>Facility</th>
                   <th>Patient ID</th>
+                  <th>Name</th>
+                  <th>Age</th>
+                  <th>Sex</th>
                   <th>Sample ID</th>
                   <th>Sample Type</th>
                   <th>Date Collected</th>
@@ -115,7 +118,11 @@ class ManifestPrint extends React.Component {
                   this.props.sampleObj.sampleInformation.map((data, i) => (
                     <tr key={i}>
                       <td>{this.props.sampleObj.sendingFacilityName}</td>
+
                       <td>{data.patientID[0].idNumber}</td>
+                      <td>{data.surName + " " + data.firstName}</td>
+                      <td>{data.age}</td>
+                      <td>{data.sex}</td>
                       <td>{data.sampleID}</td>
                       <td>{data.sampleType}</td>
                       <td>{data.sampleCollectionDate}</td>
